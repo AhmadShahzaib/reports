@@ -1,0 +1,8 @@
+vehicle,state,identified,unidentified,total
+"1996","Punjab",13,0,13
+"1996","Chicago",0,0,0
+"1996","GRW",16,12,28
+"1997","Punjab",19,1,20
+"1997","Chicago",35,0,35
+"1997","GRW",0,23242,23242
+"Total","",83,23255,23338
