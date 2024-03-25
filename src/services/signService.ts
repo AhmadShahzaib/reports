@@ -106,9 +106,4 @@ export class SignService {
       throw err;
     }
   };
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> fcc3cc2dcf6337396fed0392a295588da4bdd2b1

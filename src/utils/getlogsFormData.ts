@@ -85,20 +85,14 @@ export let getLogsFormData = async (
     formData['distance'] = distance;
 
     console.log("\n\n\n\n ::" + data)
-<<<<<<< HEAD
     let mostRecent;
     let notPresentLogform = false;
 
-=======
-    let mostRecent
-    let notPresentLogform = false
->>>>>>> fcc3cc2dcf6337396fed0392a295588da4bdd2b1
     if (data && data['_doc'] && data['_doc']['trailerNumber']) {
       formData['trailerNumber'] = data['_doc']['trailerNumber'];
     } else {
       mostRecent = await serviceSign.findLogFormMostRecent(id, date, companyTimeZone);
       // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
-<<<<<<< HEAD
       notPresentLogform = true;
 
       if (
@@ -129,22 +123,10 @@ export let getLogsFormData = async (
       }
     }
 
-=======
-      notPresentLogform =true
-      if (mostRecent && mostRecent['_doc'] && mostRecent['_doc']['trailerNumber']) {
-        formData['trailerNumber'] = mostRecent['_doc']['trailerNumber'][mostRecent['_doc']['trailerNumber'].length-1]; // or provide a default value
-
-      }else{
-        formData['trailerNumber'] =[]
-      }
-    }
-    
->>>>>>> fcc3cc2dcf6337396fed0392a295588da4bdd2b1
     if (data && data['_doc'] && data['_doc']['shippingDocument']) {
       formData['shippingDocument'] = data['_doc']['shippingDocument'];
     } else {
       // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
-<<<<<<< HEAD
       mostRecent = await serviceSign.findLogFormMostRecent(
         id,
         date,
@@ -185,19 +167,6 @@ export let getLogsFormData = async (
     }
 
     return { logForm: formData, notPresentLogform: notPresentLogform };
-=======
-      mostRecent = await serviceSign.findLogFormMostRecent(id, date, companyTimeZone);
-      notPresentLogform =true
-      if (mostRecent && mostRecent['_doc'] && mostRecent['_doc']['shippingDocument']) {
-        formData['shippingDocument'] = mostRecent['_doc']['shippingDocument'][mostRecent['_doc']['shippingDocument'].length-1]; // or provide a default value
-
-      }else{
-        formData['shippingDocument'] =[]
-      }
-    }
-    
-    return {logForm:formData, notPresentLogform:notPresentLogform};
->>>>>>> fcc3cc2dcf6337396fed0392a295588da4bdd2b1
   } catch (err) {
     throw err;
   }
