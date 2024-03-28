@@ -234,7 +234,7 @@ export class AppController extends BaseController {
   }
   @GetAllInspectionDecorators()
   async getAllInspectionList(
-    // @Param('driverId', MongoIdValidationPipe) driverId: string,
+    @Param('driverId', MongoIdValidationPipe) driverId: string,
     // @Query('date') date: string = moment().format('YYYY-MM-DD'),
     @Res() response: Response,
     @Req() request: Request,
@@ -247,10 +247,10 @@ export class AppController extends BaseController {
       //   companyTimeZone,
       // );
 
-      const options = {}
-      //   driverId: driverId,
+      const options = {
+        driverId: driverId,
       //   inspectionTime: { $gt: startOfDay, $lt: endOfDay },
-      // };
+      };
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
       // Logger.log(`getInspectionList was called with params: ${driverId}`);

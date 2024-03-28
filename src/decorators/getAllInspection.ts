@@ -78,8 +78,8 @@ export default function GetAllInspectionDecorators() {
     ],
   };
 
-  const GetInspectionDecorators: Array<CombineDecoratorType> = [
-    Get(''),
+  const GetAllInspectionDecorators: Array<CombineDecoratorType> = [
+    Get('all/:driverId'),
     SetMetadata('permissions', [USER.ADD, INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiParam({
@@ -99,5 +99,5 @@ export default function GetAllInspectionDecorators() {
       },
     }),
   ];
-  return CombineDecorators(GetInspectionDecorators);
+  return CombineDecorators(GetAllInspectionDecorators);
 }
