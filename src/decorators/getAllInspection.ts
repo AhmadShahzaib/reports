@@ -79,15 +79,15 @@ export default function GetAllInspectionDecorators() {
   };
 
   const GetAllInspectionDecorators: Array<CombineDecoratorType> = [
-    Get('all'),
+    Get(''),
     SetMetadata('permissions', [USER.ADD, INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
-    ApiParam({
-      name: 'driverId',
-      description: 'Driver id (system generated id) is required.',
-      example: '',
-      required: true,
-    }),
+    // ApiParam({
+    //   name: 'driverId',
+    //   description: 'Driver id (system generated id) is required.',
+    //   example: '',
+    //   required: true,
+    // }),
     ApiResponse({
       status: HttpStatus.OK,
       content: {
