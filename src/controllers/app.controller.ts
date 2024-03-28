@@ -234,26 +234,18 @@ export class AppController extends BaseController {
   }
   @GetAllInspectionDecorators()
   async getAllInspectionList(
-    // @Param('driverId', MongoIdValidationPipe) driverId: string,
-    // @Query('date') date: string = moment().format('YYYY-MM-DD'),
     @Res() response: Response,
     @Req() request: Request,
   ) {
     try {
       const { companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
-      // const { start: startOfDay, end: endOfDay } = getTimeZoneDateRangeForDay(
-      //   date,
-      //   companyTimeZone,
-      // );
+     
 
-      const options = {
-        // driverId: driverId,
-      //   inspectionTime: { $gt: startOfDay, $lt: endOfDay },
-      };
+      const options = {};
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
-      // Logger.log(`getInspectionList was called with params: ${driverId}`);
+      
       const inspections = await this.tripInspectionService.find(options);
       if (inspections && Object.keys(inspections).length > 0) {
         for (const inspection of inspections) {
