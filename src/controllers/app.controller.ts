@@ -114,6 +114,7 @@ import certificationMobileDecorators from 'decorators/certificationMobileDecorat
 import { generateEditPdf } from 'utils/genrateEditReport';
 import { getEventPower } from 'utils/eventPower';
 import { getCertificationCheck } from 'utils/eventCertification';
+// import { Query } from 'mongoose';
 // import { signature } from '../../../logEld-TenantBackendMicroservices-Units-Future/src/models/signaturesModel';
 
 // // Register fonts
@@ -234,21 +235,40 @@ export class AppController extends BaseController {
   }
   @GetAllInspectionDecorators()
   async getAllInspectionList(
+    @Query(ListingParamsValidationPipe) queryParams: ListingParams,
     @Res() response: Response,
     @Req() request: Request,
   ) {
     try {
       const { companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
-     
-
-      const options = {};
+        const options = {};
+        const { search, orderBy, orderType, pageNo, limit } = queryParams;
+        const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+        options['$and'] = [{tenantId:id}]
+        if (search) {
+          options['$or'] = [];
+          iftaSearchables.forEach((attribute) => {
+            options['$or'].push({ [attribute]: new RegExp(search, 'i') });
+          });
+        }
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
       
-      const inspections = await this.tripInspectionService.find(options);
-      if (inspections && Object.keys(inspections).length > 0) {
-        for (const inspection of inspections) {
+      const newQuery: any = await this.tripInspectionService.find(options);
+
+      if (orderBy && sortableAttributes.includes(orderBy)) {
+        newQuery.collation({ locale: 'en' }).sort({ [orderBy]: orderType ?? 1 });
+      } else {
+        newQuery.sort({ createdAt: -1 });
+      }
+      let queryResponse;
+      if (!limit || !isNaN(limit)) {
+        newQuery.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
+      }
+      queryResponse = await newQuery.exec();
+      if (queryResponse && Object.keys(queryResponse).length > 0) {
+        for (const inspection of queryResponse) {
           list.push(new InspectionResponse(inspection));
         }
       }

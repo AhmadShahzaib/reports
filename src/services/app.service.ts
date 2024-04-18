@@ -97,13 +97,7 @@ export class AppService extends BaseService<TIDocument> {
 
   find = (options) => {
     try {
-      const query = this.tripInspectionModel.find(options).populate({
-        path: 'defectsCategory',
-        populate: {
-          path: 'vehicle.defects trailer.defects',
-          model: 'defects',
-        },
-      });
+      const query = this.tripInspectionModel.find(options);
       query.and([{ isDeleted: false, isActive: true }]);
       return query;
     } catch (err) {
@@ -111,6 +105,9 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
+
+
+  
   getGraphDataOnRange = async (
     driverId: string,
     startOfRange: number,
