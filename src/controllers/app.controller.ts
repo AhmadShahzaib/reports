@@ -242,31 +242,24 @@ export class AppController extends BaseController {
     try {
       const { companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
-        const options = {};
-        const { search, orderBy, orderType, pageNo, limit } = queryParams;
-        const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-        options['$and'] = [{tenantId:id}]
-        if (search) {
-          options['$or'] = [];
-          iftaSearchables.forEach((attribute) => {
-            options['$or'].push({ [attribute]: new RegExp(search, 'i') });
-          });
-        }
+      const options = {};
+      const { search, orderBy, orderType, pageNo, limit } = queryParams;
+      const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+      // options['$and'] = [{ tenantId: id }];
+      if (search) {
+        options['$or'] = [];
+        iftaSearchables.forEach((attribute) => {
+          options['$or'].push({ [attribute]: new RegExp(search, 'i') });
+        });
+      }
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
-      
-      const newQuery: any = await this.tripInspectionService.find(options);
 
-      if (orderBy && sortableAttributes.includes(orderBy)) {
-        newQuery.collation({ locale: 'en' }).sort({ [orderBy]: orderType ?? 1 });
-      } else {
-        newQuery.sort({ createdAt: -1 });
-      }
-      let queryResponse;
-      if (!limit || !isNaN(limit)) {
-        newQuery.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
-      }
-      queryResponse = await newQuery.exec();
+      const queryResponse = await this.tripInspectionService.findAllDvir(options,queryParams);
+
+     
+      // let queryResponse;
+      // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {
           list.push(new InspectionResponse(inspection));
@@ -1588,7 +1581,7 @@ export class AppController extends BaseController {
         createdAt: currentDateTime,
         pdf: base64PDF,
         csv: csv,
-        tenantId:tenantId,
+        tenantId: tenantId,
       });
 
       return response.status(HttpStatus.OK).send({
@@ -1606,14 +1599,14 @@ export class AppController extends BaseController {
   @GetAllIFTARecords()
   async getAllIftaReports(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
-    @Req() request : Request,
+    @Req() request: Request,
     @Res() response: Response,
   ) {
     try {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-options['$and'] = [{tenantId:id}]
+      options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
         iftaSearchables.forEach((attribute) => {
@@ -2782,11 +2775,11 @@ options['$and'] = [{tenantId:id}]
         tenantId,
         id,
       );
-      if(logFormRequest.trailerNumber || logFormRequest.shippingDocument){
-      const trilers = logFormRequest.trailerNumber+""
-      const shipings = logFormRequest.shippingDocument+""
-      requestLog.trailerNumber = JSON.parse(trilers);
-      requestLog.shippingDocument = JSON.parse(shipings);
+      if (logFormRequest.trailerNumber || logFormRequest.shippingDocument) {
+        const trilers = logFormRequest.trailerNumber + '';
+        const shipings = logFormRequest.shippingDocument + '';
+        requestLog.trailerNumber = JSON.parse(trilers);
+        requestLog.shippingDocument = JSON.parse(shipings);
       }
       let logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
@@ -2958,12 +2951,12 @@ options['$and'] = [{tenantId:id}]
         tenantId,
         driverId,
       );
-      if(logFormRequest.trailerNumber || logFormRequest.shippingDocument){
-        const trilers = logFormRequest.trailerNumber+""
-        const shipings = logFormRequest.shippingDocument+""
+      if (logFormRequest.trailerNumber || logFormRequest.shippingDocument) {
+        const trilers = logFormRequest.trailerNumber + '';
+        const shipings = logFormRequest.shippingDocument + '';
         requestLog.trailerNumber = JSON.parse(trilers);
         requestLog.shippingDocument = JSON.parse(shipings);
-        }
+      }
 
       let logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
@@ -3001,52 +2994,48 @@ options['$and'] = [{tenantId:id}]
         request.user ?? ({ tenantId: undefined } as any);
       Logger.log(`getInspectionList was called`);
       let logsOfSelectedDate =
-          await this.tripInspectionService.getLogsBetweenRange(
-            id,
-            date,
-            date,
-          );
-          let logFormData = await getLogsFormData(
-            date,
-            id,
-            this.tripInspectionService,
-            this.serviceSign,
-            this.awsService,
-            tenantId,
-            companyTimeZone,
-          );
-          let data = logFormData?.logForm
-          // if(logFormData.notPresentLogform){
-          //  const requestLog: LogFormRequest = new LogFormRequest();
-          //  requestLog.shippingDocument = (data as any)?.shippingDocument
-          //  requestLog.trailerNumber = (data as any)?.trailerNumber
-          //  requestLog.homeTerminalAddress = (data as any)?.homeTerminalAddress
-          //  let logResult = await this.serviceSign.UpdateLogForm(
-          //    requestLog,
-          //    id,
-          //    date,
-          //    true,
-          //    companyTimeZone,
-          //  );
-          //  console.log(logResult)
-          // }
-          if(logsOfSelectedDate.data[0]?.csv?.eldEventListForDriverCertificationOfOwnRecords.length==0){
-
-          
-     
-            if ("sign" in data) {
-              delete data.sign;
-            }
-      return response.status(HttpStatus.OK).send({
-        message: 'Log form data found',
-        data: data ?? {},
-      });
-    }else{  
-       return response.status(HttpStatus.OK).send({
-      message: 'Log form data found',
-      data: data ?? {},
-    });}
-
+        await this.tripInspectionService.getLogsBetweenRange(id, date, date);
+      let logFormData = await getLogsFormData(
+        date,
+        id,
+        this.tripInspectionService,
+        this.serviceSign,
+        this.awsService,
+        tenantId,
+        companyTimeZone,
+      );
+      let data = logFormData?.logForm;
+      // if(logFormData.notPresentLogform){
+      //  const requestLog: LogFormRequest = new LogFormRequest();
+      //  requestLog.shippingDocument = (data as any)?.shippingDocument
+      //  requestLog.trailerNumber = (data as any)?.trailerNumber
+      //  requestLog.homeTerminalAddress = (data as any)?.homeTerminalAddress
+      //  let logResult = await this.serviceSign.UpdateLogForm(
+      //    requestLog,
+      //    id,
+      //    date,
+      //    true,
+      //    companyTimeZone,
+      //  );
+      //  console.log(logResult)
+      // }
+      if (
+        logsOfSelectedDate.data[0]?.csv
+          ?.eldEventListForDriverCertificationOfOwnRecords.length == 0
+      ) {
+        if ('sign' in data) {
+          delete data.sign;
+        }
+        return response.status(HttpStatus.OK).send({
+          message: 'Log form data found',
+          data: data ?? {},
+        });
+      } else {
+        return response.status(HttpStatus.OK).send({
+          message: 'Log form data found',
+          data: data ?? {},
+        });
+      }
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
       throw err;
@@ -3056,7 +3045,7 @@ options['$and'] = [{tenantId:id}]
   @GetAllSubmittedRecords()
   async getAllSubmittedRecords(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
-    @Req() request : Request,
+    @Req() request: Request,
     @Res() response: Response,
   ) {
     try {
@@ -3156,8 +3145,8 @@ options['$and'] = [{tenantId:id}]
         tenantId,
         companyTimeZone,
       );
-      let data = logFormData?.logForm
-      Logger.log("Massege PAttern True \n\n\n" +logFormData.notPresentLogform)
+      let data = logFormData?.logForm;
+      Logger.log('Massege PAttern True \n\n\n' + logFormData.notPresentLogform);
       // if(logFormData.notPresentLogform){
       //   Logger.log("In IF")
       //  const requestLog: LogFormRequest = new LogFormRequest();
@@ -3174,29 +3163,29 @@ options['$and'] = [{tenantId:id}]
       // //  console.log(logResult)
       // }
       let logsOfSelectedDate =
-      await this.tripInspectionService.getLogsBetweenRange(
-        driverId,
-        date,
-        date,
-      );
- 
-      if(logsOfSelectedDate.data[0]?.csv?.eldEventListForDriverCertificationOfOwnRecords.length==0){
+        await this.tripInspectionService.getLogsBetweenRange(
+          driverId,
+          date,
+          date,
+        );
 
-      
- 
-        if ("sign" in data) {
+      if (
+        logsOfSelectedDate.data[0]?.csv
+          ?.eldEventListForDriverCertificationOfOwnRecords.length == 0
+      ) {
+        if ('sign' in data) {
           delete data.sign;
         }
-  return response.status(HttpStatus.OK).send({
-    message: 'Log form data found',
-    data: data ?? {},
-  });
-}else{  
-   return response.status(HttpStatus.OK).send({
-  message: 'Log form data found',
-  data: data ?? {},
-});
-}
+        return response.status(HttpStatus.OK).send({
+          message: 'Log form data found',
+          data: data ?? {},
+        });
+      } else {
+        return response.status(HttpStatus.OK).send({
+          message: 'Log form data found',
+          data: data ?? {},
+        });
+      }
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
       throw err;
@@ -3473,7 +3462,7 @@ options['$and'] = [{tenantId:id}]
           submissionID: resFmcsa.submissionId,
           errors: resFmcsa.errors,
           warnings: resFmcsa.warning,
-          tenantId:tenantId
+          tenantId: tenantId,
         });
         if (!fs.existsSync('./CSVList')) {
           fs.mkdirSync('./CSVList');
@@ -3645,7 +3634,7 @@ options['$and'] = [{tenantId:id}]
           getEventsCheckSum(certify);
           logsOfSelectedDate.data[0].csv.eldEventListForDriverCertificationOfOwnRecords =
             [certify];
-            // logsOfSelectedDate.data[0].meta.editRequest = true;
+          // logsOfSelectedDate.data[0].meta.editRequest = true;
           let update = await this.tripInspectionService.updateCertification(
             driverId,
             logsOfSelectedDate,
@@ -3655,15 +3644,7 @@ options['$and'] = [{tenantId:id}]
           requestLog.from = '';
           requestLog.to = '';
 
-
-
-
           // requestLog.shippingDocument = '';
-
-
-
-
-
 
           const signs = await splitSign(signature);
           requestLog.sign = signs;
@@ -3796,7 +3777,7 @@ options['$and'] = [{tenantId:id}]
             certificationArr.push(certify);
             logsOfSelectedDate.data[0].csv.eldEventListForDriverCertificationOfOwnRecords =
               certificationArr;
-              // logsOfSelectedDate.data[0].meta.editRequest = true;
+            // logsOfSelectedDate.data[0].meta.editRequest = true;
             let update = await this.tripInspectionService.updateCertification(
               driverId,
               logsOfSelectedDate,
@@ -3806,12 +3787,7 @@ options['$and'] = [{tenantId:id}]
             requestLog.from = '';
             requestLog.to = '';
 
-
-
             // requestLog.shippingDocument = '';
-
-
-
 
             const signs = await splitSign(signature);
             requestLog.sign = signs;
@@ -3843,15 +3819,23 @@ options['$and'] = [{tenantId:id}]
   @MessagePattern({ cmd: 'update_logform' })
   async updateLogForm(requestParam: any): Promise<any> {
     const requestLog: LogFormRequest = new LogFormRequest();
-    const { from, to, ship, signature, driverId, date, companyTimeZone,trailerNumber } =
-      requestParam;
+    const {
+      from,
+      to,
+      ship,
+      signature,
+      driverId,
+      date,
+      companyTimeZone,
+      trailerNumber,
+    } = requestParam;
     requestLog.from = from;
     requestLog.to = to;
     requestLog.shippingDocument = ship;
-    if(trailerNumber!=""){
-      requestLog.trailerNumber = trailerNumber
+    if (trailerNumber != '') {
+      requestLog.trailerNumber = trailerNumber;
     }
-    
+
     if (signature) {
       const signs = await splitSign(signature);
       requestLog.sign = signs;
@@ -4208,18 +4192,18 @@ options['$and'] = [{tenantId:id}]
       throw err;
     }
   }
-    // @UseInterceptors(new MessagePatternResponseInterceptor())
-    @MessagePattern({ cmd: 'get_logform' })
-    async getLogForm(dataRecive): Promise<any> {
-      let logResult = await getLogsFormData(
-        dataRecive.date,
-        dataRecive.driverId,
-        this.tripInspectionService,
-        this.serviceSign,
-        this.awsService,
-        dataRecive.tenantId,
-        dataRecive.companyTimeZone,
-      );
-      return { message: ' logform updated', data: logResult };
-    }
+  // @UseInterceptors(new MessagePatternResponseInterceptor())
+  @MessagePattern({ cmd: 'get_logform' })
+  async getLogForm(dataRecive): Promise<any> {
+    let logResult = await getLogsFormData(
+      dataRecive.date,
+      dataRecive.driverId,
+      this.tripInspectionService,
+      this.serviceSign,
+      this.awsService,
+      dataRecive.tenantId,
+      dataRecive.companyTimeZone,
+    );
+    return { message: ' logform updated', data: logResult };
+  }
 }
