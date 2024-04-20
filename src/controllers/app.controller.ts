@@ -258,7 +258,7 @@ export class AppController extends BaseController {
       const queryResponse = await this.tripInspectionService.findAllDvir(options,queryParams);
 
      
-      // let queryResponse;
+      let total = Object.keys(queryResponse).length;
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {
@@ -268,6 +268,14 @@ export class AppController extends BaseController {
       return response.status(HttpStatus.OK).send({
         message: 'Trip inspections found',
         data: list,
+        total,
+        pageNo: pageNo ?? 1,
+        last_page: Math.ceil(
+          total /
+            (limit && limit.toString().toLowerCase() === 'all'
+              ? total
+              : limit ?? 10),
+        ),
       });
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });

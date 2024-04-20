@@ -107,7 +107,7 @@ export class AppService extends BaseService<TIDocument> {
   };
   findAllDvir = (options, queryParams) => {
     try {
-      const { search, orderBy, orderType, pageNo, limit } = queryParams;
+      const { pageNo, limit } = queryParams;
 
       const query = this.tripInspectionModel.find(options);
       query.and([{ isDeleted: false, isActive: true }]);
@@ -119,6 +119,7 @@ export class AppService extends BaseService<TIDocument> {
       if (!limit || !isNaN(limit)) {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
+      
       return query;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
