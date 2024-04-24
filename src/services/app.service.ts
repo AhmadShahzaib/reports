@@ -97,13 +97,7 @@ export class AppService extends BaseService<TIDocument> {
 
   find = (options) => {
     try {
-      const query = this.tripInspectionModel.find(options).populate({
-        path: 'defectsCategory',
-        populate: {
-          path: 'vehicle.defects trailer.defects',
-          model: 'defects',
-        },
-      });
+      const query = this.tripInspectionModel.find(options);
       query.and([{ isDeleted: false, isActive: true }]);
       return query;
     } catch (err) {
@@ -111,6 +105,28 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
+  findAllDvir = (options, queryParams) => {
+    try {
+      const { pageNo, limit } = queryParams;
+
+      const query = this.tripInspectionModel.find(options);
+      query.and([{ isDeleted: false, isActive: true }]);
+      // if (orderBy && sortableAttributes.includes(orderBy)) {
+      //   query.collation({ locale: 'en' }).sort({ [orderBy]: orderType ?? 1 });
+      // } else {
+      //   query.sort({ createdAt: -1 });
+      // }
+      if (!limit || !isNaN(limit)) {
+        query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
+      }
+      
+      return query;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+
   getGraphDataOnRange = async (
     driverId: string,
     startOfRange: number,
@@ -214,7 +230,7 @@ export class AppService extends BaseService<TIDocument> {
     submissionID: string;
     errors: Array<any>;
     warnings: Array<any>;
-    tenantId:string;
+    tenantId: string;
   }) => {
     try {
       const query = this.eldSubmitionRecord.create(submitionDeatils);
@@ -233,7 +249,7 @@ export class AppService extends BaseService<TIDocument> {
     createdAt: string;
     pdf: string;
     csv: string;
-    tenantId:string;
+    tenantId: string;
   }) => {
     try {
       const query = this.iftaSubmissionRecord.create(submitionDeatils);
