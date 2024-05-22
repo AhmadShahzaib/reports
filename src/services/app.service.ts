@@ -147,6 +147,17 @@ export class AppService extends BaseService<TIDocument> {
       throw error;
     }
   };
+   notifyDriver = async (SpecificClient,
+    user,date,notificationObj)=>{
+      const GraphDataOnRange = await firstValueFrom(
+        this.client.send(
+          { cmd: 'call_sync' },
+          { SpecificClient,
+            user,date,notificationObj},
+        ),
+      );
+      return GraphDataOnRange;
+   }
   findGraph = (
     driverId: string,
     date: string,

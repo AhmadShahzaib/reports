@@ -2889,8 +2889,12 @@ export class AppController extends BaseController {
           mapMessagePatternResponseToException(messagePatternDriver);
         }
         const user = messagePatternDriver?.data;
-
-        const title = 'Certification added!';
+        let SpecificClient = user?.client
+        
+        
+     
+        // call message pattern here
+       
         const notificationObj = {
           logs: [],
           dateTime: '',
@@ -2903,17 +2907,13 @@ export class AppController extends BaseController {
           deviceType: user?.deviceType,
         };
         const isSilent = true;
-        await dispatchNotification(
-          title,
-          notificationObj,
-          deviceInfo,
-          this.pushNotificationClient,
-          isSilent,
-        );
+        this.tripInspectionService.notifyDriver( SpecificClient,
+          user,givenDates[0],notificationObj);
+       
         // END notification handler
 
         return response.status(HttpStatus.OK).send({
-          message: 'Certification is added Succefully  ',
+          message: 'Certification is added successfully  ',
           data: givenDates,
         });
       } else {
