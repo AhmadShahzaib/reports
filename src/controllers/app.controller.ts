@@ -255,9 +255,11 @@ export class AppController extends BaseController {
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
 
-      const queryResponse = await this.tripInspectionService.findAllDvir(options,queryParams);
+      const queryResponse = await this.tripInspectionService.findAllDvir(
+        options,
+        queryParams,
+      );
 
-     
       let total = Object.keys(queryResponse).length;
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
@@ -2889,12 +2891,10 @@ export class AppController extends BaseController {
           mapMessagePatternResponseToException(messagePatternDriver);
         }
         const user = messagePatternDriver?.data;
-        let SpecificClient = user?.client
-        
-        
-     
+        let SpecificClient = user?.client;
+
         // call message pattern here
-       
+
         const notificationObj = {
           logs: [],
           dateTime: '',
@@ -2907,9 +2907,13 @@ export class AppController extends BaseController {
           deviceType: user?.deviceType,
         };
         const isSilent = true;
-        this.tripInspectionService.notifyDriver( SpecificClient,
-          user,givenDates[0],notificationObj);
-       
+        this.tripInspectionService.notifyDriver(
+          SpecificClient,
+          user,
+          givenDates[0],
+          notificationObj,
+        );
+
         // END notification handler
 
         return response.status(HttpStatus.OK).send({
@@ -3176,23 +3180,26 @@ export class AppController extends BaseController {
           date,
           date,
         );
-        const csvOfDate=  logsOfSelectedDate.data[0];
-        const csvDataOfDutyStatus =
+      const csvOfDate = logsOfSelectedDate.data[0];
+      const csvDataOfDutyStatus =
         csvOfDate.csv.eldEventListForDriversRecordOfDutyStatus; // get all the duty statuses
-        csvDataOfDutyStatus.sort((a, b) =>
+      csvDataOfDutyStatus.sort((a, b) =>
         a.eventTime.localeCompare(b.eventTime),
       );
-    
+
       let shippingIds = [];
-      let trailerIds =[];
-      csvDataOfDutyStatus.forEach(record => {
+      let trailerIds = [];
+      csvDataOfDutyStatus.forEach((record) => {
         if (!shippingIds.includes(record.shippingId)) {
-            shippingIds.push(record.shippingId);
+          shippingIds.push(record.shippingId);
         }
         if (!trailerIds.includes(record.trailerId)) {
-            trailerIds.push(record.trailerId);
+          trailerIds.push(record.trailerId);
         }
-    });
+      });
+      data['shippingDocument'] = shippingIds;
+      data['trailerNumber'] = trailerIds;
+
       if (
         logsOfSelectedDate.data[0]?.csv
           ?.eldEventListForDriverCertificationOfOwnRecords.length == 0
