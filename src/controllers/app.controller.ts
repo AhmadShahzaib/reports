@@ -3197,8 +3197,10 @@ export class AppController extends BaseController {
           trailerIds.push(record.trailerId);
         }
       });
+      Logger.log("before shipping doc")
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
+      Logger.log("after shipping doc")
 
       if (
         logsOfSelectedDate.data[0]?.csv
