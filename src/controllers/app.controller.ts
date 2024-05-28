@@ -3176,7 +3176,23 @@ export class AppController extends BaseController {
           date,
           date,
         );
-
+        const csvOfDate=  logsOfSelectedDate.data[0];
+        const csvDataOfDutyStatus =
+        csvOfDate.csv.eldEventListForDriversRecordOfDutyStatus; // get all the duty statuses
+        csvDataOfDutyStatus.sort((a, b) =>
+        a.eventTime.localeCompare(b.eventTime),
+      );
+    
+      let shippingIds = [];
+      let trailerIds =[];
+      csvDataOfDutyStatus.forEach(record => {
+        if (!shippingIds.includes(record.shippingId)) {
+            shippingIds.push(record.shippingId);
+        }
+        if (!trailerIds.includes(record.trailerId)) {
+            trailerIds.push(record.trailerId);
+        }
+    });
       if (
         logsOfSelectedDate.data[0]?.csv
           ?.eldEventListForDriverCertificationOfOwnRecords.length == 0
