@@ -174,45 +174,61 @@ export class AppController extends BaseController {
           },
         },
       };
-Logger.log("adding image here");
-      let requestInspection = await imagesUpload(
-        files,
-        this.awsService,
-        defectRequest,
-        tenantId,
-        id,
-        this.tripInspectionService,
-      );
-      Logger.log("image added")
-      let unitData = await this.tripInspectionService.getUnitData(id);
-      Logger.log("unit data feched");
-      Logger.log(unitData);
-      requestInspection.vehicleManualId = `Vehicle1`;
+
+      Logger.log('adding image here');
+      let requestInspection;
+      try {
+        requestInspection = await imagesUpload(
+          files,
+          this.awsService,
+          defectRequest,
+          tenantId,
+          id,
+          this.tripInspectionService,
+        );
+      } catch (error) {
+        Logger.error('Error during image upload', error);
+        throw new InternalServerErrorException('Image upload failed');
+      }
+      Logger.log('image added');
+
+      // let unitData = await this.tripInspectionService.getUnitData(id);
       // requestInspection.vehicleManualId = unitData.manualVehicleId;
-      requestInspection.trailerNumber = 'trailer number';
       // requestInspection.trailerNumber = unitData.trailerNumber;
-      const addDefect = await this.tripInspectionService.addInspection(
-        requestInspection,
-      );
+      requestInspection.vehicleManualId = defectRequest.vehicleManualId;
+      requestInspection.trailerNumber = defectRequest.trailerNumber;
+
+      let addDefect;
+      try {
+        addDefect = await this.tripInspectionService.addInspection(
+          requestInspection,
+        );
+      } catch (error) {
+        Logger.error('Error adding inspection', error);
+        throw new InternalServerErrorException('Adding inspection failed');
+      }
+
       // let address = await getAddress(addDefect);
       Logger.log(`Inspection has been added successfully`);
 
       if (addDefect && Object.keys(addDefect).length > 0) {
-        let inspection = new InspectionResponse(addDefect);
-        Logger.log(`Inspection object done`);
+        Logger.log('Inspection object done');
         return response.status(HttpStatus.OK).send({
           message: 'Inspection has been added successfully',
-          data: inspection,
+          data: addDefect,
         });
       } else {
-        Logger.log(`Inspection not create`);
+        Logger.log('Inspection not created');
         throw new InternalServerErrorException(
-          `unknown error while creating inspection`,
+          'Unknown error while creating inspection',
         );
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
-      throw error;
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error adding inspection',
+        error: error.message,
+      });
     }
   }
 
