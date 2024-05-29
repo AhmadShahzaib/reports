@@ -157,7 +157,6 @@ export class AppController extends BaseController {
     @Req() request: Request,
   ) {
     try {
-      console.log(`checkpoint ????????????`, request.user);
       const { tenantId, id, vehicleId, homeTerminalAddress, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       defectRequest.tenantId = tenantId;
