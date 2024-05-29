@@ -93,6 +93,29 @@ export class AppService extends BaseService<TIDocument> {
     }
   };
 
+  deleteInspection = async (inspectionId) => {
+    try {
+      // Fetch results
+      const deletedInspection = await this.tripInspectionModel.deleteOne({
+        _id: inspectionId,
+      });
+
+      return {
+        message:
+          deletedInspection.deletedCount > 0
+            ? 'Inspection deleted successfully!'
+            : 'Inspection record not found',
+        data: {},
+      };
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error in getting defects list',
+        error: error.message,
+      });
+    }
+  };
+
   deleteOne = async (id: string) => {
     try {
       return await this.tripInspectionModel.findByIdAndUpdate(

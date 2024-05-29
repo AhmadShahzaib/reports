@@ -301,6 +301,26 @@ export class AppController extends BaseController {
     }
   }
 
+  @DeleteDecorators()
+  async deleteInspection(
+    @Param() params,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = params.id;
+      const deletedInspection =
+        await this.tripInspectionService.deleteInspection(inspectionId);
+      return response.status(HttpStatus.OK).send(deletedInspection);
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error getting defects!',
+        error: error.message,
+      });
+    }
+  }
+
   // ######## DVIR ######### - END
 
   @GetAllInspectionDecorators()
