@@ -30,6 +30,7 @@ export class AppService extends BaseService<TIDocument> {
 
   constructor(
     @InjectModel('inspections') private tripInspectionModel: Model<TIDocument>,
+    @InjectModel('defects') private defectsModel: Model<TIDocument>,
     @InjectModel('eldSubmitionRecord')
     private eldSubmitionRecord: Model<EldSubmitionRecordDocument>,
     @InjectModel('iftaSubmissionRecord')
@@ -42,9 +43,7 @@ export class AppService extends BaseService<TIDocument> {
   ) {
     super();
   }
-  addInspection = async (
-    inspection,
-  ): Promise<TIDocument> => {
+  addInspection = async (inspection): Promise<TIDocument> => {
     try {
       Logger.debug(inspection);
       let query = await this.tripInspectionModel.create(inspection);
@@ -55,10 +54,42 @@ export class AppService extends BaseService<TIDocument> {
       //     model: 'defects',
       //   },
       // });
-      return query; 
+      return query;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
+    }
+  };
+
+  getDefectsList = async () => {
+    try {
+      // query based on category
+      const query = (category) => {
+        return this.defectsModel
+          .find({
+            category: category,
+            isActive: true,
+            isDeleted: false,
+          })
+          .select('_id category defectName');
+      };
+
+      // Fetch results
+      const defectsList = await Promise.all([
+        await query('vehicle'),
+        await query('trailer'),
+      ]);
+
+      return {
+        vehicle: defectsList[0].length > 0 ? defectsList[0] : [],
+        trailer: defectsList[1].length > 0 ? defectsList[1] : [],
+      };
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error in getting defects list',
+        error: error.message,
+      });
     }
   };
 

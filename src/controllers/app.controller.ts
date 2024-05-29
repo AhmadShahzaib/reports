@@ -114,6 +114,7 @@ import certificationMobileDecorators from 'decorators/certificationMobileDecorat
 import { generateEditPdf } from 'utils/genrateEditReport';
 import { getEventPower } from 'utils/eventPower';
 import { getCertificationCheck } from 'utils/eventCertification';
+import GetDefectsDecorators from 'decorators/getDefects';
 // import { Query } from 'mongoose';
 // import { signature } from '../../../logEld-TenantBackendMicroservices-Units-Future/src/models/signaturesModel';
 
@@ -226,6 +227,23 @@ export class AppController extends BaseController {
       Logger.error({ message: error.message, stack: error.stack });
       return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
         message: 'Error adding inspection',
+        error: error.message,
+      });
+    }
+  }
+
+  @GetDefectsDecorators()
+  async getDefectsList(@Res() response: Response, @Req() request: Request) {
+    try {
+      const defectsList = await this.tripInspectionService.getDefectsList();
+      return response.status(HttpStatus.OK).send({
+        message: 'Defects list fetched successfully',
+        data: defectsList,
+      });
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error getting defects!',
         error: error.message,
       });
     }
