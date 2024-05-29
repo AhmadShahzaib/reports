@@ -139,6 +139,12 @@ export class AppController extends BaseController {
     super();
   }
 
+  // ######## DVIR ######### - START
+
+  /**
+   * @description : Function <addDefectsInspection> adds inspection request
+   * @dependency : The function requires defects list to get defects <getDefectsList>
+   */
   @AddInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -232,6 +238,9 @@ export class AppController extends BaseController {
     }
   }
 
+  /**
+   * @description : Provides with the list of defects for vehicle and trailer separately
+   */
   @GetDefectsDecorators()
   async getDefectsList(@Res() response: Response, @Req() request: Request) {
     try {
@@ -249,6 +258,9 @@ export class AppController extends BaseController {
     }
   }
 
+  /**
+   * @description : Get all inspection list according to drvierId and date
+   */
   @GetInspectionDecorators()
   async getInspectionList(
     @Param('driverId', MongoIdValidationPipe) driverId: string,
@@ -267,14 +279,16 @@ export class AppController extends BaseController {
       const options = {
         driverId: driverId,
         inspectionTime: { $gt: startOfDay, $lt: endOfDay },
+        // date: date,
       };
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
-      Logger.log(`getInspectionList was called with params: ${driverId}`);
+      // const inspectionList: InspectionResponse[] = [];
+      // let list: InspectionResponse[] = [];
+      // Logger.log(`getInspectionList was called with params: ${driverId}`);
+      let list = [];
       const inspections = await this.tripInspectionService.find(options);
       if (inspections && Object.keys(inspections).length > 0) {
         for (const inspection of inspections) {
-          list.push(new InspectionResponse(inspection));
+          list.push(inspection);
         }
       }
       return response.status(HttpStatus.OK).send({
@@ -286,6 +300,9 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
+  // ######## DVIR ######### - END
+
   @GetAllInspectionDecorators()
   async getAllInspectionList(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
