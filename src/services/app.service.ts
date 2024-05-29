@@ -30,7 +30,6 @@ export class AppService extends BaseService<TIDocument> {
 
   constructor(
     @InjectModel('inspections') private tripInspectionModel: Model<TIDocument>,
-    @InjectModel('defects') private defectModel: Model<TIDocument>,
     @InjectModel('eldSubmitionRecord')
     private eldSubmitionRecord: Model<EldSubmitionRecordDocument>,
     @InjectModel('iftaSubmissionRecord')
@@ -49,9 +48,6 @@ export class AppService extends BaseService<TIDocument> {
     try {
       Logger.debug(inspection);
       let query = await this.tripInspectionModel.create(inspection);
-      let vehicleDefects = await this.defectModel.find({
-        
-      })
       // return await query.populate({
       //   path: 'defectsCategory',
       //   populate: {

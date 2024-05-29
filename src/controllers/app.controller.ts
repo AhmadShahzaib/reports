@@ -174,7 +174,7 @@ export class AppController extends BaseController {
           },
         },
       };
-
+Logger.log("adding image here");
       let requestInspection = await imagesUpload(
         files,
         this.awsService,
@@ -183,7 +183,10 @@ export class AppController extends BaseController {
         id,
         this.tripInspectionService,
       );
-      // let unitData = await this.tripInspectionService.getUnitData(id);
+      Logger.log("image added")
+      let unitData = await this.tripInspectionService.getUnitData(id);
+      Logger.log("unit data feched");
+      Logger.log(unitData);
       requestInspection.vehicleManualId = `Vehicle1`;
       // requestInspection.vehicleManualId = unitData.manualVehicleId;
       requestInspection.trailerNumber = 'trailer number';
@@ -192,9 +195,11 @@ export class AppController extends BaseController {
         requestInspection,
       );
       // let address = await getAddress(addDefect);
+      Logger.log(`Inspection has been added successfully`);
+
       if (addDefect && Object.keys(addDefect).length > 0) {
         let inspection = new InspectionResponse(addDefect);
-        Logger.log(`Inspection has been added successfully`);
+        Logger.log(`Inspection object done`);
         return response.status(HttpStatus.OK).send({
           message: 'Inspection has been added successfully',
           data: inspection,
