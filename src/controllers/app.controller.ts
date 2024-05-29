@@ -137,24 +137,27 @@ export class AppController extends BaseController {
   ) {
     super();
   }
+
   @AddInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'defectImages', maxCount: 50 },
+      // { name: 'defectImages', maxCount: 50 },
       { name: 'signatureImages', maxCount: 2 },
     ]),
   )
   async addDefectsInspection(
-    @Body() defectRequest: InspectionRequest,
+    // @Body() defectRequest: InspectionRequest,
+    @Body() defectRequest,
     @UploadedFiles()
     files: {
-      defectImages: Express.Multer.File[];
+      // defectImages: Express.Multer.File[];
       signatureImages: Express.Multer.File[];
     },
     @Res() response: Response,
     @Req() request: Request,
   ) {
     try {
+      console.log(`checkpoint ????????????`, request.user);
       const { tenantId, id, vehicleId, homeTerminalAddress, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       defectRequest.tenantId = tenantId;
@@ -162,6 +165,16 @@ export class AppController extends BaseController {
       defectRequest.vehicleId = vehicleId;
       defectRequest.officeId = homeTerminalAddress;
       defectRequest.inspectionTime = defectRequest.inspectionTime;
+      defectRequest.defectsCategory = JSON.parse(defectRequest.defectsCategory);
+      defectRequest = {
+        ...defectRequest,
+        signatures: {
+          driverSignature: {
+            imageName: files.signatureImages[0].originalname,
+          },
+        },
+      };
+Logger.log("adding image here");
       let requestInspection = await imagesUpload(
         files,
         this.awsService,
@@ -170,16 +183,23 @@ export class AppController extends BaseController {
         id,
         this.tripInspectionService,
       );
+      Logger.log("image added")
       let unitData = await this.tripInspectionService.getUnitData(id);
-      requestInspection.vehicleManualId = unitData.manualVehicleId;
-      requestInspection.trailerNumber = unitData.trailerNumber;
+      Logger.log("unit data feched");
+      Logger.log(unitData);
+      requestInspection.vehicleManualId = `Vehicle1`;
+      // requestInspection.vehicleManualId = unitData.manualVehicleId;
+      requestInspection.trailerNumber = 'trailer number';
+      // requestInspection.trailerNumber = unitData.trailerNumber;
       const addDefect = await this.tripInspectionService.addInspection(
         requestInspection,
       );
       // let address = await getAddress(addDefect);
+      Logger.log(`Inspection has been added successfully`);
+
       if (addDefect && Object.keys(addDefect).length > 0) {
         let inspection = new InspectionResponse(addDefect);
-        Logger.log(`Inspection has been added successfully`);
+        Logger.log(`Inspection object done`);
         return response.status(HttpStatus.OK).send({
           message: 'Inspection has been added successfully',
           data: inspection,
@@ -3197,10 +3217,10 @@ export class AppController extends BaseController {
           trailerIds.push(record.trailerId);
         }
       });
-      Logger.log("before shipping doc")
+      Logger.log('before shipping doc');
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
-      Logger.log("after shipping doc")
+      Logger.log('after shipping doc');
 
       if (
         logsOfSelectedDate.data[0]?.csv
