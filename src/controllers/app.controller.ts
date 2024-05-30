@@ -255,9 +255,11 @@ export class AppController extends BaseController {
       const inspectionList: InspectionResponse[] = [];
       let list: InspectionResponse[] = [];
 
-      const queryResponse = await this.tripInspectionService.findAllDvir(options,queryParams);
+      const queryResponse = await this.tripInspectionService.findAllDvir(
+        options,
+        queryParams,
+      );
 
-     
       let total = Object.keys(queryResponse).length;
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
@@ -1613,7 +1615,8 @@ export class AppController extends BaseController {
     try {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
-      const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+      const { tenantId: id, timeZone } =
+        request.user ?? ({ tenantId: undefined } as any);
       options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
@@ -1639,6 +1642,11 @@ export class AppController extends BaseController {
       queryResponse = await query.exec();
       let data = [];
       for (let eld of queryResponse) {
+        // if (timeZone?.tzCode) {
+        //   eld.createdAt = moment
+        //     .tz(eld.createdAt, timeZone?.tzCode)
+        //     .format('DD/MM/YYYY h:mm a');
+        // }
         data.push(eld);
       }
       return response.status(HttpStatus.OK).send({
