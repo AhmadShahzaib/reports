@@ -301,6 +301,104 @@ export class AppController extends BaseController {
     }
   }
 
+  @UpdateInspectionDecorators()
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      // { name: 'defectImages', maxCount: 50 },
+      { name: 'signatureImages', maxCount: 2 },
+    ]),
+  )
+  async updateDefectsInspection(
+    // @Body() defectRequest: InspectionRequest,
+    @Body() defectRequest,
+    @UploadedFiles()
+    files: {
+      // defectImages: Express.Multer.File[];
+      signatureImages: Express.Multer.File[];
+    },
+    @Param() params,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = params.id;
+      const { tenantId, id } = request.user ?? ({ tenantId: undefined } as any);
+      // defectRequest.tenantId = tenantId;
+      // defectRequest.driverId = id;
+      // defectRequest.vehicleId = vehicleId;
+      // defectRequest.officeId = homeTerminalAddress;
+      // defectRequest.inspectionTime = defectRequest.inspectionTime;
+      // defectRequest.defectsCategory = JSON.parse(defectRequest.defectsCategory);
+      defectRequest = {
+        status: defectRequest.status,
+        signatures: {
+          mechanicSignature: {
+            imageName: files.signatureImages[0].originalname,
+          },
+        },
+      };
+
+      Logger.log('adding image here');
+      let requestInspection;
+      try {
+        requestInspection = await imagesUpload(
+          files,
+          this.awsService,
+          defectRequest,
+          tenantId,
+          id,
+          this.tripInspectionService,
+        );
+      } catch (error) {
+        Logger.error('Error during image upload', error);
+        throw new InternalServerErrorException('Image upload failed');
+      }
+      Logger.log('image added');
+
+      // let unitData = await this.tripInspectionService.getUnitData(id);
+      // requestInspection.vehicleManualId = unitData.manualVehicleId;
+      // requestInspection.trailerNumber = unitData.trailerNumber;
+      // requestInspection.vehicleManualId = defectRequest.vehicleManualId;
+      // requestInspection.trailerNumber = defectRequest.trailerNumber;
+
+      let updateDefect;
+      try {
+        updateDefect = await this.tripInspectionService.updateInspection(
+          inspectionId,
+          requestInspection,
+        );
+      } catch (error) {
+        Logger.error('Error updating inspection', error);
+        throw new InternalServerErrorException('Updating inspection failed');
+      }
+
+      // let address = await getAddress(addDefect);
+      Logger.log(`Inspection has been updated successfully`);
+
+      if (updateDefect && Object.keys(updateDefect).length > 0) {
+        Logger.log('Inspection object done');
+        return response.status(HttpStatus.OK).send({
+          message: 'Inspection has been updated successfully',
+          data: updateDefect,
+        });
+      } else {
+        Logger.log('Inspection updating failed');
+        throw new InternalServerErrorException(
+          'Unknown error while updating inspection',
+        );
+      }
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error updating inspection',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * @description : The endpoint will delete the inspection record
+   */
   @DeleteDecorators()
   async deleteInspection(
     @Param() params,

@@ -129,21 +129,22 @@ export class AppService extends BaseService<TIDocument> {
     }
   };
 
-  updateInspection = async (
-    id: string,
-    inspection: InspectionRequest,
-  ): Promise<TIDocument> => {
+  updateInspection = async (id: string, inspection) => {
     try {
-      Logger.debug(inspection);
-      return await this.tripInspectionModel.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        inspection,
-        {
-          new: true,
-        },
-      );
+      //  Get inspection record
+      const inspectionRecord: any = await this.tripInspectionModel.findOne({
+        _id: id,
+      });
+
+      // Update values in inspection record
+      inspectionRecord.status = inspection.status;
+      inspectionRecord.signatures[`mechanicSignature`] =
+        inspection.signatures.mechanicSignature;
+
+      //  save updated record
+      await inspectionRecord.save();
+
+      return inspectionRecord;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
