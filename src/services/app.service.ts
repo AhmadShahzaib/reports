@@ -261,12 +261,14 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
-  findOne = async () => {
+  findOne = async (inspectionId) => {
     try {
       return await this.tripInspectionModel
-        .find()
+        .find({
+          _id: inspectionId,
+        })
         .limit(1)
-        .sort({ $natural: -1 })
+        // .sort({ $natural: -1 })
         .and([{ isDeleted: false }]);
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });

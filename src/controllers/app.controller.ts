@@ -463,6 +463,34 @@ export class AppController extends BaseController {
     }
   }
 
+  @GetByIdDecorators()
+  async getInspectionById(
+    @Param() param,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = param.id;
+      const {} = request.user ?? ({ tenantId: undefined } as any);
+      const inspectionList = [];
+      let list = [];
+      Logger.log(`getInspectionList was called`);
+      const inspections = await this.tripInspectionService.findOne(
+        inspectionId,
+      );
+      if (inspections && Object.keys(inspections).length > 0) {
+        list = await getInspectionData(inspections, this.awsService);
+      }
+      return response.status(HttpStatus.OK).send({
+        message: 'Trip inspections found',
+        data: list,
+      });
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  }
+
   // ######## DVIR ######### - END
 
   @GetInspectionDecoratorsMobile()
@@ -2864,27 +2892,6 @@ export class AppController extends BaseController {
         message: 'Request Failed in any level.',
         data: '',
       });
-    }
-  }
-
-  @GetByIdDecorators()
-  async getInspectionById(@Res() response: Response, @Req() request: Request) {
-    try {
-      const {} = request.user ?? ({ tenantId: undefined } as any);
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
-      Logger.log(`getInspectionList was called`);
-      const inspections = await this.tripInspectionService.findOne();
-      if (inspections && Object.keys(inspections).length > 0) {
-        list = await getInspectionData(inspections, this.awsService);
-      }
-      return response.status(HttpStatus.OK).send({
-        message: 'Trip inspections found',
-        data: list,
-      });
-    } catch (err) {
-      Logger.error({ message: err.message, stack: err.stack });
-      throw err;
     }
   }
 
