@@ -411,8 +411,6 @@ export class AppController extends BaseController {
     }
   }
 
-  // ######## DVIR ######### - END
-
   @GetAllInspectionDecorators()
   async getAllInspectionList(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
@@ -432,8 +430,8 @@ export class AppController extends BaseController {
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
       }
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
+      const inspectionList = [];
+      let list = [];
 
       const queryResponse = await this.tripInspectionService.findAllDvir(
         options,
@@ -444,7 +442,7 @@ export class AppController extends BaseController {
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {
-          list.push(new InspectionResponse(inspection));
+          list.push(inspection);
         }
       }
       return response.status(HttpStatus.OK).send({
@@ -464,6 +462,9 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
+  // ######## DVIR ######### - END
+
   @GetInspectionDecoratorsMobile()
   async getInspectionListForDriver(
     @Query('date') date: string = moment().format('YYYY-MM-DD'),
