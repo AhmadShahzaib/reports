@@ -301,6 +301,9 @@ export class AppController extends BaseController {
     }
   }
 
+  /**
+   * @description : The update method gets two arguments, status and mechanic signatures to update the inspection record
+   */
   @UpdateInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -323,12 +326,7 @@ export class AppController extends BaseController {
     try {
       const inspectionId = params.id;
       const { tenantId, id } = request.user ?? ({ tenantId: undefined } as any);
-      // defectRequest.tenantId = tenantId;
-      // defectRequest.driverId = id;
-      // defectRequest.vehicleId = vehicleId;
-      // defectRequest.officeId = homeTerminalAddress;
-      // defectRequest.inspectionTime = defectRequest.inspectionTime;
-      // defectRequest.defectsCategory = JSON.parse(defectRequest.defectsCategory);
+
       defectRequest = {
         status: defectRequest.status,
         signatures: {
@@ -354,12 +352,6 @@ export class AppController extends BaseController {
         throw new InternalServerErrorException('Image upload failed');
       }
       Logger.log('image added');
-
-      // let unitData = await this.tripInspectionService.getUnitData(id);
-      // requestInspection.vehicleManualId = unitData.manualVehicleId;
-      // requestInspection.trailerNumber = unitData.trailerNumber;
-      // requestInspection.vehicleManualId = defectRequest.vehicleManualId;
-      // requestInspection.trailerNumber = defectRequest.trailerNumber;
 
       let updateDefect;
       try {
