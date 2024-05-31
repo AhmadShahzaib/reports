@@ -172,6 +172,14 @@ export class AppController extends BaseController {
       defectRequest.officeId = homeTerminalAddress;
       defectRequest.inspectionTime = defectRequest.inspectionTime;
       defectRequest.defectsCategory = JSON.parse(defectRequest.defectsCategory);
+
+      if (Object.keys(files).length == 0) {
+        return response.status(HttpStatus.OK).send({
+          message: `Driver's signature are required to create an inspection!`,
+          data: {},
+        });
+      }
+
       defectRequest = {
         ...defectRequest,
         signatures: {
@@ -326,6 +334,13 @@ export class AppController extends BaseController {
     try {
       const inspectionId = params.id;
       const { tenantId, id } = request.user ?? ({ tenantId: undefined } as any);
+
+      if (Object.keys(files).length == 0) {
+        return response.status(HttpStatus.OK).send({
+          message: `Mechanic's signature are required to update an inspection!`,
+          data: {},
+        });
+      }
 
       defectRequest = {
         status: defectRequest.status,
