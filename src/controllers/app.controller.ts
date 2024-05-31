@@ -114,6 +114,7 @@ import certificationMobileDecorators from 'decorators/certificationMobileDecorat
 import { generateEditPdf } from 'utils/genrateEditReport';
 import { getEventPower } from 'utils/eventPower';
 import { getCertificationCheck } from 'utils/eventCertification';
+import GetDefectsDecorators from 'decorators/getDefects';
 // import { Query } from 'mongoose';
 // import { signature } from '../../../logEld-TenantBackendMicroservices-Units-Future/src/models/signaturesModel';
 
@@ -138,6 +139,12 @@ export class AppController extends BaseController {
     super();
   }
 
+  // ######## DVIR ######### - START
+
+  /**
+   * @description : Function <addDefectsInspection> adds inspection request
+   * @dependency : The function requires defects list to get defects <getDefectsList>
+   */
   @AddInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -157,7 +164,6 @@ export class AppController extends BaseController {
     @Req() request: Request,
   ) {
     try {
-      console.log(`checkpoint ????????????`, request.user);
       const { tenantId, id, vehicleId, homeTerminalAddress, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       defectRequest.tenantId = tenantId;
@@ -166,6 +172,14 @@ export class AppController extends BaseController {
       defectRequest.officeId = homeTerminalAddress;
       defectRequest.inspectionTime = defectRequest.inspectionTime;
       defectRequest.defectsCategory = JSON.parse(defectRequest.defectsCategory);
+
+      if (Object.keys(files).length == 0) {
+        return response.status(HttpStatus.OK).send({
+          message: `Driver's signature are required to create an inspection!`,
+          data: {},
+        });
+      }
+
       defectRequest = {
         ...defectRequest,
         signatures: {
@@ -174,48 +188,87 @@ export class AppController extends BaseController {
           },
         },
       };
-Logger.log("adding image here");
-      let requestInspection = await imagesUpload(
-        files,
-        this.awsService,
-        defectRequest,
-        tenantId,
-        id,
-        this.tripInspectionService,
-      );
-      Logger.log("image added")
-      let unitData = await this.tripInspectionService.getUnitData(id);
-      Logger.log("unit data feched");
-      Logger.log(unitData);
-      requestInspection.vehicleManualId = `Vehicle1`;
+
+      Logger.log('adding image here');
+      let requestInspection;
+      try {
+        requestInspection = await imagesUpload(
+          files,
+          this.awsService,
+          defectRequest,
+          tenantId,
+          id,
+          this.tripInspectionService,
+        );
+      } catch (error) {
+        Logger.error('Error during image upload', error);
+        throw new InternalServerErrorException('Image upload failed');
+      }
+      Logger.log('image added');
+
+      // let unitData = await this.tripInspectionService.getUnitData(id);
       // requestInspection.vehicleManualId = unitData.manualVehicleId;
-      requestInspection.trailerNumber = 'trailer number';
       // requestInspection.trailerNumber = unitData.trailerNumber;
-      const addDefect = await this.tripInspectionService.addInspection(
-        requestInspection,
-      );
+      requestInspection.vehicleManualId = defectRequest.vehicleManualId;
+      requestInspection.trailerNumber = defectRequest.trailerNumber;
+
+      let addDefect;
+      try {
+        addDefect = await this.tripInspectionService.addInspection(
+          requestInspection,
+        );
+      } catch (error) {
+        Logger.error('Error adding inspection', error);
+        throw new InternalServerErrorException('Adding inspection failed');
+      }
+
       // let address = await getAddress(addDefect);
       Logger.log(`Inspection has been added successfully`);
 
       if (addDefect && Object.keys(addDefect).length > 0) {
-        let inspection = new InspectionResponse(addDefect);
-        Logger.log(`Inspection object done`);
+        Logger.log('Inspection object done');
         return response.status(HttpStatus.OK).send({
           message: 'Inspection has been added successfully',
-          data: inspection,
+          data: addDefect,
         });
       } else {
-        Logger.log(`Inspection not create`);
+        Logger.log('Inspection not created');
         throw new InternalServerErrorException(
-          `unknown error while creating inspection`,
+          'Unknown error while creating inspection',
         );
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
-      throw error;
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error adding inspection',
+        error: error.message,
+      });
     }
   }
 
+  /**
+   * @description : Provides with the list of defects for vehicle and trailer separately
+   */
+  @GetDefectsDecorators()
+  async getDefectsList(@Res() response: Response, @Req() request: Request) {
+    try {
+      const defectsList = await this.tripInspectionService.getDefectsList();
+      return response.status(HttpStatus.OK).send({
+        message: 'Defects list fetched successfully',
+        data: defectsList,
+      });
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error getting defects!',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * @description : Get all inspection list according to drvierId and date
+   */
   @GetInspectionDecorators()
   async getInspectionList(
     @Param('driverId', MongoIdValidationPipe) driverId: string,
@@ -234,14 +287,16 @@ Logger.log("adding image here");
       const options = {
         driverId: driverId,
         inspectionTime: { $gt: startOfDay, $lt: endOfDay },
+        // date: date,
       };
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
-      Logger.log(`getInspectionList was called with params: ${driverId}`);
+      // const inspectionList: InspectionResponse[] = [];
+      // let list: InspectionResponse[] = [];
+      // Logger.log(`getInspectionList was called with params: ${driverId}`);
+      let list = [];
       const inspections = await this.tripInspectionService.find(options);
       if (inspections && Object.keys(inspections).length > 0) {
         for (const inspection of inspections) {
-          list.push(new InspectionResponse(inspection));
+          list.push(inspection);
         }
       }
       return response.status(HttpStatus.OK).send({
@@ -253,6 +308,124 @@ Logger.log("adding image here");
       throw err;
     }
   }
+
+  /**
+   * @description : The update method gets two arguments, status and mechanic signatures to update the inspection record
+   */
+  @UpdateInspectionDecorators()
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      // { name: 'defectImages', maxCount: 50 },
+      { name: 'signatureImages', maxCount: 2 },
+    ]),
+  )
+  async updateDefectsInspection(
+    // @Body() defectRequest: InspectionRequest,
+    @Body() defectRequest,
+    @UploadedFiles()
+    files: {
+      // defectImages: Express.Multer.File[];
+      signatureImages: Express.Multer.File[];
+    },
+    @Param() params,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = params.id;
+      const { tenantId, id } = request.user ?? ({ tenantId: undefined } as any);
+
+      if (Object.keys(files).length == 0) {
+        return response.status(HttpStatus.OK).send({
+          message: `Mechanic's signature are required to update an inspection!`,
+          data: {},
+        });
+      }
+
+      defectRequest = {
+        status: defectRequest.status,
+        signatures: {
+          mechanicSignature: {
+            imageName: files.signatureImages[0].originalname,
+          },
+        },
+      };
+
+      Logger.log('adding image here');
+      let requestInspection;
+      try {
+        requestInspection = await imagesUpload(
+          files,
+          this.awsService,
+          defectRequest,
+          tenantId,
+          id,
+          this.tripInspectionService,
+        );
+      } catch (error) {
+        Logger.error('Error during image upload', error);
+        throw new InternalServerErrorException('Image upload failed');
+      }
+      Logger.log('image added');
+
+      let updateDefect;
+      try {
+        updateDefect = await this.tripInspectionService.updateInspection(
+          inspectionId,
+          requestInspection,
+        );
+      } catch (error) {
+        Logger.error('Error updating inspection', error);
+        throw new InternalServerErrorException('Updating inspection failed');
+      }
+
+      // let address = await getAddress(addDefect);
+      Logger.log(`Inspection has been updated successfully`);
+
+      if (updateDefect && Object.keys(updateDefect).length > 0) {
+        Logger.log('Inspection object done');
+        return response.status(HttpStatus.OK).send({
+          message: 'Inspection has been updated successfully',
+          data: updateDefect,
+        });
+      } else {
+        Logger.log('Inspection updating failed');
+        throw new InternalServerErrorException(
+          'Unknown error while updating inspection',
+        );
+      }
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error updating inspection',
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * @description : The endpoint will delete the inspection record
+   */
+  @DeleteDecorators()
+  async deleteInspection(
+    @Param() params,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = params.id;
+      const deletedInspection =
+        await this.tripInspectionService.deleteInspection(inspectionId);
+      return response.status(HttpStatus.OK).send(deletedInspection);
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error getting defects!',
+        error: error.message,
+      });
+    }
+  }
+
   @GetAllInspectionDecorators()
   async getAllInspectionList(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
@@ -272,8 +445,8 @@ Logger.log("adding image here");
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
       }
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
+      const inspectionList = [];
+      let list = [];
 
       const queryResponse = await this.tripInspectionService.findAllDvir(
         options,
@@ -284,7 +457,7 @@ Logger.log("adding image here");
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {
-          list.push(new InspectionResponse(inspection));
+          list.push(inspection);
         }
       }
       return response.status(HttpStatus.OK).send({
@@ -304,6 +477,37 @@ Logger.log("adding image here");
       throw err;
     }
   }
+
+  @GetByIdDecorators()
+  async getInspectionById(
+    @Param() param,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const inspectionId = param.id;
+      const {} = request.user ?? ({ tenantId: undefined } as any);
+      const inspectionList = [];
+      let list = [];
+      Logger.log(`getInspectionList was called`);
+      const inspections = await this.tripInspectionService.findOne(
+        inspectionId,
+      );
+      if (inspections && Object.keys(inspections).length > 0) {
+        list = await getInspectionData(inspections, this.awsService);
+      }
+      return response.status(HttpStatus.OK).send({
+        message: 'Trip inspections found',
+        data: list,
+      });
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  }
+
+  // ######## DVIR ######### - END
+
   @GetInspectionDecoratorsMobile()
   async getInspectionListForDriver(
     @Query('date') date: string = moment().format('YYYY-MM-DD'),
@@ -2703,27 +2907,6 @@ Logger.log("adding image here");
         message: 'Request Failed in any level.',
         data: '',
       });
-    }
-  }
-
-  @GetByIdDecorators()
-  async getInspectionById(@Res() response: Response, @Req() request: Request) {
-    try {
-      const {} = request.user ?? ({ tenantId: undefined } as any);
-      const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
-      Logger.log(`getInspectionList was called`);
-      const inspections = await this.tripInspectionService.findOne();
-      if (inspections && Object.keys(inspections).length > 0) {
-        list = await getInspectionData(inspections, this.awsService);
-      }
-      return response.status(HttpStatus.OK).send({
-        message: 'Trip inspections found',
-        data: list,
-      });
-    } catch (err) {
-      Logger.error({ message: err.message, stack: err.stack });
-      throw err;
     }
   }
 

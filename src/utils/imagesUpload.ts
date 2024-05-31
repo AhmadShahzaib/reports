@@ -1,3 +1,4 @@
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { InspectionRequest } from 'models/inspectionRequestModel';
 import moment from 'moment';
 import { AppService } from 'services/app.service';
@@ -55,47 +56,71 @@ export const imagesUpload = async (
   //     }
   //   }
   // }
-  if (
-    files.signatureImages &&
-    Object.keys(files?.signatureImages).length > 0 &&
-    (defectRequest?.signatures.driverSignature ||
-      defectRequest?.signatures.mechanicSignature)
-  ) {
-    let driverSignatureFiles = files.signatureImages.find(
-      (file) =>
-        defectRequest?.signatures?.driverSignature?.imageName ==
-        file.originalname,
-    );
-    let MechanicsSignatureFiles = files?.signatureImages.find(
-      (file) =>
-        defectRequest?.signatures?.mechanicSignature?.imageName ==
-        file.originalname,
-    );
-    if (driverSignatureFiles) {
-      let imageUrl = await awsService.uploadFile(
-        driverSignatureFiles?.buffer,
-        `${tenantId}/${id}/Signatures/${moment().unix()}-${
-          driverSignatureFiles?.originalname
-        }`,
+  try {
+    // Signature images upload
+    if (
+      files.signatureImages &&
+      Object.keys(files.signatureImages).length > 0 &&
+      (defectRequest?.signatures?.driverSignature ||
+        defectRequest?.signatures?.mechanicSignature)
+    ) {
+      // Upload driver signature
+      let driverSignatureFiles = files.signatureImages.find(
+        (file) =>
+          defectRequest?.signatures?.driverSignature?.imageName ===
+          file.originalname,
       );
-      tripInspectionService.updateUnitDriverSign(
-        id,
-        imageUrl.key,
-        driverSignatureFiles?.originalname,
+      if (driverSignatureFiles) {
+        try {
+          let imageUrl = await awsService.uploadFile(
+            driverSignatureFiles.buffer,
+            `${tenantId}/${id}/Signatures/${Date.now()}-${
+              driverSignatureFiles.originalname
+            }`,
+          );
+          // await tripInspectionService.updateUnitDriverSign(
+          //   id,
+          //   imageUrl.key,
+          //   driverSignatureFiles.originalname,
+          // );
+          defectRequest.signatures.driverSignature.imageUrl = imageUrl.Location;
+          defectRequest.signatures.driverSignature.key = imageUrl.key;
+        } catch (error) {
+          Logger.error('Error uploading driver signature image', error);
+          throw new InternalServerErrorException(
+            'Error uploading driver signature image',
+          );
+        }
+      }
+
+      // Upload mechanic signature
+      let mechanicsSignatureFiles = files.signatureImages.find(
+        (file) =>
+          defectRequest?.signatures?.mechanicSignature?.imageName ===
+          file.originalname,
       );
-      defectRequest.signatures.driverSignature.imageUrl = imageUrl.Location;
-      defectRequest.signatures.driverSignature.key = imageUrl.key;
+      if (mechanicsSignatureFiles) {
+        try {
+          let imageUrl = await awsService.uploadFile(
+            mechanicsSignatureFiles.buffer,
+            `${tenantId}/${id}/Signatures/${Date.now()}-${
+              mechanicsSignatureFiles.originalname
+            }`,
+          );
+          defectRequest.signatures.mechanicSignature.imageUrl =
+            imageUrl.Location;
+          defectRequest.signatures.mechanicSignature.key = imageUrl.key;
+        } catch (error) {
+          Logger.error('Error uploading mechanic signature image', error);
+          throw new InternalServerErrorException(
+            'Error uploading mechanic signature image',
+          );
+        }
+      }
     }
-    if (MechanicsSignatureFiles) {
-      let imageUrl = await awsService.uploadFile(
-        MechanicsSignatureFiles?.buffer,
-        `${tenantId}/${id}/Signatures/${moment().unix()}-${
-          MechanicsSignatureFiles?.originalname
-        }`,
-      );
-      defectRequest.signatures.mechanicSignature.imageUrl = imageUrl.Location;
-      defectRequest.signatures.mechanicSignature.key = imageUrl.key;
-    }
+    return defectRequest;
+  } catch (error) {
+    Logger.error('Error in imagesUpload function', error);
+    throw error;
   }
-  return defectRequest;
 };
