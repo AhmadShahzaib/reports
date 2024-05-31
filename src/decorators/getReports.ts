@@ -9,14 +9,14 @@ import {
 import {
   CombineDecorators,
   CombineDecoratorType,
-  REPORT,
+  INSPECTIONS,
   USER,
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetReportsDecorators() {
   const GetReportsDecorators: Array<CombineDecoratorType> = [
     Get('report/dailyLogReport'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
@@ -38,7 +38,7 @@ export default function GetReportsDecorators() {
 export function GetEmailDecorator() {
   const GetEmailDecorator: Array<CombineDecoratorType> = [
     Get('report/email'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
@@ -66,7 +66,7 @@ export function GetEmailDecorator() {
 export function GetEmail7DaysDecorator() {
   const GetEmail7DaysDecorator: Array<CombineDecoratorType> = [
     Get('report/email7Days'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
@@ -112,7 +112,7 @@ export function GetReportsMobileDecorators() {
 export function GetPrevious7Days() {
   const GetPrevious7Days: Array<CombineDecoratorType> = [
     Get('report/previous7Days'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', [INSPECTIONS.LIST, USER.ADD]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
@@ -134,7 +134,7 @@ export function GetPrevious7Days() {
 export function GetIFTAReport() {
   const GetIFTAReport: Array<CombineDecoratorType> = [
     Post('report/iftaReport'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
