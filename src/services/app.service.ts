@@ -43,18 +43,19 @@ export class AppService extends BaseService<TIDocument> {
     super();
   }
   addInspection = async (
-    inspection: InspectionRequest,
+    inspection,
   ): Promise<TIDocument> => {
     try {
       Logger.debug(inspection);
       let query = await this.tripInspectionModel.create(inspection);
-      return await query.populate({
-        path: 'defectsCategory',
-        populate: {
-          path: 'vehicle.defects trailer.defects',
-          model: 'defects',
-        },
-      });
+      // return await query.populate({
+      //   path: 'defectsCategory',
+      //   populate: {
+      //     path: 'vehicle.defects trailer.defects',
+      //     model: 'defects',
+      //   },
+      // });
+      return query; 
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
@@ -119,7 +120,7 @@ export class AppService extends BaseService<TIDocument> {
       if (!limit || !isNaN(limit)) {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
-      
+
       return query;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
@@ -146,6 +147,15 @@ export class AppService extends BaseService<TIDocument> {
       Logger.error({ message: error.message, stack: error.stack });
       throw error;
     }
+  };
+  notifyDriver = async (SpecificClient, user, date, notificationObj) => {
+    const GraphDataOnRange = await firstValueFrom(
+      this.client.send(
+        { cmd: 'call_sync' },
+        { SpecificClient, user, date, notificationObj },
+      ),
+    );
+    return GraphDataOnRange;
   };
   findGraph = (
     driverId: string,
@@ -308,11 +318,18 @@ export class AppService extends BaseService<TIDocument> {
           { cmd: 'get_assigned_driver_eld_SerialNo' },
           driverId,
         ),
-      );
-      if (res.isError) {
-        Logger.log('Error in getting  Graph data from UNIT srvice');
-        mapMessagePatternResponseToException(res);
-      }
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
+      // if (res.isError) {
+      //   Logger.log('Error in getting  Graph data from UNIT srvice');
+      //   mapMessagePatternResponseToException(res);
+      // }
       return res.data;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });

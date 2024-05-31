@@ -5,55 +5,56 @@ import { AppService } from 'services/app.service';
 export const imagesUpload = async (
   files,
   awsService: any,
+  // defectRequest: InspectionRequest,
   defectRequest: InspectionRequest,
   tenantId: string,
   id: string,
   tripInspectionService: AppService,
 ) => {
-  if (
-    files.defectImages &&
-    Object.keys(files.defectImages).length > 0 &&
-    defectRequest?.defectsCategory?.vehicle.length > 0
-  ) {
-    let item;
-    for (item of defectRequest?.defectsCategory?.vehicle) {
-      let vehiclefiles = files.defectImages.find(
-        (file) => item.imageName == file.originalname,
-      );
-      if (vehiclefiles) {
-        let resUrl = await awsService.uploadFile(
-          vehiclefiles.buffer,
-          `${tenantId}/${id}/Defects/${moment().unix()}-${
-            vehiclefiles?.originalname
-          }`,
-        );
-        item.imageUrl = resUrl.Location;
-        item.key = resUrl.key;
-      }
-    }
-  }
-  if (
-    files.defectImages &&
-    Object.keys(files.defectImages).length > 0 &&
-    defectRequest?.defectsCategory?.trailer.length > 0
-  ) {
-    let value;
-    for (value of defectRequest?.defectsCategory?.trailer) {
-      let defectsfiles = files.defectImages.find(
-        (file) => value.imageName == file.originalname,
-      );
-      if (defectsfiles) {
-        let imageUrl = await awsService.uploadFile(
-          defectsfiles?.buffer,
-          `${tenantId}/${id}/Defects/${moment().unix()}-${
-            defectsfiles?.originalname
-          }`,
-        );
-        value.imageUrl = imageUrl.Location;
-        value.key = imageUrl.key;
-      }
-    }
-  }
+  // if (
+  //   files.defectImages &&
+  //   Object.keys(files.defectImages).length > 0 &&
+  //   defectRequest?.defectsCategory?.vehicle.length > 0
+  // ) {
+  //   let item;
+  //   for (item of defectRequest?.defectsCategory?.vehicle) {
+  //     let vehiclefiles = files.defectImages.find(
+  //       (file) => item.imageName == file.originalname,
+  //     );
+  //     if (vehiclefiles) {
+  //       let resUrl = await awsService.uploadFile(
+  //         vehiclefiles.buffer,
+  //         `${tenantId}/${id}/Defects/${moment().unix()}-${
+  //           vehiclefiles?.originalname
+  //         }`,
+  //       );
+  //       item.imageUrl = resUrl.Location;
+  //       item.key = resUrl.key;
+  //     }
+  //   }
+  // }
+  // if (
+  //   files.defectImages &&
+  //   Object.keys(files.defectImages).length > 0 &&
+  //   defectRequest?.defectsCategory?.trailer.length > 0
+  // ) {
+  //   let value;
+  //   for (value of defectRequest?.defectsCategory?.trailer) {
+  //     let defectsfiles = files.defectImages.find(
+  //       (file) => value.imageName == file.originalname,
+  //     );
+  //     if (defectsfiles) {
+  //       let imageUrl = await awsService.uploadFile(
+  //         defectsfiles?.buffer,
+  //         `${tenantId}/${id}/Defects/${moment().unix()}-${
+  //           defectsfiles?.originalname
+  //         }`,
+  //       );
+  //       value.imageUrl = imageUrl.Location;
+  //       value.key = imageUrl.key;
+  //     }
+  //   }
+  // }
   if (
     files.signatureImages &&
     Object.keys(files?.signatureImages).length > 0 &&
