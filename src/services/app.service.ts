@@ -30,6 +30,7 @@ export class AppService extends BaseService<TIDocument> {
 
   constructor(
     @InjectModel('inspections') private tripInspectionModel: Model<TIDocument>,
+    @InjectModel('defects') private defectsModel: Model<TIDocument>,
     @InjectModel('eldSubmitionRecord')
     private eldSubmitionRecord: Model<EldSubmitionRecordDocument>,
     @InjectModel('iftaSubmissionRecord')
@@ -42,9 +43,7 @@ export class AppService extends BaseService<TIDocument> {
   ) {
     super();
   }
-  addInspection = async (
-    inspection,
-  ): Promise<TIDocument> => {
+  addInspection = async (inspection): Promise<TIDocument> => {
     try {
       Logger.debug(inspection);
       let query = await this.tripInspectionModel.create(inspection);
@@ -55,10 +54,65 @@ export class AppService extends BaseService<TIDocument> {
       //     model: 'defects',
       //   },
       // });
-      return query; 
+      return query;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
+    }
+  };
+
+  getDefectsList = async () => {
+    try {
+      // query based on category
+      const query = (category) => {
+        return this.defectsModel
+          .find({
+            category: category,
+            isActive: true,
+            isDeleted: false,
+          })
+          .select('_id category defectName');
+      };
+
+      // Fetch results
+      const defectsList = await Promise.all([
+        await query('vehicle'),
+        await query('trailer'),
+      ]);
+
+      return {
+        vehicle: defectsList[0].length > 0 ? defectsList[0] : [],
+        trailer: defectsList[1].length > 0 ? defectsList[1] : [],
+      };
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error in getting defects list',
+        error: error.message,
+      });
+    }
+  };
+
+  deleteInspection = async (inspectionId) => {
+    try {
+      // Fetch results
+      const deletedInspection = await this.tripInspectionModel.deleteOne({
+        _id: inspectionId,
+      });
+
+      return {
+        message:
+          deletedInspection.deletedCount > 0
+            ? 'Inspection deleted successfully!'
+            : 'Inspection record not found',
+        data: {},
+      };
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Error in getting defects list',
+        error: error.message,
+      });
     }
   };
 
@@ -75,21 +129,22 @@ export class AppService extends BaseService<TIDocument> {
     }
   };
 
-  updateInspection = async (
-    id: string,
-    inspection: InspectionRequest,
-  ): Promise<TIDocument> => {
+  updateInspection = async (id: string, inspection) => {
     try {
-      Logger.debug(inspection);
-      return await this.tripInspectionModel.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        inspection,
-        {
-          new: true,
-        },
-      );
+      //  Get inspection record
+      const inspectionRecord: any = await this.tripInspectionModel.findOne({
+        _id: id,
+      });
+
+      // Update values in inspection record
+      inspectionRecord.status = inspection.status;
+      inspectionRecord.signatures[`mechanicSignature`] =
+        inspection.signatures.mechanicSignature;
+
+      //  save updated record
+      await inspectionRecord.save();
+
+      return inspectionRecord;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
@@ -206,12 +261,14 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
-  findOne = async () => {
+  findOne = async (inspectionId) => {
     try {
       return await this.tripInspectionModel
-        .find()
+        .find({
+          _id: inspectionId,
+        })
         .limit(1)
-        .sort({ $natural: -1 })
+        // .sort({ $natural: -1 })
         .and([{ isDeleted: false }]);
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });

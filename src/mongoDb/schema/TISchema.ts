@@ -69,4 +69,5 @@ export const TISchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   isDeleted: { type: Boolean, default: false },
   tenantId: { type: Schema.Types.ObjectId, require: true },
+  status: { type: String, require: true },
 });

@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import {
   CombineDecorators,
   CombineDecoratorType,
-  DEFECTS
+  INSPECTIONS
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetAllIFTARecords() {
@@ -15,7 +15,7 @@ export default function GetAllIFTARecords() {
   };
   const GetAllIFTARecords: Array<CombineDecoratorType> = [
     Get('getAllIFTARecords/all'),
-    SetMetadata('permissions', [DEFECTS.LIST]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth("access-token"),
     ApiQuery({
       name: 'search',
