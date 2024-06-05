@@ -138,6 +138,11 @@ export class AppService extends BaseService<TIDocument> {
 
       // Update values in inspection record
       inspectionRecord.status = inspection.status;
+      if (inspection.status == 'No Defects') {
+        inspectionRecord.defectsCategory.vehicle = [];
+        inspectionRecord.defectsCategory.trailer = [];
+      }
+
       inspectionRecord.signatures[`mechanicSignature`] =
         inspection.signatures.mechanicSignature;
 

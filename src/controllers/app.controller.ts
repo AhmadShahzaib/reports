@@ -315,8 +315,8 @@ export class AppController extends BaseController {
   @UpdateInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
-      // { name: 'defectImages', maxCount: 50 },
-      { name: 'signatureImages', maxCount: 2 },
+      { name: 'mechanicSignature', maxCount: 2 },
+      { name: 'driverSignature', maxCount: 2 },
     ]),
   )
   async updateDefectsInspection(
@@ -327,7 +327,6 @@ export class AppController extends BaseController {
       // defectImages: Express.Multer.File[];
       mechanicSignature: Express.Multer.File[];
       driverSignature: Express.Multer.File[];
-
     },
     @Param() params,
     @Res() response: Response,
@@ -2914,7 +2913,7 @@ export class AppController extends BaseController {
       });
     }
   }
-// new decxorator created above.
+  // new decxorator created above.
   // @UpdateInspectionDecorators()
   // @UseInterceptors(
   //   FileFieldsInterceptor([
