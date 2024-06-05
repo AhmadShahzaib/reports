@@ -354,7 +354,9 @@ export class AppController extends BaseController {
           },
         },
       };
-
+      let signatureImages = [...files.mechanicSignature,...files.driverSignature];
+     
+      files["signatureImages"]  = signatureImages;
       Logger.log('adding image here');
       let requestInspection;
       try {
