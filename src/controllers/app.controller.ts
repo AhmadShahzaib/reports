@@ -85,7 +85,8 @@ import GetAllSubmittedRecords from 'decorators/getAllSubmittedRecords';
 import {
   searchableAttributes,
   sortableAttributes,
-  iftaSearchables,dvirSearchables
+  iftaSearchables,
+  dvirSearchables,
 } from 'models';
 import { getArrayData } from 'utils/getArrayData';
 import { fileNameCreation } from 'utils/fileNameCreation';
