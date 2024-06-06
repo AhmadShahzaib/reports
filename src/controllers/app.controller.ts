@@ -211,6 +211,12 @@ export class AppController extends BaseController {
       // requestInspection.trailerNumber = unitData.trailerNumber;
       requestInspection.vehicleManualId = defectRequest.vehicleManualId;
       requestInspection.trailerNumber = defectRequest.trailerNumber;
+      if (!defectRequest.driverManualId) {
+        throw new InternalServerErrorException(
+          'Add defectRequest.driverManualId and vehicleManualId  ',
+        );
+      }
+      requestInspection.driverManualId = defectRequest.driverManualId;
 
       let addDefect;
       try {
@@ -354,9 +360,12 @@ export class AppController extends BaseController {
           },
         },
       };
-      let signatureImages = [...files.mechanicSignature,...files.driverSignature];
-     
-      files["signatureImages"]  = signatureImages;
+      let signatureImages = [
+        ...files.mechanicSignature,
+        ...files.driverSignature,
+      ];
+
+      files['signatureImages'] = signatureImages;
       Logger.log('adding image here');
       let requestInspection;
       try {

@@ -6,6 +6,7 @@ export default interface TIDocument extends Document {
   vehicleId: string;
   officeId: string;
   vehicleManualId?: string,
+  driverManualId?:string,
   trailerNumber?:string,
   carrier: string;
   tenantId: string;
