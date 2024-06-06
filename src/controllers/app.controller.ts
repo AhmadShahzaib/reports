@@ -85,7 +85,7 @@ import GetAllSubmittedRecords from 'decorators/getAllSubmittedRecords';
 import {
   searchableAttributes,
   sortableAttributes,
-  iftaSearchables,
+  iftaSearchables,dvirSearchables
 } from 'models';
 import { getArrayData } from 'utils/getArrayData';
 import { fileNameCreation } from 'utils/fileNameCreation';
@@ -456,7 +456,7 @@ export class AppController extends BaseController {
       // options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
-        iftaSearchables.forEach((attribute) => {
+        dvirSearchables.forEach((attribute) => {
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
       }
