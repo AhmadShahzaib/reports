@@ -145,6 +145,8 @@ export class AppService extends BaseService<TIDocument> {
 
       inspectionRecord.signatures[`mechanicSignature`] =
         inspection.signatures.mechanicSignature;
+        inspectionRecord.signatures[`driverSignature`] =
+        inspection.signatures.driverSignature;
 
       //  save updated record
       await inspectionRecord.save();
