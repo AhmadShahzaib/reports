@@ -315,8 +315,8 @@ export class AppController extends BaseController {
   @UpdateInspectionDecorators()
   @UseInterceptors(
     FileFieldsInterceptor([
-      // { name: 'defectImages', maxCount: 50 },
-      { name: 'signatureImages', maxCount: 2 },
+      { name: 'mechanicSignature', maxCount: 2 },
+      { name: 'driverSignature', maxCount: 2 },
     ]),
   )
   async updateDefectsInspection(
@@ -325,7 +325,8 @@ export class AppController extends BaseController {
     @UploadedFiles()
     files: {
       // defectImages: Express.Multer.File[];
-      signatureImages: Express.Multer.File[];
+      mechanicSignature: Express.Multer.File[];
+      driverSignature: Express.Multer.File[];
     },
     @Param() params,
     @Res() response: Response,
@@ -346,11 +347,16 @@ export class AppController extends BaseController {
         status: defectRequest.status,
         signatures: {
           mechanicSignature: {
-            imageName: files.signatureImages[0].originalname,
+            imageName: files.mechanicSignature[0].originalname,
+          },
+          driverSignature: {
+            imageName: files.driverSignature[0].originalname,
           },
         },
       };
-
+      let signatureImages = [...files.mechanicSignature,...files.driverSignature];
+     
+      files["signatureImages"]  = signatureImages;
       Logger.log('adding image here');
       let requestInspection;
       try {
@@ -2915,14 +2921,14 @@ export class AppController extends BaseController {
       });
     }
   }
-
-  @UpdateInspectionDecorators()
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'defectImages', maxCount: 50 },
-      { name: 'signatureImages', maxCount: 2 },
-    ]),
-  )
+  // new decxorator created above.
+  // @UpdateInspectionDecorators()
+  // @UseInterceptors(
+  //   FileFieldsInterceptor([
+  //     { name: 'defectImages', maxCount: 50 },
+  //     { name: 'signatureImages', maxCount: 2 },
+  //   ]),
+  // )
   async UpdateDefectsInspection(
     @Body() defectRequest: InspectionRequest,
     @Param('id', MongoIdValidationPipe) inspectionReportId: string,

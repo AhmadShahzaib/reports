@@ -64,7 +64,7 @@ export const imagesUpload = async (
       (defectRequest?.signatures?.driverSignature ||
         defectRequest?.signatures?.mechanicSignature)
     ) {
-      // Upload driver signature
+      // Upload driver signature .
       let driverSignatureFiles = files.signatureImages.find(
         (file) =>
           defectRequest?.signatures?.driverSignature?.imageName ===
