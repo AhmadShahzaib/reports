@@ -142,9 +142,11 @@ export class AppService extends BaseService<TIDocument> {
         inspectionRecord.defectsCategory.vehicle = [];
         inspectionRecord.defectsCategory.trailer = [];
       }
+if(inspection.signatures.mechanicSignature){
 
-      inspectionRecord.signatures[`mechanicSignature`] =
-        inspection.signatures.mechanicSignature;
+  inspectionRecord.signatures[`mechanicSignature`] =
+    inspection.signatures.mechanicSignature;
+}
         inspectionRecord.signatures[`driverSignature`] =
         inspection.signatures.driverSignature;
 

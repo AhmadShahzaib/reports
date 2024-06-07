@@ -353,18 +353,24 @@ export class AppController extends BaseController {
       defectRequest = {
         status: defectRequest.status,
         signatures: {
-          mechanicSignature: {
-            imageName: files.mechanicSignature[0].originalname,
-          },
+          
           driverSignature: {
             imageName: files.driverSignature[0].originalname,
           },
         },
       };
       let signatureImages = [
-        ...files.mechanicSignature,
+     
         ...files.driverSignature,
       ];
+      if(files.mechanicSignature){
+
+        defectRequest.signatures.mechanicSignature= {
+          imageName: files.mechanicSignature[0].originalname,
+        }
+        signatureImages.push(...files.mechanicSignature)
+      }
+     
 
       files['signatureImages'] = signatureImages;
       Logger.log('adding image here');
@@ -454,7 +460,7 @@ export class AppController extends BaseController {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-      // options['$and'] = [{ tenantId: id }];
+      // options['$and'] = [{ tenantId: id },{}];
       if (search) {
         options['$or'] = [];
         dvirSearchables.forEach((attribute) => {
