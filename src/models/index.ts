@@ -25,4 +25,9 @@ export const searchableAttributes = [
     "createdAt",
    
   ];
-  
+  export const dvirSearchables=[
+    "driverManualId",
+    "vehicleManualId",
+   
+   
+  ];

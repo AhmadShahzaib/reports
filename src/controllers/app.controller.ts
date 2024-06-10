@@ -86,6 +86,7 @@ import {
   searchableAttributes,
   sortableAttributes,
   iftaSearchables,
+  dvirSearchables,
 } from 'models';
 import { getArrayData } from 'utils/getArrayData';
 import { fileNameCreation } from 'utils/fileNameCreation';
@@ -211,6 +212,12 @@ export class AppController extends BaseController {
       // requestInspection.trailerNumber = unitData.trailerNumber;
       requestInspection.vehicleManualId = defectRequest.vehicleManualId;
       requestInspection.trailerNumber = defectRequest.trailerNumber;
+      if (!defectRequest.driverManualId) {
+        throw new InternalServerErrorException(
+          'Add defectRequest.driverManualId and vehicleManualId  ',
+        );
+      }
+      requestInspection.driverManualId = defectRequest.driverManualId;
 
       let addDefect;
       try {
@@ -346,17 +353,26 @@ export class AppController extends BaseController {
       defectRequest = {
         status: defectRequest.status,
         signatures: {
-          mechanicSignature: {
-            imageName: files.mechanicSignature[0].originalname,
-          },
+          
           driverSignature: {
             imageName: files.driverSignature[0].originalname,
           },
         },
       };
-      let signatureImages = [...files.mechanicSignature,...files.driverSignature];
+      let signatureImages = [
      
-      files["signatureImages"]  = signatureImages;
+        ...files.driverSignature,
+      ];
+      if(files.mechanicSignature){
+
+        defectRequest.signatures.mechanicSignature= {
+          imageName: files.mechanicSignature[0].originalname,
+        }
+        signatureImages.push(...files.mechanicSignature)
+      }
+     
+
+      files['signatureImages'] = signatureImages;
       Logger.log('adding image here');
       let requestInspection;
       try {
@@ -444,10 +460,10 @@ export class AppController extends BaseController {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-      // options['$and'] = [{ tenantId: id }];
+      // options['$and'] = [{ tenantId: id },{}];
       if (search) {
         options['$or'] = [];
-        iftaSearchables.forEach((attribute) => {
+        dvirSearchables.forEach((attribute) => {
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
       }
