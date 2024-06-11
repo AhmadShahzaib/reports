@@ -451,6 +451,7 @@ export class AppController extends BaseController {
   @GetAllInspectionDecorators()
   async getAllInspectionList(
     @Query(ListingParamsValidationPipe) queryParams: ListingParams,
+    @Query('date') date: string = moment().format('YYYY-MM-DD'),
     @Res() response: Response,
     @Req() request: Request,
   ) {
@@ -460,13 +461,13 @@ export class AppController extends BaseController {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-      // options['$and'] = [{ tenantId: id },{}];
+      options['$and'] = [{ tenantId: id },{ inspectionDate: new RegExp(date, 'i') }];
       if (search) {
         options['$or'] = [];
         dvirSearchables.forEach((attribute) => {
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
-      }
+      }// added search here
       const inspectionList = [];
       let list = [];
 
