@@ -353,24 +353,18 @@ export class AppController extends BaseController {
       defectRequest = {
         status: defectRequest.status,
         signatures: {
-          
           driverSignature: {
             imageName: files.driverSignature[0].originalname,
           },
         },
       };
-      let signatureImages = [
-     
-        ...files.driverSignature,
-      ];
-      if(files.mechanicSignature){
-
-        defectRequest.signatures.mechanicSignature= {
+      let signatureImages = [...files.driverSignature];
+      if (files.mechanicSignature) {
+        defectRequest.signatures.mechanicSignature = {
           imageName: files.mechanicSignature[0].originalname,
-        }
-        signatureImages.push(...files.mechanicSignature)
+        };
+        signatureImages.push(...files.mechanicSignature);
       }
-     
 
       files['signatureImages'] = signatureImages;
       Logger.log('adding image here');
@@ -461,13 +455,16 @@ export class AppController extends BaseController {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
-      options['$and'] = [{ tenantId: id },{ inspectionDate: new RegExp(date, 'i') }];
+      options['$and'] = [
+        { tenantId: id },
+        { inspectionDate: new RegExp(date, 'i') },
+      ];
       if (search) {
         options['$or'] = [];
         dvirSearchables.forEach((attribute) => {
           options['$or'].push({ [attribute]: new RegExp(search, 'i') });
         });
-      }// added search here
+      } // added search here
       const inspectionList = [];
       let list = [];
 
@@ -476,7 +473,7 @@ export class AppController extends BaseController {
         queryParams,
       );
 
-      let total = Object.keys(queryResponse).length;
+      let total = await this.tripInspectionService.getTotal(options);
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {

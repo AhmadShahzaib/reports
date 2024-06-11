@@ -170,7 +170,7 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
-  findAllDvir = (options, queryParams) => {
+  findAllDvir = async (options, queryParams) => {
     try {
       const { pageNo, limit } = queryParams;
 
@@ -181,6 +181,7 @@ if(inspection.signatures.mechanicSignature){
       // } else {
       //   query.sort({ createdAt: -1 });
       // }
+      // const totalCount = await this.tripInspectionModel.countDocuments(options);
       if (!limit || !isNaN(limit)) {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
@@ -191,7 +192,21 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
+  getTotal = async (options) => {
+    try {
+    
 
+     
+   
+      const totalCount = await this.tripInspectionModel.countDocuments(options);
+     
+
+      return totalCount;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   getGraphDataOnRange = async (
     driverId: string,
     startOfRange: number,
