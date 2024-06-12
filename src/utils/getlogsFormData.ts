@@ -6,7 +6,7 @@ import { graphUpdatedData } from './updatedGraphData';
 import getTimeZoneDateRangeForDay from '@shafiqrathore/logeld-tenantbackend-common-future';
 import { Logger } from '@nestjs/common';
 
-export let getLogsFormData = async (
+export const getLogsFormData = async (
   date: string,
   id: string,
   tripInspectionService: AppService,
@@ -18,7 +18,7 @@ export let getLogsFormData = async (
   try {
     let formData = {};
     let logsForm = {};
-    let unitData = await tripInspectionService.getUnitData(id);
+    const unitData = await tripInspectionService.getUnitData(id);
 
     const data = await serviceSign.findLogForm(id, date, companyTimeZone);
     if (data) {
@@ -42,7 +42,7 @@ export let getLogsFormData = async (
       logsForm['totalVehicleMiles'] = unitData?.meta?.totalVehicleMiles ?? null;
     }
     formData = await getDriverSign(data, logsForm, awsService);
-    let resGraph: any = await tripInspectionService.getLogsBetweenRange(
+    const resGraph: any = await tripInspectionService.getLogsBetweenRange(
       logsForm['driverId'],
       date,
       date,
@@ -58,7 +58,7 @@ export let getLogsFormData = async (
         })
         dutyLogs = dutyLogs.sort((a, b) => a.eventTime.localeCompare(b.eventTime));
       if (dutyLogs.length > 1) {
-        let lastLogInfo = resGraph?.data[0]?.meta?.deviceCalculations?.lastLogTime
+        const lastLogInfo = resGraph?.data[0]?.meta?.deviceCalculations?.lastLogTime
         if(((lastLogInfo?.eventCode == "3" && lastLogInfo?.eventType == "1") || (lastLogInfo?.eventCode == "1" && lastLogInfo?.eventType == "3") || (lastLogInfo?.eventCode == "2" && lastLogInfo?.eventType == "3")) && lastLogInfo?.eventTime<="230000" ){
             dutyLogs.shift()
 

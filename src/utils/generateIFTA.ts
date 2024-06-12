@@ -39,8 +39,8 @@ fileName
 
 ): Promise<Buffer> {
 
-let keys = Object.keys(completeData)
-  var context =       {
+const keys = Object.keys(completeData)
+  const context =       {
     startDate:startDate,
     
     endDate:endDate,
@@ -83,16 +83,16 @@ let keys = Object.keys(completeData)
         return moment.unix(index).format('HH:mm:ss A');
       });
       hb.registerHelper('workHours', function (value, options) {
-        let time = value.split(':');
+        const time = value.split(':');
         let ret = '';
         if (time[0].trim() > 0) {
-          let hrs = Math.floor(70 - time[0].trim());
+          const hrs = Math.floor(70 - time[0].trim());
           hrs < 10 ? (ret += '0' + hrs + ':') : (ret += hrs + ':');
         } else {
           ret += '00:';
         }
         if (time[1].trim() > 0) {
-          let mins = Math.floor(60 - time[1].trim());
+          const mins = Math.floor(60 - time[1].trim());
           mins < 10 ? (ret += '0' + mins) : (ret += mins);
         } else {
           ret += '00';

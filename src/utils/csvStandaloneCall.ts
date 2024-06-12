@@ -11,7 +11,7 @@ export const csvStandalone = async (
   investigationCode,
 ) => {
   try {
-    var data = JSON.stringify({
+    const data = JSON.stringify({
       unitData: unitData,
       decimalList: decimalList,
       logForm: logForm,
@@ -22,7 +22,7 @@ export const csvStandalone = async (
       investigationCode: investigationCode,
     });
 
-    var config = {
+    const config = {
       method: 'post',
       url: 'http://localhost:2000/getStringCsv',
       headers: {
@@ -33,7 +33,7 @@ export const csvStandalone = async (
       data: data,
     };
 
-    let response = await axios(config);
+    const response = await axios(config);
     return response.data;
   } catch (err) {
     console.log(err);

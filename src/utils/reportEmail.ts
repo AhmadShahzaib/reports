@@ -2,14 +2,14 @@ import axios from 'axios';
 import { error } from 'console';
 export const reportEmail = async (pdfBase: string, email : string, fileName: string) => {
   try {
-let data = JSON.stringify({
+const data = JSON.stringify({
   "toEmail": email,
   "pdfBase64": pdfBase,
   "fileName": fileName,
   "subject":"Daily Log Report"
 });
 
-let config = {
+const config = {
   method: 'post',
   maxBodyLength: Infinity,
   url: 'https://logelddev.azurewebsites.net/api/ELDSubmission/SendReport',
@@ -20,7 +20,7 @@ let config = {
   data : data
 };
 
-let response = await axios(config);
+const response = await axios(config);
     return response;
 
   } catch (err) {

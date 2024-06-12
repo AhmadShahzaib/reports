@@ -8,7 +8,7 @@ import {
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetDefectsDecorators() {
-  let response = {
+  const response = {
     message: 'Defects list found',
     data: [
       {

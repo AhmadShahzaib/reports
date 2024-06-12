@@ -1,8 +1,8 @@
 export const vinChecksum = (vin) => {
   if (vin) {
-    let vinArr = vin.split('');
-    let orignalArr = vin.split('');
-    let sampleArr = vinArr;
+    const vinArr = vin.split('');
+    const orignalArr = vin.split('');
+    const sampleArr = vinArr;
     let sum = 0;
     for (let i = 0; i < vinArr.length; i++) {
       switch (vinArr[i]) {
