@@ -10,7 +10,7 @@ export const convertICDtoV1 = (
   tenantId,
   companyTimeZone,
 ) => {
-  let allLoginLogoutLogs = csvData.eldLoginLogoutReport;
+  const allLoginLogoutLogs = csvData.eldLoginLogoutReport;
   let allLogs = JSON.parse(
             JSON.stringify(
               csvData.eldEventListForDriversRecordOfDutyStatus,
@@ -25,9 +25,9 @@ export const convertICDtoV1 = (
 
   // })
   allLogs = allLogs.sort((a, b) => a.eventTime - b.eventTime);
-  let allPowerupPowerdown = csvData.cmvEnginePowerUpShutDownActivity;
-  let certification = csvData.eldEventListForDriverCertificationOfOwnRecords
-  let nawLog = {
+  const allPowerupPowerdown = csvData.cmvEnginePowerUpShutDownActivity;
+  const certification = csvData.eldEventListForDriverCertificationOfOwnRecords
+  const nawLog = {
     status: '',
     startedAt: 0,
 
@@ -63,8 +63,8 @@ export const convertICDtoV1 = (
     eventType: '',
   };
 
-  let allRawLog = [];
-  let graph = JSON.parse(JSON.stringify(allLogs));
+  const allRawLog = [];
+  const graph = JSON.parse(JSON.stringify(allLogs));
       
   const filteredGraph = graph.filter((item) => { return (item.eventType != '2' && item.eventCode != '1') || (item.eventType != '2' && item.eventCode != '2') });
   const inter = graph.filter((item) => { return !((item.eventType != '2' && item.eventCode != '1') || (item.eventType != '2' && item.eventCode != '2') )});
@@ -72,7 +72,7 @@ export const convertICDtoV1 = (
 allLogs = filteredGraph
   allLogs.forEach((item, index) => {
     // if(index + 1 < allLogs.length){
-    let rawLog = JSON.parse(JSON.stringify(nawLog));
+    const rawLog = JSON.parse(JSON.stringify(nawLog));
     rawLog.status =
       item.eventCode == '1'
         ? 'OFF DUTY'
@@ -124,14 +124,14 @@ allLogs = filteredGraph
       rawLog.eventRecordOrigin = 'UNIDENTIFIED';
     }
 
-    let startTime = moment(
+    const startTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
     let lastTime;
 
     if (index + 1 < allLogs.length) {
-      let testString =
+      const testString =
         allLogs[index + 1].eventDate + allLogs[index + 1].eventTime;
 
       lastTime = moment(
@@ -141,7 +141,7 @@ allLogs = filteredGraph
     } else {
       lastTime = startTime;
     }
-    let drv = {
+    const drv = {
       id: driverId,
       tenantId: tenantId,
       firstName: csvData.driver.firstName,
@@ -151,7 +151,7 @@ allLogs = filteredGraph
     if (item.address) {
       addressOf = item.address;
     }
-    let location = {
+    const location = {
       longitude: item.eventLongitude,
       latitude: item.eventLatitude,
 
@@ -185,7 +185,7 @@ allLogs = filteredGraph
 
     if (index == allLogs.length - 1) {
       if (currentDate != item.eventDate) {
-        let last = moment(
+        const last = moment(
           allLogs[index].eventDate + '235900',
           'MMDDYYHHmmss',
         ).unix();
@@ -201,7 +201,7 @@ allLogs = filteredGraph
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const seconds = now.getSeconds().toString().padStart(2, '0');
         const hhmmss = hours + minutes + seconds;
-        let last = moment(
+        const last = moment(
           allLogs[index].eventDate + hhmmss,
           'MMDDYYHHmmss',
         ).unix();
@@ -213,9 +213,9 @@ allLogs = filteredGraph
 
     // }
   });
-  let allLogin = [];
+  const allLogin = [];
   allLoginLogoutLogs.map((item, index) => {
-    let login = JSON.parse(JSON.stringify(nawLog));
+    const login = JSON.parse(JSON.stringify(nawLog));
 
     if (item.eventCode == '1') {
       login.status = 'LOGIN';
@@ -240,15 +240,15 @@ allLogs = filteredGraph
     if (item.eventRecordOrigin == '4') {
       login.eventRecordOrigin = 'UNIDENTIFIED';
     }
-    let startTime = moment(
+    const startTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let lastTime = moment(
+    const lastTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let drv = {
+    const drv = {
       id: driverId,
       tenantId: tenantId,
       firstName: csvData.driver.firstName,
@@ -258,7 +258,7 @@ allLogs = filteredGraph
     if (item.address) {
       addressOf = item.address;
     }
-    let location = {
+    const location = {
       longitude:
         csvData.eldEventListForDriversRecordOfDutyStatus[0].eventLongitude,
       latitude:
@@ -289,9 +289,9 @@ allLogs = filteredGraph
     delete login.lastStartedAt;
     allLogin.push(login);
   });
-  let allpower = [];
+  const allpower = [];
   allPowerupPowerdown.map((item, index) => {
-    let power = JSON.parse(JSON.stringify(nawLog));
+    const power = JSON.parse(JSON.stringify(nawLog));
 
     if (item.eventCode == '4' || item.eventCode == '3') {
       power.status = 'EV_ENGINE_OFF';
@@ -316,15 +316,15 @@ allLogs = filteredGraph
     if (item.eventRecordOrigin == '4') {
       power.eventRecordOrigin = 'UNIDENTIFIED';
     }
-    let startTime = moment(
+    const startTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let lastTime = moment(
+    const lastTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let drv = {
+    const drv = {
       id: driverId,
       tenantId: tenantId,
       firstName: csvData.driver.firstName,
@@ -334,7 +334,7 @@ allLogs = filteredGraph
     if (item.address) {
       addressOf = item.address;
     }
-    let location = {
+    const location = {
       longitude:
         csvData.eldEventListForDriversRecordOfDutyStatus[0].eventLongitude,
       latitude:
@@ -365,9 +365,9 @@ allLogs = filteredGraph
     delete power.lastStartedAt;
     allpower.push(power);
   });
-  let int = []
+  const int = []
  inter.map((item, index) => {
-    let intermediate = JSON.parse(JSON.stringify(nawLog));
+    const intermediate = JSON.parse(JSON.stringify(nawLog));
 
     if (item.eventCode == '1') {
       intermediate.status = 'LOGIN';
@@ -398,15 +398,15 @@ allLogs = filteredGraph
     if (item.eventRecordOrigin == '4') {
       intermediate.eventRecordOrigin = 'UNIDENTIFIED';
     }
-    let startTime = moment(
+    const startTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let lastTime = moment(
+    const lastTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let drv = {
+    const drv = {
       id: driverId,
       tenantId: tenantId,
       firstName: csvData.driver.firstName,
@@ -416,7 +416,7 @@ allLogs = filteredGraph
     if (item.address) {
       addressOf = item.address;
     }
-    let location = {
+    const location = {
       longitude:
         csvData.eldEventListForDriversRecordOfDutyStatus[0].eventLongitude,
       latitude:
@@ -447,9 +447,9 @@ allLogs = filteredGraph
    delete intermediate.lastStartedAt;
     int.push(intermediate);
  });
-    let certi = []
+    const certi = []
  certification.map((item, index) => {
-    let certify = JSON.parse(JSON.stringify(nawLog));
+    const certify = JSON.parse(JSON.stringify(nawLog));
 
     // if (item.eventCode == '1') {
     //   certify.status = 'LOGIN';
@@ -487,15 +487,15 @@ allLogs = filteredGraph
     if (item.eventRecordOrigin == '4') {
       certify.eventRecordOrigin = 'UNIDENTIFIED';
     }
-    let startTime = moment(
+    const startTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let lastTime = moment(
+    const lastTime = moment(
       item.eventDate + item.eventTime,
       'MMDDYYHHmmss',
     ).unix();
-    let drv = {
+    const drv = {
       id: driverId,
       tenantId: tenantId,
       firstName: csvData.driver.firstName,
@@ -505,7 +505,7 @@ allLogs = filteredGraph
     if (item.address) {
       addressOf = item.address;
     }
-    let location = {
+    const location = {
       longitude:
         csvData.eldEventListForDriversRecordOfDutyStatus[0].eventLongitude,
       latitude:

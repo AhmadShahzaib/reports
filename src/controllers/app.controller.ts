@@ -299,7 +299,7 @@ export class AppController extends BaseController {
       // const inspectionList: InspectionResponse[] = [];
       // let list: InspectionResponse[] = [];
       // Logger.log(`getInspectionList was called with params: ${driverId}`);
-      let list = [];
+      const list = [];
       const inspections = await this.tripInspectionService.find(options);
       if (inspections && Object.keys(inspections).length > 0) {
         for (const inspection of inspections) {
@@ -358,7 +358,7 @@ export class AppController extends BaseController {
           },
         },
       };
-      let signatureImages = [...files.driverSignature];
+      const signatureImages = [...files.driverSignature];
       if (files.mechanicSignature) {
         defectRequest.signatures.mechanicSignature = {
           imageName: files.mechanicSignature[0].originalname,
@@ -466,14 +466,14 @@ export class AppController extends BaseController {
         });
       } // added search here
       const inspectionList = [];
-      let list = [];
+      const list = [];
 
       const queryResponse = await this.tripInspectionService.findAllDvir(
         options,
         queryParams,
       );
 
-      let total = await this.tripInspectionService.getTotal(options);
+      const total = await this.tripInspectionService.getTotal(options);
       // queryResponse = await newQuery.exec();
       if (queryResponse && Object.keys(queryResponse).length > 0) {
         for (const inspection of queryResponse) {
@@ -546,7 +546,7 @@ export class AppController extends BaseController {
         inspectionTime: { $gt: startOfDay, $lt: endOfDay },
       };
       const inspectionList: InspectionResponse[] = [];
-      let list: InspectionResponse[] = [];
+      const list: InspectionResponse[] = [];
       Logger.log(`getInspectionList was called with params: ${id}`);
       const inspections = await this.tripInspectionService.find(options);
       if (inspections && Object.keys(inspections).length > 0) {
@@ -623,8 +623,8 @@ export class AppController extends BaseController {
       if (!driverId) {
         driverId = id;
       }
-      let unitData = await this.tripInspectionService.getUnitData(driverId);
-      let companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+      const unitData = await this.tripInspectionService.getUnitData(driverId);
+      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
 
       function previousWeekDate(dateStr) {
         // Create a new Date object from the input date string
@@ -653,17 +653,17 @@ export class AppController extends BaseController {
         return newDateStr;
       }
 
-      let previousdate = previousWeekDate(date);
+      const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
-      let logsOfSelectedDate =
+      const logsOfSelectedDate =
         await this.tripInspectionService.getLogsBetweenRange(
           driverId,
           previousdate,
           date,
         );
-      let checkDate = date.split('-');
-      let todayDate = date;
+      const checkDate = date.split('-');
+      const todayDate = date;
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
@@ -693,14 +693,14 @@ export class AppController extends BaseController {
         //       data: [],
         //     });
         function formatDate(dateString) {
-          var date = new Date(dateString);
-          var month = (date.getMonth() + 1).toString().padStart(2, '0');
-          var day = date.getDate().toString().padStart(2, '0');
-          var year = date.getFullYear().toString().slice(-2);
+          const date = new Date(dateString);
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          const year = date.getFullYear().toString().slice(-2);
           return month + day + year;
         }
 
-        var formattedDate = formatDate(date);
+        const formattedDate = formatDate(date);
         if (currentDate != date) {
           last = moment(formattedDate + '235900', 'MMDDYYHHmmss').unix();
         } else {
@@ -716,7 +716,7 @@ export class AppController extends BaseController {
           const hhmmss = hours + minutes + seconds;
           last = moment(formattedDate + hhmmss, 'MMDDYYHHmmss').unix();
         }
-        let offDutyLog = [
+        const offDutyLog = [
           {
             status: 'OFF DUTY',
             startedAt: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
@@ -751,7 +751,7 @@ export class AppController extends BaseController {
             eventType: '',
           },
         ];
-        let rr = {
+        const rr = {
           date: date,
           recapData: {
             hoursWorked: {
@@ -763,7 +763,7 @@ export class AppController extends BaseController {
             total: 0,
           },
         };
-        let ob = [
+        const ob = [
           '00:00',
           '00:00',
           '00:00',
@@ -772,7 +772,7 @@ export class AppController extends BaseController {
           '00:00',
           '00:00',
         ];
-        let offDutyBuffer = await generatePdf(
+        const offDutyBuffer = await generatePdf(
           offDutyLog, //according to v2
           // updatedDataGraph?.updatedGraph, // according to v1
           // recap, // according to v1
@@ -799,7 +799,7 @@ export class AppController extends BaseController {
           0,
           // usdot,// according to v2
         );
-        var st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
+        const st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
         return response.status(HttpStatus.OK).send({
           message: 'Base64 string stream',
           data: st,
@@ -897,8 +897,8 @@ export class AppController extends BaseController {
         // Hours, minutes and seconds
         let ret = '';
         if (value) {
-          var hrs = value / 3600;
-          var mins = (value % 3600) / 60;
+          const hrs = value / 3600;
+          const mins = (value % 3600) / 60;
           // Output like "1:01" or "4:03:59" or "123:03:59"
           if (hrs > 0) {
             ret +=
@@ -919,13 +919,13 @@ export class AppController extends BaseController {
 
         return ret;
       }
-      let allDaysworkHour = getNext8Days(previousdate);
+      const allDaysworkHour = getNext8Days(previousdate);
       Logger.log(
         'Start Date ===================================> End date  ============= >' +
           allDaysworkHour,
       );
 
-      let object = [
+      const object = [
         '00:00',
         '00:00',
         '00:00',
@@ -936,19 +936,19 @@ export class AppController extends BaseController {
       ];
       object.reverse();
       let totalDutyTime = 0;
-      let totalMielsTrevled = getDistance(
+      const totalMielsTrevled = getDistance(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv
           .eldEventListForDriversRecordOfDutyStatus,
       );
       logsOfSelectedDate.data.map(async (item, index) => {
         // if(item.csv.eldEventListForDriversRecordOfDutyStatus.length !=0)
-        let newData = convertICDtoV1(
+        const newData = convertICDtoV1(
           logsOfSelectedDate.data[index].csv,
           driverId,
           tenantId,
           companyTimeZone,
         );
-        let updatedDataGraph = await graphUpdatedData(newData);
+        const updatedDataGraph = await graphUpdatedData(newData);
         if (newData[newData.length - 1].status == 'ON SB') {
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -979,10 +979,10 @@ export class AppController extends BaseController {
               newData[newData.length - 1].startedAt);
         }
         if (allDaysworkHour.includes(item.date)) {
-          let totalDutyHours =
+          const totalDutyHours =
             updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
             updatedDataGraph.TotalTimeInHHMM.totalDrivingTime;
-          let dateIndex = allDaysworkHour.indexOf(item.date);
+          const dateIndex = allDaysworkHour.indexOf(item.date);
           totalDutyTime += totalDutyHours;
           let eachObject = '';
           eachObject = convertHM(totalDutyHours);
@@ -993,8 +993,8 @@ export class AppController extends BaseController {
           // console.log('df');
         }
       });
-      let list: InspectionResponse[] = [];
-      let inspection = await this.tripInspectionService.findInspection(
+      const list: InspectionResponse[] = [];
+      const inspection = await this.tripInspectionService.findInspection(
         driverId,
         date,
       );
@@ -1041,7 +1041,7 @@ export class AppController extends BaseController {
       // let graph = await resGraph;
       // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
 
-      let newGraph = convertICDtoV1(
+      const newGraph = convertICDtoV1(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
         driverId,
         tenantId,
@@ -1049,7 +1049,7 @@ export class AppController extends BaseController {
       );
 
       // let clock= logsOfSelectedDateconsole.log()
-      let updatedDataGraph = await graphUpdatedData(newGraph);
+      const updatedDataGraph = await graphUpdatedData(newGraph);
       if (newGraph[newGraph.length - 1].status == 'ON SB') {
         updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -1098,7 +1098,7 @@ export class AppController extends BaseController {
       //   }
       // });
 
-      let newRecap = {
+      const newRecap = {
         date: date,
         recapData: {
           hoursWorked: {
@@ -1132,7 +1132,7 @@ export class AppController extends BaseController {
         ' ' +
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv.coDriver
           .coDriverLastName;
-      let buffer = await generatePdf(
+      const buffer = await generatePdf(
         newGraph, //according to v2
         // updatedDataGraph?.updatedGraph, // according to v1
         // recap, // according to v1
@@ -1154,8 +1154,8 @@ export class AppController extends BaseController {
         totalMielsTrevled,
         // usdot,// according to v2
       );
-      var pdfBase = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
-      let reportName = 'Daily_Log_Report_' + date;
+      const pdfBase = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
+      const reportName = 'Daily_Log_Report_' + date;
       const resp = await reportEmail(pdfBase, email, reportName);
       return response.status(HttpStatus.OK).send({
         message: resp.data,
@@ -1185,10 +1185,10 @@ export class AppController extends BaseController {
     if (!driverId) {
       driverId = id;
     }
-    let unitData = await this.tripInspectionService.getUnitData(driverId);
-    let companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-    var string = '';
-    let availableDatesPDF = [];
+    const unitData = await this.tripInspectionService.getUnitData(driverId);
+    const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+    const string = '';
+    const availableDatesPDF = [];
     function previousDateWeek(dateStr) {
       // Create a new Date object from the input date string
       const date = new Date(dateStr);
@@ -1205,7 +1205,7 @@ export class AppController extends BaseController {
       // Return the new date string
       return newDateStr;
     }
-    let previousDate = previousDateWeek(date);
+    const previousDate = previousDateWeek(date);
     function get8Days(dateString) {
       const result = [dateString];
       const currentDate = new Date(dateString);
@@ -1227,7 +1227,7 @@ export class AppController extends BaseController {
     let buffer;
     for (let i = 0; i < previousDateArray.length; i++) {
       const date = previousDateArray[i];
-      let eachDayLog = await this.tripInspectionService.getLogsBetweenRange(
+      const eachDayLog = await this.tripInspectionService.getLogsBetweenRange(
         driverId,
         date,
         date,
@@ -1254,17 +1254,17 @@ export class AppController extends BaseController {
           return newDateStr;
         }
 
-        let previousdate = previousWeekDate(date);
+        const previousdate = previousWeekDate(date);
         Logger.log('previous date :  ' + previousdate);
 
-        let logsOfSelectedDate =
+        const logsOfSelectedDate =
           await this.tripInspectionService.getLogsBetweenRange(
             driverId,
             previousdate,
             date,
           );
-        let checkDate = date.split('-');
-        let todayDate = date;
+        const checkDate = date.split('-');
+        const todayDate = date;
         let malfunctionIndicator = 'NO';
         let unidentifiedIndicator = 'NO';
         let dataDignosticIndicator = 'NO';
@@ -1332,8 +1332,8 @@ export class AppController extends BaseController {
           // Hours, minutes and seconds
           let ret = '';
           if (value) {
-            var hrs = value / 3600;
-            var mins = (value % 3600) / 60;
+            const hrs = value / 3600;
+            const mins = (value % 3600) / 60;
             // Output like "1:01" or "4:03:59" or "123:03:59"
             if (hrs > 0) {
               ret +=
@@ -1354,8 +1354,8 @@ export class AppController extends BaseController {
 
           return ret;
         }
-        let allDaysworkHour = getNext8Days(previousdate);
-        let object = [
+        const allDaysworkHour = getNext8Days(previousdate);
+        const object = [
           '00:00',
           '00:00',
           '00:00',
@@ -1367,19 +1367,19 @@ export class AppController extends BaseController {
         ];
         object.reverse();
         let totalDutyTime = 0;
-        let totalMielsTrevled = getDistance(
+        const totalMielsTrevled = getDistance(
           logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv
             .eldEventListForDriversRecordOfDutyStatus,
         );
         logsOfSelectedDate.data.map(async (item, index) => {
           // if(item.csv.eldEventListForDriversRecordOfDutyStatus.length !=0)
-          let newData = convertICDtoV1(
+          const newData = convertICDtoV1(
             logsOfSelectedDate.data[index].csv,
             driverId,
             tenantId,
             companyTimeZone,
           );
-          let updatedDataGraph = await graphUpdatedData(newData);
+          const updatedDataGraph = await graphUpdatedData(newData);
           if (newData[newData.length - 1].status == 'ON SB') {
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
               updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -1404,10 +1404,10 @@ export class AppController extends BaseController {
                 newData[newData.length - 1].startedAt);
           }
           if (allDaysworkHour.includes(item.date)) {
-            let totalDutyHours =
+            const totalDutyHours =
               updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
               updatedDataGraph.TotalTimeInHHMM.totalDrivingTime;
-            let dateIndex = allDaysworkHour.indexOf(item.date);
+            const dateIndex = allDaysworkHour.indexOf(item.date);
             totalDutyTime += totalDutyHours;
             let eachObject = '';
             eachObject = convertHM(totalDutyHours);
@@ -1418,8 +1418,8 @@ export class AppController extends BaseController {
             // console.log('df');
           }
         });
-        let list: InspectionResponse[] = [];
-        let inspection = await this.tripInspectionService.findInspection(
+        const list: InspectionResponse[] = [];
+        const inspection = await this.tripInspectionService.findInspection(
           driverId,
           date,
         );
@@ -1435,9 +1435,9 @@ export class AppController extends BaseController {
         // }
         if (list && list?.length > 0) {
           for (const entity of list) {
-            let driverSignature = entity?.signatures?.driverSignature;
+            const driverSignature = entity?.signatures?.driverSignature;
             if (driverSignature?.key) {
-              let driverSignaturePath = await this.awsService.getObject(
+              const driverSignaturePath = await this.awsService.getObject(
                 driverSignature.key,
               );
               driverSignature[
@@ -1447,9 +1447,9 @@ export class AppController extends BaseController {
                 .pop()};base64,${driverSignaturePath.replace(/\s+/g, '')}`;
               delete driverSignature['key'];
             }
-            let mechanicSignature = entity?.signatures?.mechanicSignature;
+            const mechanicSignature = entity?.signatures?.mechanicSignature;
             if (mechanicSignature?.key) {
-              let driverSignaturePath = await this.awsService.getObject(
+              const driverSignaturePath = await this.awsService.getObject(
                 mechanicSignature.key,
               );
               mechanicSignature[
@@ -1463,7 +1463,7 @@ export class AppController extends BaseController {
         }
         // let graph = await resGraph;
         // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
-        let newGraph = convertICDtoV1(
+        const newGraph = convertICDtoV1(
           logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
           driverId,
           tenantId,
@@ -1471,7 +1471,7 @@ export class AppController extends BaseController {
         );
 
         // let clock= logsOfSelectedDateconsole.log()
-        let updatedDataGraph = await graphUpdatedData(newGraph);
+        const updatedDataGraph = await graphUpdatedData(newGraph);
         if (newGraph[newGraph.length - 1].status == 'ON SB') {
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -1508,7 +1508,7 @@ export class AppController extends BaseController {
         //   }
         // });
 
-        let newRecap = {
+        const newRecap = {
           date: date,
           recapData: {
             hoursWorked: {
@@ -1609,7 +1609,7 @@ export class AppController extends BaseController {
         });
       }
     }
-    let reportName = 'Daily_Log_Report_' + date;
+    const reportName = 'Daily_Log_Report_' + date;
     const resp = await reportEmail(mergedPdfBase64, email, reportName);
     return response.status(HttpStatus.OK).send({
       message: resp.data,
@@ -1632,14 +1632,14 @@ export class AppController extends BaseController {
       const company = await firstValueFrom(
         this.unitClient.send({ cmd: 'get_company' }, tenantId),
       );
-      let { startDate, endDate, vehiclesArr, states, fileName, recipient } =
+      const { startDate, endDate, vehiclesArr, states, fileName, recipient } =
         queryObj;
-      let allVehiclesObject = {};
+      const allVehiclesObject = {};
       for (let i = 0; i < vehiclesArr.length; i++) {
         const vehicleId = vehiclesArr[i];
         let vehicaleName = '';
-        let unIdentified = [];
-        let dutyLogs = [];
+        const unIdentified = [];
+        const dutyLogs = [];
         const messagePatternUnits = await firstValueFrom(
           this.unitClient.send({ cmd: 'get_unit_by_vehicleID' }, vehicleId),
         );
@@ -1651,9 +1651,9 @@ export class AppController extends BaseController {
           for (let index = 0; index < messagePatternUnits.length; index++) {
             drivers.push(messagePatternUnits[index]?.driverId);
           }
-          let allRequierdCSVs = [];
+          const allRequierdCSVs = [];
           for (let i = 0; i < drivers.length; i++) {
-            let logsOfSelectedDate =
+            const logsOfSelectedDate =
               await this.tripInspectionService.getLogsBetweenRange(
                 drivers[i],
                 startDate,
@@ -1665,7 +1665,7 @@ export class AppController extends BaseController {
           }
 
           if (allRequierdCSVs.length > 0) {
-            let filteredCSVs = allRequierdCSVs.filter((each) => {
+            const filteredCSVs = allRequierdCSVs.filter((each) => {
               let flag = true;
               for (
                 let index = 0;
@@ -1688,7 +1688,7 @@ export class AppController extends BaseController {
                 }
               });
               if (assignedUserCmvOrderNumber.length > 0) {
-                let dutyStatusLog =
+                const dutyStatusLog =
                   eachCSV.csv.eldEventListForDriversRecordOfDutyStatus.filter(
                     (eachLog) => {
                       return (
@@ -1702,7 +1702,7 @@ export class AppController extends BaseController {
                   eachCSV.csv.eventLogListForUnidentifiedDriverProfile.length !=
                   0
                 ) {
-                  let unidentifiedLogs =
+                  const unidentifiedLogs =
                     eachCSV.csv.eventLogListForUnidentifiedDriverProfile.filter(
                       (eachLog) => {
                         return (
@@ -1726,7 +1726,7 @@ export class AppController extends BaseController {
         allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
         console.log('dsada');
       } //vehicle arry map
-      let allvehiclesMiles = {};
+      const allvehiclesMiles = {};
       let totalIdentityVeh = 0;
       let totalUnidentifiedVeh = 0;
       Object.keys(allVehiclesObject).forEach((vehicle) => {
@@ -1736,18 +1736,18 @@ export class AppController extends BaseController {
         let totalID = 0;
         let totalUID = 0;
 
-        let obj = {};
-        let eachStateArr = [];
+        const obj = {};
+        const eachStateArr = [];
         let count = 0;
         states.map((state) => {
-          let allLogsOfState = allVehiclesObject[vehicle][0].filter(
+          const allLogsOfState = allVehiclesObject[vehicle][0].filter(
             (eachDutyStatus) => {
               console.log(eachDutyStatus.state === state);
 
               return eachDutyStatus.state === state;
             },
           ); //filter each state duty logs
-          let allUnidentefiedLogsOfState = allVehiclesObject[vehicle][1].filter(
+          const allUnidentefiedLogsOfState = allVehiclesObject[vehicle][1].filter(
             (eachDutyStatus) => {
               console.log('your issue : ', eachDutyStatus.state === state);
 
@@ -1826,7 +1826,7 @@ export class AppController extends BaseController {
 
       const currentDateTime = moment().format('YYYY/MM/DD h:mm:ss A');
 
-      var base64PDF = Buffer.from(buffer).toString('base64');
+      const base64PDF = Buffer.from(buffer).toString('base64');
       console.log(csv);
       this.tripInspectionService.addIFTA({
         reportType: 'IFTA By Vehicle',
@@ -1883,8 +1883,8 @@ export class AppController extends BaseController {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
       queryResponse = await query.exec();
-      let data = [];
-      for (let eld of queryResponse) {
+      const data = [];
+      for (const eld of queryResponse) {
         data.push(eld);
       }
       return response.status(HttpStatus.OK).send({
@@ -1940,10 +1940,10 @@ export class AppController extends BaseController {
     if (!driverId) {
       driverId = id;
     }
-    let unitData = await this.tripInspectionService.getUnitData(driverId);
-    let companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-    var string = '';
-    let availableDatesPDF = [];
+    const unitData = await this.tripInspectionService.getUnitData(driverId);
+    const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+    const string = '';
+    const availableDatesPDF = [];
     function previousDateWeek(dateStr) {
       // Create a new Date object from the input date string
       const date = new Date(dateStr);
@@ -1960,7 +1960,7 @@ export class AppController extends BaseController {
       // Return the new date string
       return newDateStr;
     }
-    let previousDate = previousDateWeek(date);
+    const previousDate = previousDateWeek(date);
     function get8Days(dateString) {
       const result = [dateString];
       const currentDate = new Date(dateString);
@@ -1982,7 +1982,7 @@ export class AppController extends BaseController {
     let buffer;
     for (let i = 0; i < previousDateArray.length; i++) {
       const date = previousDateArray[i];
-      let eachDayLog = await this.tripInspectionService.getLogsBetweenRange(
+      const eachDayLog = await this.tripInspectionService.getLogsBetweenRange(
         driverId,
         date,
         date,
@@ -2009,17 +2009,17 @@ export class AppController extends BaseController {
           return newDateStr;
         }
 
-        let previousdate = previousWeekDate(date);
+        const previousdate = previousWeekDate(date);
         Logger.log('previous date :  ' + previousdate);
 
-        let logsOfSelectedDate =
+        const logsOfSelectedDate =
           await this.tripInspectionService.getLogsBetweenRange(
             driverId,
             previousdate,
             date,
           );
-        let checkDate = date.split('-');
-        let todayDate = date;
+        const checkDate = date.split('-');
+        const todayDate = date;
         let malfunctionIndicator = 'NO';
         let unidentifiedIndicator = 'NO';
         let dataDignosticIndicator = 'NO';
@@ -2087,8 +2087,8 @@ export class AppController extends BaseController {
           // Hours, minutes and seconds
           let ret = '';
           if (value) {
-            var hrs = value / 3600;
-            var mins = (value % 3600) / 60;
+            const hrs = value / 3600;
+            const mins = (value % 3600) / 60;
             // Output like "1:01" or "4:03:59" or "123:03:59"
             if (hrs > 0) {
               ret +=
@@ -2109,8 +2109,8 @@ export class AppController extends BaseController {
 
           return ret;
         }
-        let allDaysworkHour = getNext8Days(previousdate);
-        let object = [
+        const allDaysworkHour = getNext8Days(previousdate);
+        const object = [
           '00:00',
           '00:00',
           '00:00',
@@ -2122,19 +2122,19 @@ export class AppController extends BaseController {
         ];
         object.reverse();
         let totalDutyTime = 0;
-        let totalMielsTrevled = getDistance(
+        const totalMielsTrevled = getDistance(
           logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv
             .eldEventListForDriversRecordOfDutyStatus,
         );
         logsOfSelectedDate.data.map(async (item, index) => {
           // if(item.csv.eldEventListForDriversRecordOfDutyStatus.length !=0)
-          let newData = convertICDtoV1(
+          const newData = convertICDtoV1(
             logsOfSelectedDate.data[index].csv,
             driverId,
             tenantId,
             companyTimeZone,
           );
-          let updatedDataGraph = await graphUpdatedData(newData);
+          const updatedDataGraph = await graphUpdatedData(newData);
           if (newData[newData.length - 1].status == 'ON SB') {
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
               updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -2159,10 +2159,10 @@ export class AppController extends BaseController {
                 newData[newData.length - 1].startedAt);
           }
           if (allDaysworkHour.includes(item.date)) {
-            let totalDutyHours =
+            const totalDutyHours =
               updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
               updatedDataGraph.TotalTimeInHHMM.totalDrivingTime;
-            let dateIndex = allDaysworkHour.indexOf(item.date);
+            const dateIndex = allDaysworkHour.indexOf(item.date);
             totalDutyTime += totalDutyHours;
             let eachObject = '';
             eachObject = convertHM(totalDutyHours);
@@ -2173,8 +2173,8 @@ export class AppController extends BaseController {
             // console.log('df');
           }
         });
-        let list: InspectionResponse[] = [];
-        let inspection = await this.tripInspectionService.findInspection(
+        const list: InspectionResponse[] = [];
+        const inspection = await this.tripInspectionService.findInspection(
           driverId,
           date,
         );
@@ -2190,9 +2190,9 @@ export class AppController extends BaseController {
         // }
         if (list && list?.length > 0) {
           for (const entity of list) {
-            let driverSignature = entity?.signatures?.driverSignature;
+            const driverSignature = entity?.signatures?.driverSignature;
             if (driverSignature?.key) {
-              let driverSignaturePath = await this.awsService.getObject(
+              const driverSignaturePath = await this.awsService.getObject(
                 driverSignature.key,
               );
               driverSignature[
@@ -2202,9 +2202,9 @@ export class AppController extends BaseController {
                 .pop()};base64,${driverSignaturePath.replace(/\s+/g, '')}`;
               delete driverSignature['key'];
             }
-            let mechanicSignature = entity?.signatures?.mechanicSignature;
+            const mechanicSignature = entity?.signatures?.mechanicSignature;
             if (mechanicSignature?.key) {
-              let driverSignaturePath = await this.awsService.getObject(
+              const driverSignaturePath = await this.awsService.getObject(
                 mechanicSignature.key,
               );
               mechanicSignature[
@@ -2218,7 +2218,7 @@ export class AppController extends BaseController {
         }
         // let graph = await resGraph;
         // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
-        let newGraph = convertICDtoV1(
+        const newGraph = convertICDtoV1(
           logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
           driverId,
           tenantId,
@@ -2226,7 +2226,7 @@ export class AppController extends BaseController {
         );
 
         // let clock= logsOfSelectedDateconsole.log()
-        let updatedDataGraph = await graphUpdatedData(newGraph);
+        const updatedDataGraph = await graphUpdatedData(newGraph);
         if (newGraph[newGraph.length - 1].status == 'ON SB') {
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -2263,7 +2263,7 @@ export class AppController extends BaseController {
         //   }
         // });
 
-        let newRecap = {
+        const newRecap = {
           date: date,
           recapData: {
             hoursWorked: {
@@ -2385,8 +2385,8 @@ export class AppController extends BaseController {
       if (!driverId) {
         driverId = id;
       }
-      let unitData = await this.tripInspectionService.getUnitData(driverId);
-      let companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+      const unitData = await this.tripInspectionService.getUnitData(driverId);
+      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
 
       function previousWeekDate(dateStr) {
         // Create a new Date object from the input date string
@@ -2415,17 +2415,17 @@ export class AppController extends BaseController {
         return newDateStr;
       }
 
-      let previousdate = previousWeekDate(date);
+      const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
-      let logsOfSelectedDate =
+      const logsOfSelectedDate =
         await this.tripInspectionService.getLogsBetweenRange(
           driverId,
           previousdate,
           date,
         );
-      let checkDate = date.split('-');
-      let todayDate = date;
+      const checkDate = date.split('-');
+      const todayDate = date;
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
@@ -2455,14 +2455,14 @@ export class AppController extends BaseController {
         //       data: [],
         //     });
         function formatDate(dateString) {
-          var date = new Date(dateString);
-          var month = (date.getMonth() + 1).toString().padStart(2, '0');
-          var day = date.getDate().toString().padStart(2, '0');
-          var year = date.getFullYear().toString().slice(-2);
+          const date = new Date(dateString);
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          const year = date.getFullYear().toString().slice(-2);
           return month + day + year;
         }
 
-        var formattedDate = formatDate(date);
+        const formattedDate = formatDate(date);
         if (currentDate != date) {
           last = moment(formattedDate + '235900', 'MMDDYYHHmmss').unix();
         } else {
@@ -2478,7 +2478,7 @@ export class AppController extends BaseController {
           const hhmmss = hours + minutes + seconds;
           last = moment(formattedDate + hhmmss, 'MMDDYYHHmmss').unix();
         }
-        let offDutyLog = [
+        const offDutyLog = [
           {
             status: 'OFF DUTY',
             startedAt: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
@@ -2513,7 +2513,7 @@ export class AppController extends BaseController {
             eventType: '',
           },
         ];
-        let rr = {
+        const rr = {
           date: date,
           recapData: {
             hoursWorked: {
@@ -2525,7 +2525,7 @@ export class AppController extends BaseController {
             total: 0,
           },
         };
-        let ob = [
+        const ob = [
           '00:00',
           '00:00',
           '00:00',
@@ -2534,7 +2534,7 @@ export class AppController extends BaseController {
           '00:00',
           '00:00',
         ];
-        let offDutyBuffer = await generatePdf(
+        const offDutyBuffer = await generatePdf(
           offDutyLog, //according to v2
           // updatedDataGraph?.updatedGraph, // according to v1
           // recap, // according to v1
@@ -2561,7 +2561,7 @@ export class AppController extends BaseController {
           0,
           // usdot,// according to v2
         );
-        var st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
+        const st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
         return response.status(HttpStatus.OK).send({
           message: 'Base64 string stream',
           data: st,
@@ -2659,8 +2659,8 @@ export class AppController extends BaseController {
         // Hours, minutes and seconds
         let ret = '';
         if (value) {
-          var hrs = value / 3600;
-          var mins = (value % 3600) / 60;
+          const hrs = value / 3600;
+          const mins = (value % 3600) / 60;
           // Output like "1:01" or "4:03:59" or "123:03:59"
           if (hrs > 0) {
             ret +=
@@ -2681,13 +2681,13 @@ export class AppController extends BaseController {
 
         return ret;
       }
-      let allDaysworkHour = getNext8Days(previousdate);
+      const allDaysworkHour = getNext8Days(previousdate);
       Logger.log(
         'Start Date ===================================> End date  ============= >' +
           allDaysworkHour,
       );
 
-      let object = [
+      const object = [
         '00:00',
         '00:00',
         '00:00',
@@ -2698,19 +2698,19 @@ export class AppController extends BaseController {
       ];
       object.reverse();
       let totalDutyTime = 0;
-      let totalMielsTrevled = getDistance(
+      const totalMielsTrevled = getDistance(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv
           .eldEventListForDriversRecordOfDutyStatus,
       );
       logsOfSelectedDate.data.map(async (item, index) => {
         // if(item.csv.eldEventListForDriversRecordOfDutyStatus.length !=0)
-        let newData = convertICDtoV1(
+        const newData = convertICDtoV1(
           logsOfSelectedDate.data[index].csv,
           driverId,
           tenantId,
           companyTimeZone,
         );
-        let updatedDataGraph = await graphUpdatedData(newData);
+        const updatedDataGraph = await graphUpdatedData(newData);
         if (newData[newData.length - 1].status == 'ON SB') {
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
             updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -2741,10 +2741,10 @@ export class AppController extends BaseController {
               newData[newData.length - 1].startedAt);
         }
         if (allDaysworkHour.includes(item.date)) {
-          let totalDutyHours =
+          const totalDutyHours =
             updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
             updatedDataGraph.TotalTimeInHHMM.totalDrivingTime;
-          let dateIndex = allDaysworkHour.indexOf(item.date);
+          const dateIndex = allDaysworkHour.indexOf(item.date);
           totalDutyTime += totalDutyHours;
           let eachObject = '';
           eachObject = convertHM(totalDutyHours);
@@ -2755,8 +2755,8 @@ export class AppController extends BaseController {
           // console.log('df');
         }
       });
-      let list: InspectionResponse[] = [];
-      let inspection = await this.tripInspectionService.findInspection(
+      const list: InspectionResponse[] = [];
+      const inspection = await this.tripInspectionService.findInspection(
         driverId,
         date,
       );
@@ -2803,7 +2803,7 @@ export class AppController extends BaseController {
       // let graph = await resGraph;
       // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
 
-      let newGraph = convertICDtoV1(
+      const newGraph = convertICDtoV1(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
         driverId,
         tenantId,
@@ -2811,7 +2811,7 @@ export class AppController extends BaseController {
       );
 
       // let clock= logsOfSelectedDateconsole.log()
-      let updatedDataGraph = await graphUpdatedData(newGraph);
+      const updatedDataGraph = await graphUpdatedData(newGraph);
       if (newGraph[newGraph.length - 1].status == 'ON SB') {
         updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -2860,7 +2860,7 @@ export class AppController extends BaseController {
       //   }
       // });
 
-      let newRecap = {
+      const newRecap = {
         date: date,
         recapData: {
           hoursWorked: {
@@ -2894,7 +2894,7 @@ export class AppController extends BaseController {
         ' ' +
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv.coDriver
           .coDriverLastName;
-      let buffer = await generatePdf(
+      const buffer = await generatePdf(
         newGraph, //according to v2
         // updatedDataGraph?.updatedGraph, // according to v1
         // recap, // according to v1
@@ -2916,7 +2916,7 @@ export class AppController extends BaseController {
         totalMielsTrevled,
         // usdot,// according to v2
       );
-      var string = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
+      const string = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
       return response.status(HttpStatus.OK).send({
         message: 'Base64 string stream',
         data: string,
@@ -2955,7 +2955,7 @@ export class AppController extends BaseController {
       defectRequest.driverId = id;
       defectRequest.vehicleId = vehicleId;
       defectRequest.officeId = homeTerminalAddress;
-      let requestInspection = await imagesUpload(
+      const requestInspection = await imagesUpload(
         files,
         this.awsService,
         defectRequest,
@@ -2963,7 +2963,7 @@ export class AppController extends BaseController {
         id,
         this.tripInspectionService,
       );
-      let unitData = await this.tripInspectionService.getUnitData(id);
+      const unitData = await this.tripInspectionService.getUnitData(id);
       requestInspection.vehicleManualId = unitData.manualVehicleId;
       requestInspection.trailerNumber = unitData.trailerNumber;
       const addDefect = await this.tripInspectionService.updateInspection(
@@ -3001,7 +3001,7 @@ export class AppController extends BaseController {
       const { tenantId, id, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       logFormRequest.tenantId = tenantId;
-      let requestLog = await signUpload(
+      const requestLog = await signUpload(
         driverSign,
         this.awsService,
         logFormRequest,
@@ -3014,7 +3014,7 @@ export class AppController extends BaseController {
         requestLog.trailerNumber = JSON.parse(trilers);
         requestLog.shippingDocument = JSON.parse(shipings);
       }
-      let logResult = await this.serviceSign.UpdateLogForm(
+      const logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
         id,
         date,
@@ -3065,8 +3065,8 @@ export class AppController extends BaseController {
       const { tenantId, id, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       logFormRequest.tenantId = tenantId;
-      let givenDates = date.split(',');
-      let requestLog = await signUpload(
+      const givenDates = date.split(',');
+      const requestLog = await signUpload(
         driverSign,
         this.awsService,
         logFormRequest,
@@ -3076,7 +3076,7 @@ export class AppController extends BaseController {
       // requestLog.trailerNumber = JSON.parse(JSON.stringify(requestLog.trailerNumber));
       // requestLog.shippingDocument = JSON.parse(JSON.stringify(requestLog.shippingDocument));
 
-      let logResult = await this.serviceSign.UpdateLogForm(
+      const logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
         id,
         givenDates[0],
@@ -3098,7 +3098,7 @@ export class AppController extends BaseController {
         }
       }
 
-      let isCertified = await this.tripInspectionService.certification(
+      const isCertified = await this.tripInspectionService.certification(
         id,
         givenDates,
         companyTimeZone,
@@ -3114,7 +3114,7 @@ export class AppController extends BaseController {
           mapMessagePatternResponseToException(messagePatternDriver);
         }
         const user = messagePatternDriver?.data;
-        let SpecificClient = user?.client;
+        const SpecificClient = user?.client;
 
         // call message pattern here
 
@@ -3179,7 +3179,7 @@ export class AppController extends BaseController {
       const { tenantId, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       logFormRequest.tenantId = tenantId;
-      let requestLog = await signUpload(
+      const requestLog = await signUpload(
         driverSign,
         this.awsService,
         logFormRequest,
@@ -3193,7 +3193,7 @@ export class AppController extends BaseController {
         requestLog.shippingDocument = JSON.parse(shipings);
       }
 
-      let logResult = await this.serviceSign.UpdateLogForm(
+      const logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
         driverId,
         date,
@@ -3228,9 +3228,9 @@ export class AppController extends BaseController {
       const { id, tenantId, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       Logger.log(`getInspectionList was called`);
-      let logsOfSelectedDate =
+      const logsOfSelectedDate =
         await this.tripInspectionService.getLogsBetweenRange(id, date, date);
-      let logFormData = await getLogsFormData(
+      const logFormData = await getLogsFormData(
         date,
         id,
         this.tripInspectionService,
@@ -3239,7 +3239,7 @@ export class AppController extends BaseController {
         tenantId,
         companyTimeZone,
       );
-      let data = logFormData?.logForm;
+      const data = logFormData?.logForm;
       // if(logFormData.notPresentLogform){
       //  const requestLog: LogFormRequest = new LogFormRequest();
       //  requestLog.shippingDocument = (data as any)?.shippingDocument
@@ -3289,7 +3289,7 @@ export class AppController extends BaseController {
       const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
 
       let isActive = queryParams.isActive;
-      let arr = [];
+      const arr = [];
       arr.push(isActive);
       if (arr.includes('true')) {
         isActive = true;
@@ -3339,8 +3339,8 @@ export class AppController extends BaseController {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
       queryResponse = await query.exec();
-      let data = [];
-      for (let eld of queryResponse) {
+      const data = [];
+      for (const eld of queryResponse) {
         data.push(eld);
       }
       return response.status(HttpStatus.OK).send({
@@ -3371,7 +3371,7 @@ export class AppController extends BaseController {
       const { id, tenantId, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       Logger.log(`getInspectionList was called`);
-      let logFormData = await getLogsFormData(
+      const logFormData = await getLogsFormData(
         date,
         driverId,
         this.tripInspectionService,
@@ -3380,7 +3380,7 @@ export class AppController extends BaseController {
         tenantId,
         companyTimeZone,
       );
-      let data = logFormData?.logForm;
+      const data = logFormData?.logForm;
       Logger.log('Massege PAttern True \n\n\n' + logFormData.notPresentLogform);
       // if(logFormData.notPresentLogform){
       //   Logger.log("In IF")
@@ -3397,7 +3397,7 @@ export class AppController extends BaseController {
       //  );
       // //  console.log(logResult)
       // }
-      let logsOfSelectedDate =
+      const logsOfSelectedDate =
         await this.tripInspectionService.getLogsBetweenRange(
           driverId,
           date,
@@ -3410,8 +3410,8 @@ export class AppController extends BaseController {
         a.eventTime.localeCompare(b.eventTime),
       );
 
-      let shippingIds = [];
-      let trailerIds = [];
+      const shippingIds = [];
+      const trailerIds = [];
       csvDataOfDutyStatus.forEach((record) => {
         if (!shippingIds.includes(record.shippingId)) {
           shippingIds.push(record.shippingId);
@@ -3466,7 +3466,7 @@ export class AppController extends BaseController {
       } else {
         dateStart = moment(dateStart).format('YYYY-MM-DD');
       }
-      let fileRes = [];
+      const fileRes = [];
       let driverIdArrItrator = [];
       const { id, tenantId, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
@@ -3476,8 +3476,8 @@ export class AppController extends BaseController {
       } else {
         driverIdArrItrator = driverIdArr;
       }
-      for (let driverId of driverIdArrItrator) {
-        let logsOfSelectedDate =
+      for (const driverId of driverIdArrItrator) {
+        const logsOfSelectedDate =
           await this.tripInspectionService.getLogsBetweenRange(
             driverId,
             dateStart,
@@ -3488,7 +3488,7 @@ export class AppController extends BaseController {
             message: 'No, record found there.',
           });
         }
-        let finalCsv = logsOfSelectedDate.data[0].csv;
+        const finalCsv = logsOfSelectedDate.data[0].csv;
         finalCsv.eldFileHeaderSegment.outputFileComment =
           investigationCode.trim();
         let stringOfEldLine = '';
@@ -3497,7 +3497,7 @@ export class AppController extends BaseController {
             stringOfEldLine += finalCsv.eldFileHeaderSegment[item];
           }
         });
-        let result = checkSum(stringOfEldLine);
+        const result = checkSum(stringOfEldLine);
         finalCsv.eldFileHeaderSegment.lineDataCheckValue = result.hexa;
         logsOfSelectedDate.data.forEach((singleDay, index) => {
           if (index != 0) {
@@ -3524,7 +3524,7 @@ export class AppController extends BaseController {
             );
           }
         });
-        let driverCertification = [];
+        const driverCertification = [];
         await finalCsv.eldEventListForDriverCertificationOfOwnRecords.forEach(
           (element) => {
             driverCertification.push(getCertificationCheck(element));
@@ -3533,7 +3533,7 @@ export class AppController extends BaseController {
         finalCsv.eldEventListForDriverCertificationOfOwnRecords =
           driverCertification;
 
-        let malfuntion = [];
+        const malfuntion = [];
         await finalCsv.malfunctionsAndDiagnosticEventRecords.forEach(
           (element) => {
             malfuntion.push(getEventsCheckSum(element));
@@ -3541,13 +3541,13 @@ export class AppController extends BaseController {
         );
         finalCsv.malfunctionsAndDiagnosticEventRecords = malfuntion;
 
-        let powerUpDown = [];
+        const powerUpDown = [];
         await finalCsv.cmvEnginePowerUpShutDownActivity.forEach((element) => {
           powerUpDown.push(getEventPower(element));
         });
         finalCsv.cmvEnginePowerUpShutDownActivity = powerUpDown;
 
-        let unidentified = [];
+        const unidentified = [];
         await finalCsv.eventLogListForUnidentifiedDriverProfile.forEach(
           (element) => {
             unidentified.push(getUnidentifiedcheckSum(element));
@@ -3555,13 +3555,13 @@ export class AppController extends BaseController {
         );
         finalCsv.eventLogListForUnidentifiedDriverProfile = unidentified;
 
-        let loginLogout = [];
+        const loginLogout = [];
         await finalCsv.eldLoginLogoutReport.forEach((element) => {
           loginLogout.push(getEventsCheckSum(element));
         });
         finalCsv.eldLoginLogoutReport = loginLogout;
 
-        let dutyStatusesArray = [];
+        const dutyStatusesArray = [];
         await finalCsv.eldEventListForDriversRecordOfDutyStatus.forEach(
           (element) => {
             dutyStatusesArray.push(getLogChecksum(element));
@@ -3605,7 +3605,7 @@ export class AppController extends BaseController {
             stringOfTimePlaceLine += finalCsv.timePlaceLine[item];
           }
         });
-        let resultofTimePlaceLine = checkSum(stringOfTimePlaceLine);
+        const resultofTimePlaceLine = checkSum(stringOfTimePlaceLine);
         finalCsv.timePlaceLine.lineDataCheckValue = resultofTimePlaceLine.hexa;
 
         finalCsv.eventAnnotationsCommentsAndDriverLocation.map(
@@ -3642,7 +3642,7 @@ export class AppController extends BaseController {
                 delete element.eventDataCheckValue;
               }
             });
-            let resultofEventAnnotation = checkSum(stringOfEventAnnotation);
+            const resultofEventAnnotation = checkSum(stringOfEventAnnotation);
             finalCsv.eventAnnotationsCommentsAndDriverLocation[
               index
             ].lineDataCheckValue = resultofEventAnnotation.hexa;
@@ -3666,20 +3666,20 @@ export class AppController extends BaseController {
         });
 
         finalCsv.fileDataCheckLine.fileDataCheckValue = fileCheckData(decimal);
-        let current = moment().unix();
-        let res = await getArrayData(finalCsv);
+        const current = moment().unix();
+        const res = await getArrayData(finalCsv);
         let resultString = '';
-        for (let line of res) {
+        for (const line of res) {
           resultString += line + '\r';
         }
-        let fileName = fileNameCreation(
+        const fileName = fileNameCreation(
           finalCsv.driver.lastName,
           finalCsv.driver.driverLicenseNumber,
           dateFormat(current, companyTimeZone),
           timeFormat(current, companyTimeZone),
         );
 
-        let resFmcsa = await fmcsaCall(
+        const resFmcsa = await fmcsaCall(
           resultString,
           investigationCode.trim(),
           fileName,
@@ -3687,7 +3687,7 @@ export class AppController extends BaseController {
 
         //this part here is just to add validation on csv data
         //please test it by cahnging vin or carrier name
-        let flag = await isValidVin(
+        const flag = await isValidVin(
           finalCsv.cmvList[finalCsv.cmvList.length - 1].cmvVin,
         );
         resFmcsa['warning'] = [];
@@ -3696,17 +3696,17 @@ export class AppController extends BaseController {
             'contains 17 characters. only contains capital letters and numbers. does not contain the characters I, O, or Q',
           );
         }
-        let carrierValidation = await isValidCarrierName(
+        const carrierValidation = await isValidCarrierName(
           finalCsv.carrierLine.carrierName,
         );
         if (carrierValidation.length != 0) {
           resFmcsa.warning.push(carrierValidation);
         }
         // validation part ends here
-        let driverName =
+        const driverName =
           finalCsv.driver.firstName + ' ' + finalCsv.driver.lastName;
         fileRes.push(resFmcsa); // call for .net service to submit csv on fmcsa web portal.
-        let now = new Date();
+        const now = new Date();
         this.tripInspectionService.addReportSubmitTable({
           origin: origin ? origin : 'mobile',
           eRODScode: investigationCode.trim(),
@@ -3723,7 +3723,7 @@ export class AppController extends BaseController {
         if (!fs.existsSync('./CSVList')) {
           fs.mkdirSync('./CSVList');
         }
-        let data = fs.writeFileSync(
+        const data = fs.writeFileSync(
           './CSVList/' + fileName + '.csv',
           resultString,
         );
@@ -3788,14 +3788,14 @@ export class AppController extends BaseController {
     @Res() response: Response,
     @Req() request: Request,
   ) {
-    let logsOfSelectedDate =
+    const logsOfSelectedDate =
       await this.tripInspectionService.getLogsBetweenRange(
         driverId,
         dateStart,
         dateEnd,
       );
 
-    let dates = [];
+    const dates = [];
     if (logsOfSelectedDate.data.length > 0) {
       logsOfSelectedDate.data.map((element) => {
         if (
@@ -3840,7 +3840,7 @@ export class AppController extends BaseController {
     }
     const { id, tenantId, companyTimeZone } =
       request.user ?? ({ tenantId: undefined } as any);
-    let isMatched = await checkSign(
+    const isMatched = await checkSign(
       signature,
       driverId,
       this.tripInspectionService,
@@ -3852,14 +3852,14 @@ export class AppController extends BaseController {
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
         const currentDate = moment().format('YYYY-MM-DD').toString();
-        for (let date of givenDates) {
+        for (const date of givenDates) {
           logsOfSelectedDate =
             await this.tripInspectionService.getLogsBetweenRange(
               driverId,
               date,
               date,
             );
-          let certify = {};
+          const certify = {};
 
           certify['eventSequenceIdNumber'] = '1C';
           certify['eventCode'] = '1';
@@ -3891,7 +3891,7 @@ export class AppController extends BaseController {
           logsOfSelectedDate.data[0].csv.eldEventListForDriverCertificationOfOwnRecords =
             [certify];
           // logsOfSelectedDate.data[0].meta.editRequest = true;
-          let update = await this.tripInspectionService.updateCertification(
+          const update = await this.tripInspectionService.updateCertification(
             driverId,
             logsOfSelectedDate,
           );
@@ -3905,7 +3905,7 @@ export class AppController extends BaseController {
           const signs = await splitSign(signature);
           requestLog.sign = signs;
 
-          let logResult = await this.serviceSign.UpdateLogForm(
+          const logResult = await this.serviceSign.UpdateLogForm(
             requestLog,
             driverId,
             date,
@@ -3977,9 +3977,9 @@ export class AppController extends BaseController {
   async update_certification(requestParam: any): Promise<any> {
     try {
       const { date, driverId, time, signature, companyTimeZone } = requestParam;
-      let givenDates = [date];
+      const givenDates = [date];
 
-      let isMatched = await checkSign(
+      const isMatched = await checkSign(
         signature,
         driverId,
         this.tripInspectionService,
@@ -3991,17 +3991,17 @@ export class AppController extends BaseController {
         let logsOfSelectedDate;
         if (givenDates.length != 0) {
           const currentDate = moment().format('YYYY-MM-DD').toString();
-          for (let date of givenDates) {
+          for (const date of givenDates) {
             logsOfSelectedDate =
               await this.tripInspectionService.getLogsBetweenRange(
                 driverId,
                 date,
                 date,
               );
-            let certificationArr =
+            const certificationArr =
               logsOfSelectedDate.data[0].csv
                 .eldEventListForDriverCertificationOfOwnRecords;
-            let certify = {};
+            const certify = {};
 
             certify['eventSequenceIdNumber'] = generateUniqueHexId();
             certify['eventCode'] = '1';
@@ -4034,7 +4034,7 @@ export class AppController extends BaseController {
             logsOfSelectedDate.data[0].csv.eldEventListForDriverCertificationOfOwnRecords =
               certificationArr;
             // logsOfSelectedDate.data[0].meta.editRequest = true;
-            let update = await this.tripInspectionService.updateCertification(
+            const update = await this.tripInspectionService.updateCertification(
               driverId,
               logsOfSelectedDate,
             );
@@ -4048,7 +4048,7 @@ export class AppController extends BaseController {
             const signs = await splitSign(signature);
             requestLog.sign = signs;
 
-            let logResult = await this.serviceSign.UpdateLogForm(
+            const logResult = await this.serviceSign.UpdateLogForm(
               requestLog,
               driverId,
               date,
@@ -4098,7 +4098,7 @@ export class AppController extends BaseController {
     } else {
       // requestLog.sign = {}
     }
-    let logResult = await this.serviceSign.UpdateLogForm(
+    const logResult = await this.serviceSign.UpdateLogForm(
       requestLog,
       driverId,
       date,
@@ -4114,8 +4114,8 @@ export class AppController extends BaseController {
     try {
       const { tenantId, driverId, dateStart, csv } = requestParam;
 
-      let unitData = await this.tripInspectionService.getUnitData(driverId);
-      let companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+      const unitData = await this.tripInspectionService.getUnitData(driverId);
+      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
 
       function previousWeekDate(dateStr) {
         // Create a new Date object from the input date string
@@ -4143,8 +4143,8 @@ export class AppController extends BaseController {
         // Return the new date string
         return newDateStr;
       }
-      let date = dateStart;
-      let previousdate = previousWeekDate(date);
+      const date = dateStart;
+      const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
       // let logsOfSelectedDate =
@@ -4153,8 +4153,8 @@ export class AppController extends BaseController {
       //     previousdate,
       //     date,
       //   );
-      let checkDate = date.split('-');
-      let todayDate = date;
+      const checkDate = date.split('-');
+      const todayDate = date;
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
@@ -4233,8 +4233,8 @@ export class AppController extends BaseController {
         // Hours, minutes and seconds
         let ret = '';
         if (value) {
-          var hrs = value / 3600;
-          var mins = (value % 3600) / 60;
+          const hrs = value / 3600;
+          const mins = (value % 3600) / 60;
           // Output like "1:01" or "4:03:59" or "123:03:59"
           if (hrs > 0) {
             ret +=
@@ -4255,13 +4255,13 @@ export class AppController extends BaseController {
 
         return ret;
       }
-      let allDaysworkHour = getNext8Days(previousdate);
+      const allDaysworkHour = getNext8Days(previousdate);
       Logger.log(
         'Start Date ===================================> End date  ============= >' +
           allDaysworkHour,
       );
 
-      let object = [
+      const object = [
         '00:00',
         '00:00',
         '00:00',
@@ -4272,7 +4272,7 @@ export class AppController extends BaseController {
       ];
       object.reverse();
       let totalDutyTime = 0;
-      let totalMielsTrevled = getDistance(
+      const totalMielsTrevled = getDistance(
         csv.eldEventListForDriversRecordOfDutyStatus,
       );
       // logsOfSelectedDate.data.map(async (item, index) => {
@@ -4322,8 +4322,8 @@ export class AppController extends BaseController {
       //     // console.log('df');
       //   }
       // });
-      let list: InspectionResponse[] = [];
-      let inspection = await this.tripInspectionService.findInspection(
+      const list: InspectionResponse[] = [];
+      const inspection = await this.tripInspectionService.findInspection(
         driverId,
         date,
       );
@@ -4334,10 +4334,10 @@ export class AppController extends BaseController {
         }
       }
 
-      let newGraph = convertICDtoV1(csv, driverId, tenantId, companyTimeZone);
+      const newGraph = convertICDtoV1(csv, driverId, tenantId, companyTimeZone);
 
       // let clock= logsOfSelectedDateconsole.log()
-      let updatedDataGraph = await graphUpdatedData(newGraph);
+      const updatedDataGraph = await graphUpdatedData(newGraph);
       if (newGraph[newGraph.length - 1].status == 'ON SB') {
         updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
@@ -4386,7 +4386,7 @@ export class AppController extends BaseController {
       //   }
       // });
 
-      let newRecap = {
+      const newRecap = {
         date: date,
         recapData: {
           hoursWorked: {
@@ -4414,7 +4414,7 @@ export class AppController extends BaseController {
 
       unitData.coDriverId =
         csv.coDriver.coDriverFirstName + ' ' + csv.coDriver.coDriverLastName;
-      let buffer = await generateEditPdf(
+      const buffer = await generateEditPdf(
         newGraph, //according to v2
         // updatedDataGraph?.updatedGraph, // according to v1
         // recap, // according to v1
@@ -4436,7 +4436,7 @@ export class AppController extends BaseController {
         totalMielsTrevled,
         // usdot,// according to v2
       );
-      var string = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
+      const string = Buffer.from(buffer).toString('base64'); //buffer.toString('base64');
       return {
         isMessagePattern: true,
         isError: false,
@@ -4451,7 +4451,7 @@ export class AppController extends BaseController {
   // @UseInterceptors(new MessagePatternResponseInterceptor())
   @MessagePattern({ cmd: 'get_logform' })
   async getLogForm(dataRecive): Promise<any> {
-    let logResult = await getLogsFormData(
+    const logResult = await getLogsFormData(
       dataRecive.date,
       dataRecive.driverId,
       this.tripInspectionService,

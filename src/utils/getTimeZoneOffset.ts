@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export const getTimeZoneOffset = (companyTimeZone) => {
-    var now = moment.utc().unix();
+    const now = moment.utc().unix();
     let offset =  moment.tz.zone(companyTimeZone).utcOffset(now) / 60;
   
     // Asia/Thimbu Chile/Continental Africa/Asmera

@@ -10,7 +10,7 @@ import {
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetByIdDecorators() {
-  let response = {
+  const response = {
     message: 'Trip inspectns found',
     data: [
       {

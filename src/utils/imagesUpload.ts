@@ -65,14 +65,14 @@ export const imagesUpload = async (
         defectRequest?.signatures?.mechanicSignature)
     ) {
       // Upload driver signature .
-      let driverSignatureFiles = files.signatureImages.find(
+      const driverSignatureFiles = files.signatureImages.find(
         (file) =>
           defectRequest?.signatures?.driverSignature?.imageName ===
           file.originalname,
       );
       if (driverSignatureFiles) {
         try {
-          let imageUrl = await awsService.uploadFile(
+          const imageUrl = await awsService.uploadFile(
             driverSignatureFiles.buffer,
             `${tenantId}/${id}/Signatures/${Date.now()}-${
               driverSignatureFiles.originalname
@@ -94,14 +94,14 @@ export const imagesUpload = async (
       }
 
       // Upload mechanic signature
-      let mechanicsSignatureFiles = files.signatureImages.find(
+      const mechanicsSignatureFiles = files.signatureImages.find(
         (file) =>
           defectRequest?.signatures?.mechanicSignature?.imageName ===
           file.originalname,
       );
       if (mechanicsSignatureFiles) {
         try {
-          let imageUrl = await awsService.uploadFile(
+          const imageUrl = await awsService.uploadFile(
             mechanicsSignatureFiles.buffer,
             `${tenantId}/${id}/Signatures/${Date.now()}-${
               mechanicsSignatureFiles.originalname

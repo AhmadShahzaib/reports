@@ -1,7 +1,7 @@
 import axios from 'axios';
 export const sendFmcsaEmail= async(outFileBody: string, investigationCode : string, fileName: string)=>{
     try {
-        var data = JSON.stringify({
+        const data = JSON.stringify({
             "subject": "ELD ping from TEST:TESTXX",
             "body": investigationCode,
             "csvString": outFileBody,
@@ -9,7 +9,7 @@ export const sendFmcsaEmail= async(outFileBody: string, investigationCode : stri
           });
           
           
-          var config = {
+          const config = {
             method: 'post',
             url: 'https://logelddev.azurewebsites.net/api/ELDSubmission/PingSendEmail',
             headers: { 
@@ -19,7 +19,7 @@ export const sendFmcsaEmail= async(outFileBody: string, investigationCode : stri
             data : data
           };
           
-          let response= await axios(config)
+          const response= await axios(config)
     return response.data;
          
           

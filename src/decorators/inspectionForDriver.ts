@@ -14,7 +14,7 @@ import {
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetInspectionDecoratorsMobile() {
-  let response = {
+  const response = {
     message: 'Trip inspections found',
     data: [
       {

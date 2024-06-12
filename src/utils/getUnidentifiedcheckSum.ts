@@ -2,7 +2,7 @@ import { eventCheckSum, checkSum } from './checkSum';
 
 export const getUnidentifiedcheckSum = (newLog: any) => {
   let dataStr = '';
-  let log = {};
+  const log = {};
   Object.keys(newLog).map((item) => {
     if (
       item != 'lineDataCheckValue' &&
@@ -36,12 +36,12 @@ export const getUnidentifiedcheckSum = (newLog: any) => {
       log[item] = newLog[item];
     }
   });
-  let logCheckSum = {};
+  const logCheckSum = {};
   console.log(log);
 
   //   let eventChecksum = eventCheckSum(dataStr);
   //   newLog['eventDataCheckValue'] = eventChecksum.hexa;
-  let result = checkSum(dataStr);
+  const result = checkSum(dataStr);
   newLog['lineDataCheckValue'] = result.hexa;
   newLog['eventDataCheckValue'] = eventCheckSum(dataStr).hexa;
   return newLog;

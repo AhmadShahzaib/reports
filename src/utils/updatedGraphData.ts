@@ -7,7 +7,7 @@ export const graphUpdatedData = async (graph): Promise<any> => {
     totalDrivingTime: 0,
     totalDutyTime: 0,
   };
-  let updatedGraph = [];
+  const updatedGraph = [];
   let statusesArray = [];
 
   if (graph) {
@@ -24,7 +24,7 @@ export const graphUpdatedData = async (graph): Promise<any> => {
         return el;
       }
     });
-    for (let item of graph) {
+    for (const item of graph) {
       if (item?.updated && item?.updated?.length > 0) {
         if (item?.updated[0].status === 'OFF DUTY' ||item?.updated[0].status ==='PC') {
           TotalTimeInHHMM.totalOffDutyTime +=
