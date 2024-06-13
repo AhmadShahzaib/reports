@@ -66,6 +66,35 @@ export class SignService {
     }
   };
 
+  updateNotes = async (
+    notes:string,
+    driverId: string,
+    date: string,
+    companyTimeZone: string,
+  ): Promise<any> => {
+    try {
+      // let dateRR = date.split(",");
+      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const logform =  await this.signModel.findOne({
+        driverId: driverId,
+        date: { $gte: start, $lte: end },
+      }).lean();
+      logform.notes = notes;
+      let data = await this.signModel.findOneAndUpdate(
+        { driverId: driverId, date: { $gte: start, $lte: end } },
+        { $set: logform },
+        {
+          new: true,
+          upsert: true,
+          rawResult: true,
+        },
+      );
+    } catch (err) {
+      this.logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   findLogForm = async (
     driverId: string,
     date: string,
