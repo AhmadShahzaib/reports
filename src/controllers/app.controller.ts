@@ -3042,7 +3042,12 @@ export class AppController extends BaseController {
     try {
       const { tenantId, id, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
-
+      if (!date) {
+        throw new InternalServerErrorException(`Date is compulsary`);
+      }
+      if (!logFormRequest.driverId || !logFormRequest.notes) {
+        throw new InternalServerErrorException(`driverId or notes is missing`);
+      }
       let logResult = await this.serviceSign.updateNotes(
         logFormRequest.notes,
         logFormRequest.driverId,
@@ -3050,16 +3055,14 @@ export class AppController extends BaseController {
         companyTimeZone,
       );
 
-      if (logResult && Object.keys(logResult).length > 0) {
+      if (logResult) {
         Logger.log(`Log Form Notes has been updated successfully`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes has been updated successfully',
         });
       } else {
         Logger.log(`Inspection not updated`);
-        throw new InternalServerErrorException(
-          `unknown error while updating inspection`,
-        );
+        throw new InternalServerErrorException(`Inspection not updated`);
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
