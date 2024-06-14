@@ -3057,7 +3057,7 @@ export class AppController extends BaseController {
   }
    @getLogFormNotesDecorators()
   async getDriverNotes(
-    @Body() logFormRequest: LogFormNotes,
+    @Query('driverId') driverId: string,
     @Query('date') date: string,
     @Res() response: Response,
     @Req() request: Request,
@@ -3068,12 +3068,12 @@ export class AppController extends BaseController {
       if (!date) {
         throw new InternalServerErrorException(`Date is compulsary`);
       }
-      if (!logFormRequest.driverId || !logFormRequest.notes) {
-        throw new InternalServerErrorException(`driverId or notes is missing`);
+      if (!driverId ) {
+        throw new InternalServerErrorException(`driverId is missing`);
       }
       let logResult = await this.serviceSign.getLogFormNotes(
-        logFormRequest.notes,
-        logFormRequest.driverId,
+       
+        driverId,
         date,
         companyTimeZone,
       );

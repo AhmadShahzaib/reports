@@ -67,7 +67,7 @@ export class SignService {
   };
 
   getLogFormNotes = async (
-    notes: string,
+   
     driverId: string,
     date: string,
     companyTimeZone: string,
