@@ -83,10 +83,7 @@ export const getLogsFormData = async (
         resGraph?.data[0].csv?.timePlaceLine?.currentTotalEngineHours;
     }
     formData['distance'] = distance;
-    if(logsForm["notes"]){
-
-      formData['notes'] = logsForm["notes"];
-    }
+   
     console.log("\n\n\n\n ::" + data)
     let mostRecent;
     let notPresentLogform = false;
@@ -168,7 +165,10 @@ export const getLogsFormData = async (
         formData['shippingDocument'] = [];
       }
     }
+    if(logsForm["notes"]){
 
+      formData['notes'] = logsForm["notes"];
+    }
     return { logForm: formData, notPresentLogform: notPresentLogform };
   } catch (err) {
     throw err;
