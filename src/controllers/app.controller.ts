@@ -1724,11 +1724,12 @@ export class AppController extends BaseController {
           // else{
 
           // }
+          allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
         } else {
           vehicaleName = messagePatternUnits[0]?.manualVehicleId;
         }
 
-        allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
+        // allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
         console.log('dsada');
       } //vehicle arry map
       const allvehiclesMiles = {};
