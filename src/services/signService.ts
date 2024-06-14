@@ -66,6 +66,41 @@ export class SignService {
     }
   };
 
+  updateNotes = async (
+    notes: string,
+    driverId: string,
+    date: string,
+    companyTimeZone: string,
+  ): Promise<any> => {
+    try {
+      // let dateRR = date.split(",");
+      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const logform = await this.signModel
+        .findOne({
+          driverId: driverId,
+          date: { $gte: start, $lte: end },
+        })
+        .lean();
+      if (!logform) {
+        return false;
+      }
+      logform.notes = notes;
+      let data = await this.signModel.findOneAndUpdate(
+        { driverId: driverId, date: { $gte: start, $lte: end } },
+        { $set: logform },
+        {
+          new: true,
+          upsert: true,
+          rawResult: true,
+        },
+      );
+      return true;
+    } catch (err) {
+      this.logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   findLogForm = async (
     driverId: string,
     date: string,
@@ -93,14 +128,13 @@ export class SignService {
       const start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
       const end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
       const mostRecentDocument = await this.signModel
-      .findOne({
-        driverId: driverId,
-        date: { $lte: end }, // Find documents with date less than or equal to 'end'
-      })
-      .sort({ date: -1 }) // Sort in descending order of date
-      .limit(1);
-    ;
-    return mostRecentDocument;
+        .findOne({
+          driverId: driverId,
+          date: { $lte: end }, // Find documents with date less than or equal to 'end'
+        })
+        .sort({ date: -1 }) // Sort in descending order of date
+        .limit(1);
+      return mostRecentDocument;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;

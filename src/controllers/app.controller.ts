@@ -66,13 +66,15 @@ import GetByIdDecorators from 'decorators/getInspectionById';
 import { getInspectionData } from 'utils/getInspection';
 import UpdateInspectionDecorators from 'decorators/updateInspection';
 import UpdateLogFormDecorators from 'decorators/logForm';
-import { LogFormRequest } from 'models/logForm';
+import { LogFormRequest, LogFormNotes } from 'models/logForm';
+
 import { signUpload } from 'utils/signUpload';
 import { SignService } from 'services/signService';
 import { GetLogFormDecoratorMobile } from 'decorators/getLogFormMobile';
 import { getLogsFormData } from 'utils/getlogsFormData';
 import { GetLogFormDecorator } from 'decorators/getLogForm';
 import UpdateLogFormMobileDecorators from 'decorators/updateLogFormMobile';
+import UpdateLogFormNotesDecorators from 'decorators/updateLogFormNotes';
 import GetCsvDecorator from 'decorators/getcsvDecoators';
 import { dateFormat, timeFormat } from 'utils/dateTimeFormat';
 import { checkSum, eventCheckSum } from 'utils/checkSum';
@@ -3050,7 +3052,43 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+  @UpdateLogFormNotesDecorators()
+  async UpdateDriverNotes(
+    @Body() logFormRequest: LogFormNotes,
+    @Query('date') date: string,
+    @Res() response: Response,
+    @Req() request: Request,
+  ) {
+    try {
+      const { tenantId, id, companyTimeZone } =
+        request.user ?? ({ tenantId: undefined } as any);
+      if (!date) {
+        throw new InternalServerErrorException(`Date is compulsary`);
+      }
+      if (!logFormRequest.driverId || !logFormRequest.notes) {
+        throw new InternalServerErrorException(`driverId or notes is missing`);
+      }
+      let logResult = await this.serviceSign.updateNotes(
+        logFormRequest.notes,
+        logFormRequest.driverId,
+        date,
+        companyTimeZone,
+      );
 
+      if (logResult) {
+        Logger.log(`Log Form Notes has been updated successfully`);
+        return response.status(HttpStatus.OK).send({
+          message: 'Log Form Notes has been updated successfully',
+        });
+      } else {
+        Logger.log(`Inspection not updated`);
+        throw new InternalServerErrorException(`Inspection not updated`);
+      }
+    } catch (error) {
+      Logger.error({ message: error.message, stack: error.stack });
+      throw error;
+    }
+  }
   @certificationMobileDecorators()
   @UseInterceptors(FileInterceptor('driverSign'))
   async addCertificationMobile(

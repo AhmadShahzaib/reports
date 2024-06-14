@@ -29,4 +29,10 @@ export class LogFormRequest {
   trailerNumber:[];
   sign?: object;
   tenantId?: string;
+  notes?:string;
+}
+
+export class LogFormNotes {
+ driverId?:string;
+  notes?:string;
 }
