@@ -3085,8 +3085,11 @@ export class AppController extends BaseController {
           data:{notes:logResult}
         });
       } else {
-        Logger.log(`Inspection not updated`);
-        throw new NotFoundException(`Log Form Notes not found`);
+        return response.status(HttpStatus.OK).send({
+          message: 'Log Form Notes not found'
+         
+        });
+       
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
