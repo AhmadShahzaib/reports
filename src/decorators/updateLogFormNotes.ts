@@ -17,7 +17,7 @@ import {
 export default function UpdateLogFormNotesDecorators() {
   const UpdateLogFormNotesDecorators: Array<CombineDecoratorType> = [
     Put('logForm/updateNotes'),
-    SetMetadata('permissions', [UNITS.LIST]),
+    SetMetadata('permissions', ["cw2930c50"]),
     ApiBearerAuth('access-token'),
     ApiConsumes('multipart/form-data'),
     ApiResponse({ status: HttpStatus.CONFLICT, type: ErrorType }),

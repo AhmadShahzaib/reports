@@ -76,7 +76,7 @@ export class SignService {
       // let dateRR = date.split(",");
       let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
       let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
-      const logform = await this.signModel
+      const logform = await this. signModel
         .findOne({
           driverId: driverId,
           date: { $gte: start, $lte: end },
