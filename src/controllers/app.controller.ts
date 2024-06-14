@@ -3083,7 +3083,7 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes successfully Fetched`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes successfully Fetched',
-          data:{notes:logResult}
+          notes:logResult
         });
       } else {
         return response.status(HttpStatus.OK).send({
