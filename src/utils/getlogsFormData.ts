@@ -88,83 +88,7 @@ export const getLogsFormData = async (
     let mostRecent;
     let notPresentLogform = false;
 
-    if (data && data['_doc'] && data['_doc']['trailerNumber']) {
-      formData['trailerNumber'] = data['_doc']['trailerNumber'];
-    } else {
-      mostRecent = await serviceSign.findLogFormMostRecent(id, date, companyTimeZone);
-      // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
-      notPresentLogform = true;
-
-      if (
-        mostRecent &&
-        mostRecent['_doc'] &&
-        mostRecent['_doc']['trailerNumber']
-      ) {
-        const trailerNumberArray = mostRecent['_doc']['trailerNumber'];
-
-        if (
-          Array.isArray(trailerNumberArray) &&
-          trailerNumberArray.length > 0
-        ) {
-          formData['trailerNumber'] = [
-            trailerNumberArray[trailerNumberArray.length - 1],
-          ];
-          Logger.log(
-            "in if trailer number" +
-              trailerNumberArray[trailerNumberArray.length - 1],
-          );
-        } else {
-          formData['trailerNumber'] = [];
-          Logger.log("in else trailer number");
-        }
-      } else {
-        formData['trailerNumber'] = [];
-        Logger.log("in outer else trailer number");
-      }
-    }
-
-    if (data && data['_doc'] && data['_doc']['shippingDocument']) {
-      formData['shippingDocument'] = data['_doc']['shippingDocument'];
-    } else {
-      // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
-      mostRecent = await serviceSign.findLogFormMostRecent(
-        id,
-        date,
-        companyTimeZone,
-      );
-      notPresentLogform = true;
-
-      if (
-        mostRecent &&
-        mostRecent['_doc'] &&
-        mostRecent['_doc']['shippingDocument']
-      ) {
-        const shippingDocumentArray = mostRecent['_doc']['shippingDocument'];
-
-        if (
-          Array.isArray(shippingDocumentArray) &&
-          shippingDocumentArray.length > 0
-        ) {
-          formData['shippingDocument'] = [
-            shippingDocumentArray[shippingDocumentArray.length - 1],
-          ];
-          Logger.log(
-            "in if shipping number" +
-              shippingDocumentArray[shippingDocumentArray.length - 1],
-          );
-          if(shippingDocumentArray[shippingDocumentArray.length - 1]=="0"){
-            Logger.log("In shipping id 0")
-            formData['shippingDocument'] =[]
-          }
-        } else {
-          formData['shippingDocument'] = [];
-          Logger.log("in else shipping number");
-        }
-      } else {
-        Logger.log("in outer else shipping number");
-        formData['shippingDocument'] = [];
-      }
-    }
+   
     if(logsForm["notes"]){
 
       formData['notes'] = logsForm["notes"];
@@ -174,3 +98,81 @@ export const getLogsFormData = async (
     throw err;
   }
 };
+//91 to 167
+ // if (data && data['_doc'] && data['_doc']['trailerNumber']) {
+    //   formData['trailerNumber'] = data['_doc']['trailerNumber'];
+    // } else {
+    //   mostRecent = await serviceSign.findLogFormMostRecent(id, date, companyTimeZone);
+    //   // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
+    //   notPresentLogform = true;
+
+    //   if (
+    //     mostRecent &&
+    //     mostRecent['_doc'] &&
+    //     mostRecent['_doc']['trailerNumber']
+    //   ) {
+    //     const trailerNumberArray = mostRecent['_doc']['trailerNumber'];
+
+    //     if (
+    //       Array.isArray(trailerNumberArray) &&
+    //       trailerNumberArray.length > 0
+    //     ) {
+    //       formData['trailerNumber'] = [
+    //         trailerNumberArray[trailerNumberArray.length - 1],
+    //       ];
+    //       Logger.log(
+    //         "in if trailer number" +
+    //           trailerNumberArray[trailerNumberArray.length - 1],
+    //       );
+    //     } else {
+    //       formData['trailerNumber'] = [];
+    //       Logger.log("in else trailer number");
+    //     }
+    //   } else {
+    //     formData['trailerNumber'] = [];
+    //     Logger.log("in outer else trailer number");
+    //   }
+    // }
+
+    // if (data && data['_doc'] && data['_doc']['shippingDocument']) {
+    //   formData['shippingDocument'] = data['_doc']['shippingDocument'];
+    // } else {
+    //   // Handle the case when data, data['_doc'], or data['_doc']['trailerNumber'] is null
+    //   mostRecent = await serviceSign.findLogFormMostRecent(
+    //     id,
+    //     date,
+    //     companyTimeZone,
+    //   );
+    //   notPresentLogform = true;
+
+    //   if (
+    //     mostRecent &&
+    //     mostRecent['_doc'] &&
+    //     mostRecent['_doc']['shippingDocument']
+    //   ) {
+    //     const shippingDocumentArray = mostRecent['_doc']['shippingDocument'];
+
+    //     if (
+    //       Array.isArray(shippingDocumentArray) &&
+    //       shippingDocumentArray.length > 0
+    //     ) {
+    //       formData['shippingDocument'] = [
+    //         shippingDocumentArray[shippingDocumentArray.length - 1],
+    //       ];
+    //       Logger.log(
+    //         "in if shipping number" +
+    //           shippingDocumentArray[shippingDocumentArray.length - 1],
+    //       );
+    //       if(shippingDocumentArray[shippingDocumentArray.length - 1]=="0"){
+    //         Logger.log("In shipping id 0")
+    //         formData['shippingDocument'] =[]
+    //       }
+    //     } else {
+    //       formData['shippingDocument'] = [];
+    //       Logger.log("in else shipping number");
+    //     }
+    //   } else {
+    //     Logger.log("in outer else shipping number");
+    //     formData['shippingDocument'] = [];
+    //   }
+    // }
