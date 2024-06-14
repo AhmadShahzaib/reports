@@ -3082,6 +3082,7 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes has been updated successfully`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes has been updated successfully',
+          data:{notes:logResult}
         });
       } else {
         Logger.log(`Inspection not updated`);
@@ -3119,7 +3120,7 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes has been updated successfully`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes successfully Fetched',
-          data:logResult
+         
         });
       } else {
         Logger.log(`Inspection not updated`);
