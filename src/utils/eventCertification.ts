@@ -37,10 +37,10 @@ export const getCertificationCheck = (newLog: any) => {
       dataStr += newLog[item];
     }
   });
-  let logCheckSum = {};
+  const logCheckSum = {};
   //   let eventChecksum = eventCheckSum(dataStr);
   //   newLog['eventDataCheckValue'] = eventChecksum.hexa;
-  let result = checkSum(dataStr);
+  const result = checkSum(dataStr);
   newLog['lineDataCheckValue'] = result.hexa;
   return newLog;
 };

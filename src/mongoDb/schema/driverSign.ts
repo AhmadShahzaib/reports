@@ -9,6 +9,8 @@ export const DriverSignSchema = new mongoose.Schema({
   homeTerminalAddressId:{required:false, type: Schema.Types.ObjectId},
   from: { required: false, type: String },
   to: { required: false, type: String },
+  notes: { required: false, type: String },
+
   odoMeterSpeed: { required: false, type: Number },
   tenantId: { type: Schema.Types.ObjectId, require: true },
   trailerNumber:[],

@@ -7,7 +7,7 @@ import getTimeZoneDateRangeForDay from '@shafiqrathore/logeld-tenantbackend-comm
 import mongoose, { Model } from 'mongoose';
 import { DriverSignSchema } from 'mongoDb/schema/driverSign';
 import { dbConnection } from './db.connection';
-export let checkSign = async (
+export const checkSign = async (
   signature:string,
   id: string,
   tripInspectionService: AppService,
@@ -23,10 +23,10 @@ export let checkSign = async (
         DriverSignSchema,
         collectionName,
       );
-         let query = {
+         const query = {
         'driverId': id,
       };
-      let result = await dynamicModel.find(query).lean();
+      const result = await dynamicModel.find(query).lean();
 
       let flag = false
       result.map((element) => { 

@@ -21,7 +21,7 @@ import {
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 import { LogFormRequest } from 'models/logForm';
 export default function UpdateLogFormDecorators() {
-  let example1: LogFormRequest = {
+  const example1: LogFormRequest = {
     odoMeterSpeed: 6456,
     homeTerminalAddressId: '6367ae32d9d62f314eaadaff',
     homeTerminalAddress:'address',

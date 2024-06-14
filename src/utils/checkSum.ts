@@ -3,16 +3,16 @@ import { lineCheckData } from './lineCheckData';
 export const checkSum = (str) => {
   try {
     let checkSumVal = 0;
-    for (let letter of str) {
+    for (const letter of str) {
       checkSumVal += checkSumChar(letter);
     }
-    let checkLineData = lineCheckData(checkSumVal);
-    let xoredValue = parseInt(checkLineData, 2) ^ parseInt('10010110', 2);
+    const checkLineData = lineCheckData(checkSumVal);
+    const xoredValue = parseInt(checkLineData, 2) ^ parseInt('10010110', 2);
     
-    let hexaString = xoredValue.toString(16).toUpperCase();
+    const hexaString = xoredValue.toString(16).toUpperCase();
     let xored = hexaString;
     if (xored.length < 2) {
-      let len = 2 - xored.length;
+      const len = 2 - xored.length;
       for (let i = 0; i < len; i++) {
         xored = '0' + xored;
       }
@@ -23,15 +23,15 @@ export const checkSum = (str) => {
 export const eventCheckSum = (str) => {
   try {
     let checkSumVal = 0;
-    for (let letter of str) {
+    for (const letter of str) {
       checkSumVal += checkSumChar(letter);
     }
-    let checkLineData = lineCheckData(checkSumVal);
-    let xoredValue = parseInt(checkLineData, 2) ^ parseInt('11000011', 2);
-    let hexaString = xoredValue.toString(16).toUpperCase();
+    const checkLineData = lineCheckData(checkSumVal);
+    const xoredValue = parseInt(checkLineData, 2) ^ parseInt('11000011', 2);
+    const hexaString = xoredValue.toString(16).toUpperCase();
     let xored = hexaString;
     if (xored.length < 2) {
-      let len = 2 - xored.length;
+      const len = 2 - xored.length;
       for (let i = 0; i < len; i++) {
         xored = '0' + xored;
       }

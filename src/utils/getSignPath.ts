@@ -1,6 +1,6 @@
 import { AwsService } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
-export let getDriverSign = async (
+export const getDriverSign = async (
   data: any,
   logForm: any,
   awsService: AwsService,
@@ -8,8 +8,8 @@ export let getDriverSign = async (
   try {
     if (data && Object.keys(data['_doc']).length > 0) {
       if (logForm?.sign && Object.keys(logForm?.sign['_doc']).length > 0) {
-        let sign = logForm?.sign['_doc'];
-        let path = await awsService.getObject(sign?.key);
+        const sign = logForm?.sign['_doc'];
+        const path = await awsService.getObject(sign?.key);
         sign['imageUrl'] = sign?.imageUrl
         sign['imagePath'] = `data:image/${sign?.imageName
           .split('.')

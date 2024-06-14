@@ -63,7 +63,7 @@ const transformDataForGraphLines = (
   completeData: GraphType[],
   companyTimeZone,
 ): GraphLineType => {
-  let status = graphData.status;
+  const status = graphData.status;
   if (
     status == 'LOGIN' ||
     status == 'LOGOUT' ||
@@ -151,8 +151,8 @@ function convertHM(value) {
   // Hours, minutes and seconds
   let ret = '';
   if (value) {
-    var hrs = value / 3600;
-    var mins = (value % 3600) / 60;
+    const hrs = value / 3600;
+    const mins = (value % 3600) / 60;
     // Output like "1:01" or "4:03:59" or "123:03:59"
     if (hrs > 0) {
       ret +=
@@ -205,12 +205,12 @@ export async function generateEditPdf(
   totalMielsTrevled,
   // isDummy
 ): Promise<Buffer> {
-  let defect: boolean = false;
-  let notDefect: boolean = true;
-  let reverseable = 8;
-  let object = {};
-  let recaps = Object.keys(recap);
-  let currentDate = recap.date;
+  const defect: boolean = false;
+  const notDefect: boolean = true;
+  const reverseable = 8;
+  const object = {};
+  const recaps = Object.keys(recap);
+  const currentDate = recap.date;
   for (let i = 0; i < objectData.length; i++) {
     object[i] = objectData[i];
   }
@@ -218,12 +218,12 @@ export async function generateEditPdf(
   // object[`${reverseable}`] = convertHM(TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime);
 
   if (inspection && inspection.length > 0) {
-    for (let key of inspection) {
+    for (const key of inspection) {
       key['driver'] = driverData ?? {};
-      let vehicleDefect = key?.defectsCategory?.vehicle.filter(
+      const vehicleDefect = key?.defectsCategory?.vehicle.filter(
         (item) => item.resolved === false,
       );
-      let trailerDefect = key?.defectsCategory?.trailer.filter(
+      const trailerDefect = key?.defectsCategory?.trailer.filter(
         (item) => item.resolved === false,
       );
       if (vehicleDefect || trailerDefect) {
@@ -241,9 +241,9 @@ export async function generateEditPdf(
   if (data) {
     logsForm = Object.keys(data['_doc']).length > 0 ? data['_doc'] : {};
   }
-  let formData = await getDriverSign(data, logsForm, awaService);
-  let logDate = moment(date, 'YYYY-MM-DD').unix();
-  let graphEvent = graphData;
+  const formData = await getDriverSign(data, logsForm, awaService);
+  const logDate = moment(date, 'YYYY-MM-DD').unix();
+  const graphEvent = graphData;
   // .filter(function (element) {
   //   return (
   //     !element.eventType &&
@@ -287,7 +287,7 @@ export async function generateEditPdf(
   //   totalTime =252000 -  totalTime
   // }
 
-  let milageGraph = JSON.parse(JSON.stringify(graphEvent));
+  const milageGraph = JSON.parse(JSON.stringify(graphEvent));
   milageGraph.sort((a, b) => a.startedAt - b.startedAt);
   // if (milageGraph[0].eventType == 'LOGIN') {
   //   startEngine = milageGraph[1]?.engineHours;
@@ -299,7 +299,7 @@ export async function generateEditPdf(
   endEngine = milageGraph[milageGraph.length - 1]?.engineHours;
   endOdometer = milageGraph[milageGraph.length - 1]?.odoMeterMillage;
 
-  var context = {
+  const context = {
     driver: driverData,
     currentDate: currentDate,
     odometerStart: startOdometer,
@@ -367,11 +367,11 @@ export async function generateEditPdf(
       'M',
     ],
   };
-  let largeVerticalLines = [];
+  const largeVerticalLines = [];
   for (let i = 1; i <= 23; i++) {
     largeVerticalLines.push(60 * i);
   }
-  let smallVerticalsLines = [];
+  const smallVerticalsLines = [];
   for (let a = 1; a <= 24 * 4; a++) {
     smallVerticalsLines.push(15 * a);
   }
@@ -383,7 +383,7 @@ export async function generateEditPdf(
       // you can check by logging it on console
       // console.log(res)
 
-      let graphLinesData = graphEvent?.map(
+      const graphLinesData = graphEvent?.map(
         (item, index, completeData: GraphType[]) =>
           transformDataForGraphLines(
             item,
@@ -401,7 +401,7 @@ export async function generateEditPdf(
         smallVerticalsLines: smallVerticalsLines,
       });
       let count = 0;
-      let sortedGraph = graphEvent.sort((a, b) => a.startedAt - b.startedAt);
+      const sortedGraph = graphEvent.sort((a, b) => a.startedAt - b.startedAt);
 
       // if(sta)
       hb.registerHelper('increment', function () {
@@ -437,16 +437,16 @@ export async function generateEditPdf(
         return moment.unix(index).format('HH:mm:ss A');
       });
       hb.registerHelper('workHours', function (value, options) {
-        let time = value.split(':');
+        const time = value.split(':');
         let ret = '';
         if (time[0].trim() > 0) {
-          let hrs = Math.floor(70 - time[0].trim());
+          const hrs = Math.floor(70 - time[0].trim());
           hrs < 10 ? (ret += '0' + hrs + ':') : (ret += hrs + ':');
         } else {
           ret += '00:';
         }
         if (time[1].trim() > 0) {
-          let mins = Math.floor(60 - time[1].trim());
+          const mins = Math.floor(60 - time[1].trim());
           mins < 10 ? (ret += '0' + mins) : (ret += mins);
         } else {
           ret += '00';

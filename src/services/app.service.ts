@@ -46,7 +46,7 @@ export class AppService extends BaseService<TIDocument> {
   addInspection = async (inspection): Promise<TIDocument> => {
     try {
       Logger.debug(inspection);
-      let query = await this.tripInspectionModel.create(inspection);
+      const query = await this.tripInspectionModel.create(inspection);
       // return await query.populate({
       //   path: 'defectsCategory',
       //   populate: {
@@ -170,7 +170,7 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
-  findAllDvir = (options, queryParams) => {
+  findAllDvir = async (options, queryParams) => {
     try {
       const { pageNo, limit } = queryParams;
 
@@ -181,6 +181,7 @@ if(inspection.signatures.mechanicSignature){
       // } else {
       //   query.sort({ createdAt: -1 });
       // }
+      // const totalCount = await this.tripInspectionModel.countDocuments(options);
       if (!limit || !isNaN(limit)) {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
@@ -191,13 +192,27 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
+  getTotal = async (options) => {
+    try {
+    
 
+     
+   
+      const totalCount = await this.tripInspectionModel.countDocuments(options);
+     
+
+      return totalCount;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   getGraphDataOnRange = async (
     driverId: string,
     startOfRange: number,
     endOfRange: number,
-    groupRecords: Boolean,
-    includeAllLogs: Boolean,
+    groupRecords: boolean,
+    includeAllLogs: boolean,
   ) => {
     try {
       const GraphDataOnRange = await firstValueFrom(
@@ -524,17 +539,17 @@ if(inspection.signatures.mechanicSignature){
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
         const currentDate = moment().format('YYYY-MM-DD').toString();
-        for (let date of givenDates) {
+        for (const date of givenDates) {
           logsOfSelectedDate = JSON.parse(
             JSON.stringify(
               await this.getLogsBetweenRange(driverId, date, date),
             ),
           );
-          let certificationArr = logsOfSelectedDate.data
+          const certificationArr = logsOfSelectedDate.data
             ? logsOfSelectedDate.data[0]?.csv
                 .eldEventListForDriverCertificationOfOwnRecords
             : [];
-          let certify = {};
+          const certify = {};
 
           certify['eventSequenceIdNumber'] = generateUniqueHexId();
           certify['eventCode'] = '1';
@@ -573,7 +588,7 @@ if(inspection.signatures.mechanicSignature){
             logsOfSelectedDate.data[0].meta.editRequest = true;
           }
 
-          let update = await this.updateCertification(
+          const update = await this.updateCertification(
             driverId,
             logsOfSelectedDate,
           );
@@ -586,7 +601,7 @@ if(inspection.signatures.mechanicSignature){
           const signs = await splitSign(signature);
           requestLog.sign = signs;
 
-          let logResult = await this.serviceSign.UpdateLogForm(
+          const logResult = await this.serviceSign.UpdateLogForm(
             requestLog,
             driverId,
             date,

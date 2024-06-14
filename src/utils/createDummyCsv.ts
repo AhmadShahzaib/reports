@@ -2,8 +2,8 @@ import moment from 'moment';
 
 export const dummyCsv = async (location:any , driverId:any,tenantId:any,companyTimeZone:any , vehicleId:any,checkDate:any) => {
     try {
-        let index = 0
-        let nawLog = {
+        const index = 0
+        const nawLog = {
             status: '',
             startedAt: 0,
         
@@ -40,7 +40,7 @@ export const dummyCsv = async (location:any , driverId:any,tenantId:any,companyT
           };
 
 
-          let rawLog = JSON.parse(JSON.stringify(nawLog));
+          const rawLog = JSON.parse(JSON.stringify(nawLog));
         rawLog.status ='offDuty'
         rawLog.actionType ='OFF_DUTY'
       
@@ -49,14 +49,14 @@ export const dummyCsv = async (location:any , driverId:any,tenantId:any,companyT
        
     
 
-        let startTime = moment(
+        const startTime = moment(
           checkDate + "000000",
           'MMDDYYHHmmss',
         ).unix();
         
             
       
-        let drv = {
+        const drv = {
           id: driverId,
           tenantId: tenantId,
           firstName:'Dummay',
@@ -66,7 +66,7 @@ export const dummyCsv = async (location:any , driverId:any,tenantId:any,companyT
         if(location.hasOwnProperty('address')){
               addressOf=location.address
         }
-        let loc= {
+        const loc= {
           longitude: location.longitude,
           latitude: location.latitude,
           
@@ -102,7 +102,7 @@ export const dummyCsv = async (location:any , driverId:any,tenantId:any,companyT
 
         
           if(currentDate!=checkDate){
-           let last = moment(
+           const last = moment(
               checkDate + "235900",
               'MMDDYYHHmmss',
             ).unix();
@@ -124,7 +124,7 @@ const hours = now.getHours().toString().padStart(2, "0");
 const minutes = now.getMinutes().toString().padStart(2, "0");
 const seconds = now.getSeconds().toString().padStart(2, "0");
 const hhmmss = hours + minutes + seconds;
-let last = moment(
+const last = moment(
   checkDate + hhmmss,
   'MMDDYYHHmmss',
 ).unix();

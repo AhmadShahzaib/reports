@@ -10,7 +10,7 @@ export const signUpload = async (
 ) => {
   if (files && Object.keys(files).length > 0) {
     logRequest['sign'] = {};
-    let image = await awsService.uploadFile(
+    const image = await awsService.uploadFile(
       files?.buffer,
       `${tenantId}/${id}/Signatures/${moment().unix()}-${files?.originalname}`,
     );

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { error } from 'console';
 export const fmcsaCall = async (outFileBody: string, investigationCode : string, fileName: string) => {
   try {
-    var data = JSON.stringify({
+    const data = JSON.stringify({
       eldIdentifier: 'TESTXX',
       eldRegistrationId: 'TEST',
       outputFileBody: outFileBody,
@@ -12,7 +12,7 @@ export const fmcsaCall = async (outFileBody: string, investigationCode : string,
       version: 1,
     });
 
-    var config = {
+    const config = {
       method: 'post',
       url: 'https://logelddev.azurewebsites.net/api/ELDSubmission/Post',
       headers: {
@@ -24,7 +24,7 @@ export const fmcsaCall = async (outFileBody: string, investigationCode : string,
       data: data,
     };
 
-    let response = await axios(config);
+    const response = await axios(config);
     response.data.fileName = fileName;
     return response.data;
   } catch (err) {

@@ -22,7 +22,7 @@ import { DefectsType, InspectionType } from 'enums';
 import { InspectionRequest } from 'models/inspectionRequestModel';
 
 export default function UpdateInspectionDecorators() {
-  let example1: InspectionRequest = {
+  const example1: InspectionRequest = {
     carrier: 'tekhqs',
     location: {
       longitude: 0,
@@ -51,7 +51,7 @@ export default function UpdateInspectionDecorators() {
     isActive: true,
   };
 
-  let responseExample = {
+  const responseExample = {
     message: 'Inspection has been Updated successfully',
     data: [
       {

@@ -8,6 +8,7 @@ export default interface DriverSignDocument extends Document {
   shippingDocument?: [];
   from?: string;
   to?: string;
+  notes?:string;
   odoMeterSpeed?: number;
   tenantId?: string;
   trailerNumber?:[];
