@@ -3066,10 +3066,10 @@ export class AppController extends BaseController {
       const { tenantId, id, companyTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
       if (!date) {
-        throw new InternalServerErrorException(`Date is compulsary`);
+        throw new BadRequestException(`Date is compulsary`);
       }
       if (!driverId ) {
-        throw new InternalServerErrorException(`driverId is missing`);
+        throw new BadRequestException(`driverId is missing`);
       }
       let logResult = await this.serviceSign.getLogFormNotes(
        
@@ -3086,7 +3086,7 @@ export class AppController extends BaseController {
         });
       } else {
         Logger.log(`Inspection not updated`);
-        throw new InternalServerErrorException(`Inspection not updated`);
+        throw new NotFoundException(`Log Form Notes not found`);
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
