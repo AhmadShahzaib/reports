@@ -1723,11 +1723,12 @@ export class AppController extends BaseController {
           // else{
 
           // }
+          allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
         } else {
           vehicaleName = messagePatternUnits[0]?.manualVehicleId;
         }
 
-        allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
+        // allVehiclesObject[vehicaleName] = [dutyLogs, unIdentified];
         console.log('dsada');
       } //vehicle arry map
       const allvehiclesMiles = {};
@@ -3081,11 +3082,13 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes successfully Fetched`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes successfully Fetched',
-          data: { notes: logResult },
+          notes: logResult,
         });
       } else {
-        Logger.log(`Inspection not updated`);
-        throw new NotFoundException(`Log Form Notes not found`);
+        return response.status(HttpStatus.OK).send({
+          statusCode: 200,
+          message: 'Log Form Notes not found',
+        });
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
