@@ -57,6 +57,8 @@ export const TISchema = new mongoose.Schema({
   vehicleId: { type: Schema.Types.ObjectId, require: true },
   officeId: { type: String, require: false },
   vehicleManualId: { required: false, type: String },
+  driverManualId: { required: false, type: String },
+
   trailerNumber: { required: true, type: String },
   carrier: { required: false, type: String },
   location: { type: String, required: true },

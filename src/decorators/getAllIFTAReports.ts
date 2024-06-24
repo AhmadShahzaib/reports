@@ -9,7 +9,7 @@ import {
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetAllIFTARecords() {
-  let response = {
+  const response = {
     message: 'getAllSubmittedRecords list found',
     
   };

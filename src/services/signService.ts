@@ -33,11 +33,11 @@ export class SignService {
       //   moment(date).format('YYYY-MM-DD'),
       //   companyTimeZone,
       // );
-      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
-      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      const end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
       // let homeTerminalAddress = logForm.homeTerminalAddress;
       logForm['date'] = currentDate;
-      let data = await this.signModel.findOneAndUpdate(
+      const data = await this.signModel.findOneAndUpdate(
         { driverId: driverId, date: { $gte: start, $lte: end } },
         { $set: logForm },
         {
@@ -60,6 +60,33 @@ export class SignService {
       //   );
       // }
       return data;
+    } catch (err) {
+      this.logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+
+  getLogFormNotes = async (
+   
+    driverId: string,
+    date: string,
+    companyTimeZone: string,
+  ): Promise<any> => {
+    try {
+      // let dateRR = date.split(",");
+      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const logform = await this. signModel
+        .findOne({
+          driverId: driverId,
+          date: { $gte: start, $lte: end },
+        })
+        .lean();
+      if (!logform) {
+        return false;
+      }
+     
+      return logform.notes;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
       throw err;
@@ -108,8 +135,8 @@ export class SignService {
   ): Promise<any> => {
     try {
       // let dateRR = date.split(",");
-      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
-      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      const end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
       return await this.signModel.findOne({
         driverId: driverId,
         date: { $gte: start, $lte: end },
@@ -125,8 +152,8 @@ export class SignService {
     companyTimeZone: string,
   ): Promise<any> => {
     try {
-      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
-      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      const end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
       const mostRecentDocument = await this.signModel
         .findOne({
           driverId: driverId,

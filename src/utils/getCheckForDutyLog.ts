@@ -38,10 +38,10 @@ export const getLogChecksum = (newLog: any) => {
       dataStr += newLog[item];
     }
   });
-  let logCheckSum = {};
-  let eventChecksum = eventCheckSum(dataStr);
+  const logCheckSum = {};
+  const eventChecksum = eventCheckSum(dataStr);
   newLog['eventDataCheckValue'] = eventChecksum.hexa;
-  let result = checkSum(dataStr + eventChecksum.hexa);
+  const result = checkSum(dataStr + eventChecksum.hexa);
   newLog['lineDataCheckValue'] = result.hexa;
   return newLog;
 };

@@ -4,11 +4,11 @@ import { ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import {
   CombineDecorators,
   CombineDecoratorType,
-  DEFECTS,
+  INSPECTIONS,
 } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export default function GetDefectsDecorators() {
-  let response = {
+  const response = {
     message: 'Defects list found',
     data: [
       {
@@ -22,7 +22,7 @@ export default function GetDefectsDecorators() {
   };
   const GetDefectsDecorators: Array<CombineDecoratorType> = [
     Get('/defectslist'),
-    SetMetadata('permissions', [DEFECTS.LIST]),
+    SetMetadata('permissions', [INSPECTIONS.LIST]),
     ApiBearerAuth('access-token'),
     ApiResponse({
       status: HttpStatus.OK,

@@ -11,7 +11,7 @@ const options = {
 const geocoder = NodeGeocoder(options);
 
 export async function getAddress(data: TIDocument) {
-  let updateAddressObject = {};
+  const updateAddressObject = {};
   if (
     isLatitude(data.location.latitude) &&
     isLongitude(data.location.longitude)

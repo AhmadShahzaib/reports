@@ -1,6 +1,6 @@
 export const fileNameCreation = (lastName, licenceNumber, date, time) => {
     try {
-        let filename=[];
+        const filename=[];
         
         for(let i =0; i< 5 ; i++){
             if(lastName[i]){
@@ -13,7 +13,7 @@ export const fileNameCreation = (lastName, licenceNumber, date, time) => {
             
             filename[5] = licenceNumber[licenceNumber.length-2];
             filename[6] = licenceNumber[licenceNumber.length-1];
-            let sum = findSum(licenceNumber);
+            const sum = findSum(licenceNumber);
             filename[7]=sum[0];
             filename[8]=sum[1];
             filename[9]= date[0];
@@ -50,7 +50,7 @@ return filename.join("");
 		let sum = 0;
 
 		for (let i = 0; i < str.length; i++) {
-			let ch = str[i];
+			const ch = str[i];
 
 			if (!isNaN((ch) * 1))
 				{temp += ch;

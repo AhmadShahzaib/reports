@@ -9,7 +9,7 @@ import {
 export function GetLogFormDecorator() {
   const GetLogFormDecorator: Array<CombineDecoratorType> = [
     Get('logForm/:driverId'),
-    SetMetadata('permissions', ["3171d828"]),
+    SetMetadata('permissions', ["cw2930c50"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see LogForm',

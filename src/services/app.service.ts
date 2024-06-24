@@ -46,7 +46,7 @@ export class AppService extends BaseService<TIDocument> {
   addInspection = async (inspection): Promise<TIDocument> => {
     try {
       Logger.debug(inspection);
-      let query = await this.tripInspectionModel.create(inspection);
+      const query = await this.tripInspectionModel.create(inspection);
       // return await query.populate({
       //   path: 'defectsCategory',
       //   populate: {
@@ -138,8 +138,17 @@ export class AppService extends BaseService<TIDocument> {
 
       // Update values in inspection record
       inspectionRecord.status = inspection.status;
-      inspectionRecord.signatures[`mechanicSignature`] =
-        inspection.signatures.mechanicSignature;
+      if (inspection.status == 'No Defects') {
+        inspectionRecord.defectsCategory.vehicle = [];
+        inspectionRecord.defectsCategory.trailer = [];
+      }
+if(inspection.signatures.mechanicSignature){
+
+  inspectionRecord.signatures[`mechanicSignature`] =
+    inspection.signatures.mechanicSignature;
+}
+        inspectionRecord.signatures[`driverSignature`] =
+        inspection.signatures.driverSignature;
 
       //  save updated record
       await inspectionRecord.save();
@@ -161,7 +170,7 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
-  findAllDvir = (options, queryParams) => {
+  findAllDvir = async (options, queryParams) => {
     try {
       const { pageNo, limit } = queryParams;
 
@@ -172,6 +181,7 @@ export class AppService extends BaseService<TIDocument> {
       // } else {
       //   query.sort({ createdAt: -1 });
       // }
+      // const totalCount = await this.tripInspectionModel.countDocuments(options);
       if (!limit || !isNaN(limit)) {
         query.skip(((pageNo ?? 1) - 1) * (limit ?? 10)).limit(limit ?? 10);
       }
@@ -182,13 +192,27 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
+  getTotal = async (options) => {
+    try {
+    
 
+     
+   
+      const totalCount = await this.tripInspectionModel.countDocuments(options);
+     
+
+      return totalCount;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   getGraphDataOnRange = async (
     driverId: string,
     startOfRange: number,
     endOfRange: number,
-    groupRecords: Boolean,
-    includeAllLogs: Boolean,
+    groupRecords: boolean,
+    includeAllLogs: boolean,
   ) => {
     try {
       const GraphDataOnRange = await firstValueFrom(
@@ -515,17 +539,17 @@ export class AppService extends BaseService<TIDocument> {
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
         const currentDate = moment().format('YYYY-MM-DD').toString();
-        for (let date of givenDates) {
+        for (const date of givenDates) {
           logsOfSelectedDate = JSON.parse(
             JSON.stringify(
               await this.getLogsBetweenRange(driverId, date, date),
             ),
           );
-          let certificationArr = logsOfSelectedDate.data
+          const certificationArr = logsOfSelectedDate.data
             ? logsOfSelectedDate.data[0]?.csv
                 .eldEventListForDriverCertificationOfOwnRecords
             : [];
-          let certify = {};
+          const certify = {};
 
           certify['eventSequenceIdNumber'] = generateUniqueHexId();
           certify['eventCode'] = '1';
@@ -564,7 +588,7 @@ export class AppService extends BaseService<TIDocument> {
             logsOfSelectedDate.data[0].meta.editRequest = true;
           }
 
-          let update = await this.updateCertification(
+          const update = await this.updateCertification(
             driverId,
             logsOfSelectedDate,
           );
@@ -577,7 +601,7 @@ export class AppService extends BaseService<TIDocument> {
           const signs = await splitSign(signature);
           requestLog.sign = signs;
 
-          let logResult = await this.serviceSign.UpdateLogForm(
+          const logResult = await this.serviceSign.UpdateLogForm(
             requestLog,
             driverId,
             date,
