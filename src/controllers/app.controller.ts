@@ -77,7 +77,6 @@ import UpdateLogFormMobileDecorators from 'decorators/updateLogFormMobile';
 import UpdateLogFormNotesDecorators from 'decorators/updateLogFormNotes';
 import getLogFormNotesDecorators from 'decorators/getLogFormNotes';
 
-
 import GetCsvDecorator from 'decorators/getcsvDecoators';
 import { dateFormat, timeFormat } from 'utils/dateTimeFormat';
 import { checkSum, eventCheckSum } from 'utils/checkSum';
@@ -1753,13 +1752,13 @@ export class AppController extends BaseController {
               return eachDutyStatus.state === state;
             },
           ); //filter each state duty logs
-          const allUnidentefiedLogsOfState = allVehiclesObject[vehicle][1].filter(
-            (eachDutyStatus) => {
-              console.log('your issue : ', eachDutyStatus.state === state);
+          const allUnidentefiedLogsOfState = allVehiclesObject[
+            vehicle
+          ][1].filter((eachDutyStatus) => {
+            console.log('your issue : ', eachDutyStatus.state === state);
 
-              return eachDutyStatus.state === state;
-            },
-          ); // filter each state unidentified logs
+            return eachDutyStatus.state === state;
+          }); // filter each state unidentified logs
           allLogsOfState.map((each) => {
             dutyMiles += Number(each.accumulatedVehicleMiles);
             count += 1;
@@ -3056,7 +3055,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
-   @getLogFormNotesDecorators()
+  @getLogFormNotesDecorators()
   async getDriverNotes(
     @Query('driverId') driverId: string,
     @Query('date') date: string,
@@ -3069,11 +3068,10 @@ export class AppController extends BaseController {
       if (!date) {
         throw new BadRequestException(`Date is compulsary`);
       }
-      if (!driverId ) {
+      if (!driverId) {
         throw new BadRequestException(`driverId is missing`);
       }
       let logResult = await this.serviceSign.getLogFormNotes(
-       
         driverId,
         date,
         companyTimeZone,
@@ -3083,15 +3081,13 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes successfully Fetched`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes successfully Fetched',
-          notes:logResult
+          notes: logResult,
         });
       } else {
         return response.status(HttpStatus.OK).send({
-          statusCode:200,
-          message: 'Log Form Notes not found'
-         
+          statusCode: 200,
+          message: 'Log Form Notes not found',
         });
-       
       }
     } catch (error) {
       Logger.error({ message: error.message, stack: error.stack });
@@ -3125,7 +3121,6 @@ export class AppController extends BaseController {
         Logger.log(`Log Form Notes has been updated successfully`);
         return response.status(HttpStatus.OK).send({
           message: 'Log Form Notes has been updated successfully',
-         
         });
       } else {
         Logger.log(`Inspection not updated`);
