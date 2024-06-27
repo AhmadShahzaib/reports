@@ -38,7 +38,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
-
+import { getDistance, getNext8Days, convertHM } from '../utils/getWeekData';
 import { AppService } from '../services/app.service';
 import AddInspectionDecorators from 'decorators/addInspection';
 import { InspectionRequest } from 'models/inspectionRequestModel';
@@ -1864,7 +1864,8 @@ export class AppController extends BaseController {
     try {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
-      const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+      const { tenantId: id, timeZone } =
+        request.user ?? ({ tenantId: undefined } as any);
       options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
@@ -2615,77 +2616,7 @@ export class AppController extends BaseController {
       //     tenantId,
       //     companyTimeZone,
       //   );
-      function getDistance(dutyStatuses) {
-        let distance = 0;
-        dutyStatuses.map((element, index) => {
-          distance += Number(element.accumulatedVehicleMiles);
-        });
-        return distance;
-      }
-      function getNext8Days(dateString) {
-        Logger.log('Incoming date: -----------> ', dateString);
-        const result = [];
-        const currentDate = new Date(dateString);
-        currentDate.setUTCHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 in UTC
 
-        const formattedStartDate = `${currentDate.getFullYear().toString()}-${(
-          currentDate.getUTCMonth() + 1
-        )
-          .toString()
-          .padStart(2, '0')}-${currentDate
-          .getUTCDate()
-          .toString()
-          .padStart(2, '0')}`;
-
-        result.push(formattedStartDate);
-
-        Logger.log('Formatted Start Date: ' + formattedStartDate);
-
-        for (let i = 0; i < 6; i++) {
-          const nextDate = new Date(currentDate);
-          nextDate.setUTCDate(currentDate.getUTCDate() + (i + 1)); // Increment i by 1 to get the correct next date
-          Logger.log('Next Date: ------ > ', nextDate);
-
-          const formattedDate = `${nextDate.getFullYear().toString()}-${(
-            nextDate.getUTCMonth() + 1
-          )
-            .toString()
-            .padStart(2, '0')}-${nextDate
-            .getUTCDate()
-            .toString()
-            .padStart(2, '0')}`;
-          result.push(formattedDate);
-        }
-
-        return result;
-      }
-
-      function convertHM(value) {
-        // Hours, minutes and seconds
-        let ret = '';
-        if (value) {
-          const hrs = value / 3600;
-          const mins = (value % 3600) / 60;
-          // Output like "1:01" or "4:03:59" or "123:03:59"
-          if (hrs > 0) {
-            ret +=
-              '' +
-              (hrs < 10 ? '0' + Math.floor(hrs) : '' + Math.floor(hrs)) +
-              ':';
-          } else {
-            ret += '00:';
-          }
-          if (mins > 0) {
-            ret += mins < 10 ? '0' + Math.floor(mins) : '' + Math.floor(mins);
-          } else {
-            ret += '00';
-          }
-        } else {
-          ret = '00:00';
-        }
-
-        return ret;
-      }
       const allDaysworkHour = getNext8Days(previousdate);
       Logger.log(
         'Start Date ===================================> End date  ============= >' +
@@ -2942,6 +2873,7 @@ export class AppController extends BaseController {
   //     { name: 'signatureImages', maxCount: 2 },
   //   ]),
   // )
+
   async UpdateDefectsInspection(
     @Body() defectRequest: InspectionRequest,
     @Param('id', MongoIdValidationPipe) inspectionReportId: string,
