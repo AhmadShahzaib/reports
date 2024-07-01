@@ -1864,7 +1864,8 @@ export class AppController extends BaseController {
     try {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
-      const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+      const { tenantId: id, timeZone } =
+        request.user ?? ({ tenantId: undefined } as any);
       options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
