@@ -215,7 +215,7 @@ export class AppController extends BaseController {
       // requestInspection.vehicleManualId = unitData.manualVehicleId;
       // requestInspection.trailerNumber = unitData.trailerNumber;
       requestInspection.vehicleManualId = defectRequest.vehicleManualId;
-      requestInspection.trailerNumber = defectRequest.trailerNumber;
+      requestInspection.trailerNumber = defectRequest?.trailerNumber;
       if (!defectRequest.driverManualId) {
         throw new InternalServerErrorException(
           'Add defectRequest.driverManualId and vehicleManualId  ',
