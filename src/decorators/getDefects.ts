@@ -22,7 +22,7 @@ export default function GetDefectsDecorators() {
   };
   const GetDefectsDecorators: Array<CombineDecoratorType> = [
     Get('/defectslist'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["d2v0i4r"]),
     ApiBearerAuth('access-token'),
     ApiResponse({
       status: HttpStatus.OK,

@@ -3466,7 +3466,7 @@ export class AppController extends BaseController {
     @Query('dateEnd') dateEnd: string = moment().format('YYYY-MM-DD'),
     @Query('origin') origin: string,
     @Query('investigationCode') investigationCode: string,
-
+    @Query('typeOfConnection') typeOfConnection: string,
     @Query('driverId') driverIdArr: [string],
     @Res() response: Response,
     @Req() request: Request,

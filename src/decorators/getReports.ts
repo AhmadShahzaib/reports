@@ -16,7 +16,7 @@ import {
 export default function GetReportsDecorators() {
   const GetReportsDecorators: Array<CombineDecoratorType> = [
     Get('report/dailyLogReport'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["dri465rep"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
@@ -134,7 +134,7 @@ export function GetPrevious7Days() {
 export function GetIFTAReport() {
   const GetIFTAReport: Array<CombineDecoratorType> = [
     Post('report/iftaReport'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["if564t5ad3"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
