@@ -16,7 +16,7 @@ import {
 export default function GetReportsDecorators() {
   const GetReportsDecorators: Array<CombineDecoratorType> = [
     Get('report/dailyLogReport'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["dri465rep"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',
