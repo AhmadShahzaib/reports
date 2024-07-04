@@ -134,7 +134,7 @@ export function GetPrevious7Days() {
 export function GetIFTAReport() {
   const GetIFTAReport: Array<CombineDecoratorType> = [
     Post('report/iftaReport'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["if564t5ad3"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see Report for.',

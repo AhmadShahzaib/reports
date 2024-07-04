@@ -12,7 +12,7 @@ import {
 export default function DeleteIFTA() {
   const DeleteIFTA: Array<CombineDecoratorType> = [
     Post('deleteIFTA/:id'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', ["fmed5idea"]),
     ApiBearerAuth('access-token'),
     ApiResponse({ status: HttpStatus.OK }),
     ApiParam({

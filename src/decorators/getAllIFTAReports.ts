@@ -15,7 +15,7 @@ export default function GetAllIFTARecords() {
   };
   const GetAllIFTARecords: Array<CombineDecoratorType> = [
     Get('getAllIFTARecords/all'),
-    SetMetadata('permissions', [INSPECTIONS.LIST]),
+    SetMetadata('permissions', ["if564ta2"]),
     ApiBearerAuth("access-token"),
     ApiQuery({
       name: 'search',
