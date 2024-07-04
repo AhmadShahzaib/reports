@@ -15,7 +15,7 @@ export default function GetAllSubmittedRecords() {
   };
   const GetAllSubmittedRecords: Array<CombineDecoratorType> = [
     Get('getAllSubmittedRecords/all'),
-    SetMetadata('permissions', [DEFECTS.LIST]),
+    SetMetadata('permissions', ["f3m2c4g6a"]),
     ApiBearerAuth("access-token"),
     ApiQuery({
       name: 'search',
