@@ -74,7 +74,7 @@ export default function GetByIdDecorators() {
   };
   const GetByIdDecorators: Array<CombineDecoratorType> = [
     Get('/record/:id'),
-    SetMetadata('permissions', [USER.ADD, INSPECTIONS.GETBYID]),
+    SetMetadata('permissions', ["d2v0i4r"]),
     ApiBearerAuth('access-token'),
     ApiParam({
       name: 'id',
