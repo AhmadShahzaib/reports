@@ -58,6 +58,7 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
+import { previousWeekDate } from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -2392,34 +2393,13 @@ export class AppController extends BaseController {
         driverId = id;
       }
       const unitData = await this.tripInspectionService.getUnitData(driverId);
-      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
-      function previousWeekDate(dateStr) {
-        // Create a new Date object from the input date string
-        const date = new Date(dateStr);
-
-        // Get the UTC values for year, month, and day
-        const year = date.getUTCFullYear();
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-        const day = date.getUTCDate().toString().padStart(2, '0');
-
-        // Create a new Date object with UTC values
-        const utcDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
-
-        // Subtract 7 days from the UTC date to get the previous week's date
-        utcDate.setUTCDate(utcDate.getUTCDate() - 7);
-
-        // Get the year, month, and day of the new date object and format it as a string
-        const newYear = utcDate.getUTCFullYear();
-        const newMonth = (utcDate.getUTCMonth() + 1)
-          .toString()
-          .padStart(2, '0');
-        const newDay = utcDate.getUTCDate().toString().padStart(2, '0');
-        const newDateStr = `${newYear}-${newMonth}-${newDay}`;
-
-        // Return the new date string
-        return newDateStr;
+      if (!unitData) {
+        return response.status(HttpStatus.OK).send({
+          message: 'Assosiated Unit not found.',
+          data: '',
+        });
       }
+      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
 
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
@@ -2430,6 +2410,13 @@ export class AppController extends BaseController {
           previousdate,
           date,
         );
+      // status
+      // if(logsOfSelectedDate){
+      //   return response.status(HttpStatus.OK).send({
+      //     message: 'Assosiated Unit not found.',
+      //     data: '',
+      //   });
+      // }
       const checkDate = date.split('-');
       const todayDate = date;
       let malfunctionIndicator = 'NO';
@@ -2495,7 +2482,7 @@ export class AppController extends BaseController {
             odoMeterSpeed: 0,
             engineHours: 0,
             address: '',
-            vehicleManualId: unitData.manualVehicleId,
+            vehicleManualId: unitData?.manualVehicleId,
             geoLocation: {
               longitude: 0,
               latitude: 0,
