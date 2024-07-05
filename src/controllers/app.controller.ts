@@ -58,7 +58,7 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
-import {previousWeekDate} from 'utils/helperFunctions'
+import { previousWeekDate } from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -2393,15 +2393,13 @@ export class AppController extends BaseController {
         driverId = id;
       }
       const unitData = await this.tripInspectionService.getUnitData(driverId);
-      if(!unitData){
+      if (!unitData) {
         return response.status(HttpStatus.OK).send({
           message: 'Assosiated Unit not found.',
           data: '',
         });
       }
       const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
-     
 
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
@@ -2412,13 +2410,13 @@ export class AppController extends BaseController {
           previousdate,
           date,
         );
-        // status
-        // if(logsOfSelectedDate){
-        //   return response.status(HttpStatus.OK).send({
-        //     message: 'Assosiated Unit not found.',
-        //     data: '',
-        //   });
-        // }
+      // status
+      // if(logsOfSelectedDate){
+      //   return response.status(HttpStatus.OK).send({
+      //     message: 'Assosiated Unit not found.',
+      //     data: '',
+      //   });
+      // }
       const checkDate = date.split('-');
       const todayDate = date;
       let malfunctionIndicator = 'NO';
