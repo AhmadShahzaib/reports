@@ -109,6 +109,7 @@ export class SignService {
         },
         {
           $set: { notes: notes },
+          date: start  
         },
         {
           new: true,
