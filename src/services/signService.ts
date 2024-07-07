@@ -67,34 +67,6 @@ export class SignService {
   };
 
   getLogFormNotes = async (
-   
-    driverId: string,
-    date: string,
-    companyTimeZone: string,
-  ): Promise<any> => {
-    try {
-      // let dateRR = date.split(",");
-      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
-      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
-      const logform = await this. signModel
-        .findOne({
-          driverId: driverId,
-          date: { $gte: start, $lte: end },
-        })
-        .lean();
-      if (!logform) {
-        return false;
-      }
-     
-      return logform.notes;
-    } catch (err) {
-      this.logger.error({ message: err.message, stack: err.stack });
-      throw err;
-    }
-  };
-
-  updateNotes = async (
-    notes: string,
     driverId: string,
     date: string,
     companyTimeZone: string,
@@ -112,16 +84,42 @@ export class SignService {
       if (!logform) {
         return false;
       }
-      logform.notes = notes;
-      let data = await this.signModel.findOneAndUpdate(
-        { driverId: driverId, date: { $gte: start, $lte: end } },
-        { $set: logform },
+
+      return logform.notes;
+    } catch (err) {
+      this.logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+
+  updateNotes = async (
+    notes: string,
+    driverId: string,
+    date: string,
+    companyTimeZone: string,
+  ): Promise<any> => {
+    try {
+      // let dateRR = date.split(",");
+      let start = moment(date, 'YYYY-MM-DD').startOf('day').unix();
+      let end = moment(date, 'YYYY-MM-DD').endOf('day').unix();
+      const data = await this.signModel.findOneAndUpdate(
+        {
+          driverId: driverId,
+          date: { $gte: start, $lte: end },
+        },
+        {
+          $set: { notes: notes },
+        },
         {
           new: true,
           upsert: true,
           rawResult: true,
         },
       );
+
+      if (!data.value) {
+        return false;
+      }
       return true;
     } catch (err) {
       this.logger.error({ message: err.message, stack: err.stack });
