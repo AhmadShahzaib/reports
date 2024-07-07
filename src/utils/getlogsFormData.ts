@@ -36,9 +36,10 @@ let terminal;
     if(tenantId){
       const tenant = await tripInspectionService.getTenent(tenantId);
       logsForm['headOffice'] =  tenant.address 
+      logsForm['carrier'] = tenant.name ?? null;
     }
     if (unitData) {
-      logsForm['carrier'] = unitData.carrier ?? null;
+     
       logsForm['homeTerminalAddressId'] =
         unitData.homeTerminalAddressId ?? null;
     
