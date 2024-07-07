@@ -114,6 +114,37 @@ const getProxyObject = (
       inject: [ConfigurationService],
     },
     {
+      provide: 'OFFICE_SERVICE',
+      useFactory: (config: ConfigurationService) => {
+        const officeServicePort = config.get('OFFICE_MICROSERVICE_PORT');
+        const officeServiceHost = config.get('OFFICE_MICROSERVICE_HOST');
+
+        return ClientProxyFactory.create({
+          transport: Transport.TCP,
+          options: {
+            port: Number(officeServicePort),
+            host: officeServiceHost,
+          },
+        });
+      },
+      inject: [ConfigurationService],
+    }, {
+      provide: 'COMPANY_SERVICE',
+      useFactory: (config: ConfigurationService) => {
+        const port: number = Number(config.get('COMPANY_MICROSERVICE_PORT'));
+        const host = config.get('COMPANY_MICROSERVICE_HOST');
+
+        return ClientProxyFactory.create({
+          transport: Transport.TCP,
+          options: {
+            port,
+            host,
+          },
+        });
+      },
+      inject: [ConfigurationService],
+    },
+    {
       provide: 'UNIT_SERVICE',
       useFactory: (config: ConfigurationService) => {
         const port: number = Number(config.get('UNIT_MICROSERVICE_PORT'));
