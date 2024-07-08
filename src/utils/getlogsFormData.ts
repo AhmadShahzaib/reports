@@ -47,13 +47,13 @@ let terminal;
     
 
       logsForm['vehicleId'] = unitData.vehicleId ?? null;
-      logsForm['manualVehicleId'] = unitData.manualVehicleId ?? null;
-      logsForm['driverId'] = unitData.driverId ?? null;
-      logsForm['manualDriverId'] = unitData.manualDriverId ?? null;
-      logsForm['driverFirstName'] = unitData.driverFirstName ?? null;
-      logsForm['driverLastName'] = unitData.driverLastName ?? null;
-      logsForm['totalEngineHours'] = unitData?.meta?.totalEngineHours ?? null;
-      logsForm['totalVehicleMiles'] = unitData?.meta?.totalVehicleMiles ?? null;
+      logsForm['manualVehicleId'] = unitData.currentVehicle ?? null;
+      logsForm['driverId'] = unitData._id ?? null;
+      logsForm['manualDriverId'] = unitData.driverId ?? null;
+      logsForm['driverFirstName'] = unitData.firstName ?? null;
+      logsForm['driverLastName'] = unitData.lastName ?? null;
+      logsForm['totalEngineHours'] =  null;
+      logsForm['totalVehicleMiles'] =  null;
     }
     formData = await getDriverSign(data, logsForm, awsService);
     const resGraph: any = await tripInspectionService.getLogsBetweenRange(

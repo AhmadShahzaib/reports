@@ -128,7 +128,22 @@ const getProxyObject = (
         });
       },
       inject: [ConfigurationService],
-    }, {
+    },  {
+      provide: 'DRIVER_SERVICE',
+      useFactory: (config: ConfigurationService) => {
+        const driverServicePort = config.get('DRIVER_MICROSERVICE_PORT');
+        const driverServiceHost = config.get('DRIVER_MICROSERVICE_HOST');
+
+        return ClientProxyFactory.create({
+          transport: Transport.TCP,
+          options: {
+            port: Number(driverServicePort),
+            host: driverServiceHost,
+          },
+        });
+      },
+      inject: [ConfigurationService],
+    },{
       provide: 'COMPANY_SERVICE',
       useFactory: (config: ConfigurationService) => {
         const port: number = Number(config.get('COMPANY_MICROSERVICE_PORT'));

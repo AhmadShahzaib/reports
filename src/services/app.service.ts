@@ -38,6 +38,7 @@ export class AppService extends BaseService<TIDocument> {
     @Inject('COMPANY_SERVICE') private readonly companyClient: ClientProxy,
     
     @Inject('OFFICE_SERVICE') private readonly officeClient: ClientProxy,
+    @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
 
     @Inject('HOS_SERVICE') private readonly client: ClientProxy,
     @Inject('UNIT_SERVICE') private readonly unitClient: ClientProxy,
@@ -398,8 +399,8 @@ if(inspection.signatures.mechanicSignature){
   getUnitData = async (driverId: string) => {
     try {
       const res = await firstValueFrom(
-        this.unitClient.send(
-          { cmd: 'get_assigned_driver_eld_SerialNo' },
+        this.driverClient.send(
+          { cmd: 'get_driver_by_id' },
           driverId,
         ),
       )
