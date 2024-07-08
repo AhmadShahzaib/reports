@@ -29,13 +29,14 @@ let terminal;
     // Check if the input matches the pattern
     if( objectIdPattern.test(unitData.homeTerminalAddress)){
       terminal = await tripInspectionService.getTerminal(unitData.homeTerminalAddress);
-      logsForm['homeTerminalAddress'] =  terminal.address 
+      logsForm['homeTerminalAddress'] =  terminal?.address 
     }else {
       logsForm['homeTerminalAddress'] =  unitData.homeTerminalAddress 
     }
     if(tenantId){
       const tenant = await tripInspectionService.getTenent(tenantId);
-      logsForm['headOffice'] =  tenant.address 
+      Logger.log(tenant);
+      logsForm['headOffice'] =  tenant?.address 
       logsForm['carrier'] = tenant.name ?? null;
     }
     if (unitData) {
