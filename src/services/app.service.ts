@@ -35,6 +35,10 @@ export class AppService extends BaseService<TIDocument> {
     private eldSubmitionRecord: Model<EldSubmitionRecordDocument>,
     @InjectModel('iftaSubmissionRecord')
     private iftaSubmissionRecord: Model<IftaReportSubmissionRecordsDocument>,
+    @Inject('COMPANY_SERVICE') private readonly companyClient: ClientProxy,
+    
+    @Inject('OFFICE_SERVICE') private readonly officeClient: ClientProxy,
+    @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
 
     @Inject('HOS_SERVICE') private readonly client: ClientProxy,
     @Inject('UNIT_SERVICE') private readonly unitClient: ClientProxy,
@@ -395,8 +399,8 @@ if(inspection.signatures.mechanicSignature){
   getUnitData = async (driverId: string) => {
     try {
       const res = await firstValueFrom(
-        this.unitClient.send(
-          { cmd: 'get_assigned_driver_eld_SerialNo' },
+        this.driverClient.send(
+          { cmd: 'get_driver_by_id' },
           driverId,
         ),
       )
@@ -405,6 +409,59 @@ if(inspection.signatures.mechanicSignature){
         })
         .catch((error) => {
           Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
+      // if (res.isError) {
+      //   Logger.log('Error in getting  Graph data from UNIT srvice');
+      //   mapMessagePatternResponseToException(res);
+      // }
+      return res.data;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+
+  getTerminal = async (terminalId: string) => {
+    try {
+      const res = await firstValueFrom(
+        this.officeClient.send(
+          { cmd: 'get_office_by_id' },
+          terminalId,
+        ),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Terminal data from Office srvice');
+          mapMessagePatternResponseToException(res);
+        });
+      // if (res.isError) {
+      //   Logger.log('Error in getting  Graph data from UNIT srvice');
+      //   mapMessagePatternResponseToException(res);
+      // }
+      return res.data;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+
+
+  getTenent = async (tenentId: string) => {
+    try {
+      const res = await firstValueFrom(
+        this.companyClient.send(
+          { cmd: 'get_company_by_id' },
+          tenentId,
+        ),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Tenent data from company srvice');
           mapMessagePatternResponseToException(res);
         });
       // if (res.isError) {
