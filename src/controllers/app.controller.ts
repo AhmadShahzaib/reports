@@ -3411,6 +3411,7 @@ export class AppController extends BaseController {
 
       const shippingIds = [];
       const trailerIds = [];
+      const vehicleIds = [];
       csvDataOfDutyStatus.forEach((record) => {
         if (!shippingIds.includes(record.shippingId)) {
           shippingIds.push(record.shippingId);
@@ -3418,11 +3419,15 @@ export class AppController extends BaseController {
         if (!trailerIds.includes(record.trailerId)) {
           trailerIds.push(record.trailerId);
         }
+        if (!vehicleIds.includes(record.vehicleId)) {
+          vehicleIds.push(record.vehicleId);
+        }
       });
-      Logger.log('before shipping doc');
+     
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
-      Logger.log('after shipping doc');
+      data['manualVehicleId'] = vehicleIds.toString() ?? null;
+     
 
       if (
         logsOfSelectedDate.data[0]?.csv
