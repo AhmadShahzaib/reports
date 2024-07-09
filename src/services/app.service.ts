@@ -36,7 +36,7 @@ export class AppService extends BaseService<TIDocument> {
     @InjectModel('iftaSubmissionRecord')
     private iftaSubmissionRecord: Model<IftaReportSubmissionRecordsDocument>,
     @Inject('COMPANY_SERVICE') private readonly companyClient: ClientProxy,
-    
+
     @Inject('OFFICE_SERVICE') private readonly officeClient: ClientProxy,
     @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
 
@@ -146,12 +146,11 @@ export class AppService extends BaseService<TIDocument> {
         inspectionRecord.defectsCategory.vehicle = [];
         inspectionRecord.defectsCategory.trailer = [];
       }
-if(inspection.signatures.mechanicSignature){
-
-  inspectionRecord.signatures[`mechanicSignature`] =
-    inspection.signatures.mechanicSignature;
-}
-        inspectionRecord.signatures[`driverSignature`] =
+      if (inspection.signatures.mechanicSignature) {
+        inspectionRecord.signatures[`mechanicSignature`] =
+          inspection.signatures.mechanicSignature;
+      }
+      inspectionRecord.signatures[`driverSignature`] =
         inspection.signatures.driverSignature;
 
       //  save updated record
@@ -198,12 +197,7 @@ if(inspection.signatures.mechanicSignature){
   };
   getTotal = async (options) => {
     try {
-    
-
-     
-   
       const totalCount = await this.tripInspectionModel.countDocuments(options);
-     
 
       return totalCount;
     } catch (err) {
@@ -399,10 +393,7 @@ if(inspection.signatures.mechanicSignature){
   getUnitData = async (driverId: string) => {
     try {
       const res = await firstValueFrom(
-        this.driverClient.send(
-          { cmd: 'get_driver_by_id' },
-          driverId,
-        ),
+        this.driverClient.send({ cmd: 'get_driver_by_id' }, driverId),
       )
         .then((success) => {
           return success;
@@ -425,10 +416,7 @@ if(inspection.signatures.mechanicSignature){
   getTerminal = async (terminalId: string) => {
     try {
       const res = await firstValueFrom(
-        this.officeClient.send(
-          { cmd: 'get_office_by_id' },
-          terminalId,
-        ),
+        this.officeClient.send({ cmd: 'get_office_by_id' }, terminalId),
       )
         .then((success) => {
           return success;
@@ -448,14 +436,10 @@ if(inspection.signatures.mechanicSignature){
     }
   };
 
-
   getTenent = async (tenentId: string) => {
     try {
       const res = await firstValueFrom(
-        this.companyClient.send(
-          { cmd: 'get_company_by_id' },
-          tenentId,
-        ),
+        this.companyClient.send({ cmd: 'get_company_by_id' }, tenentId),
       )
         .then((success) => {
           return success;

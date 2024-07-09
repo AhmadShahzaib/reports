@@ -3423,11 +3423,10 @@ export class AppController extends BaseController {
           vehicleIds.push(record.vehicleId);
         }
       });
-     
+
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
       data['manualVehicleId'] = vehicleIds.toString() ?? null;
-     
 
       if (
         logsOfSelectedDate.data[0]?.csv
