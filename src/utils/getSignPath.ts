@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { AwsService } from '@shafiqrathore/logeld-tenantbackend-common-future';
 
 export const getDriverSign = async (
@@ -9,8 +10,14 @@ export const getDriverSign = async (
     if (data && Object.keys(data['_doc']).length > 0) {
       if (logForm?.sign && Object.keys(logForm?.sign['_doc']).length > 0) {
         const sign = logForm?.sign['_doc'];
-        const path = await awsService.getObject(sign?.key);
-        sign['imageUrl'] = sign?.imageUrl
+        let path;
+        try {
+          path = await awsService.getObject(sign?.key);
+        } catch (error) {
+          Logger.log(error);
+          return logForm;
+        }
+        sign['imageUrl'] = sign?.imageUrl;
         sign['imagePath'] = `data:image/${sign?.imageName
           .split('.')
           .pop()};base64,${path.replace(/\s+/g, '')}`;

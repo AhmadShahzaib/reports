@@ -17,7 +17,7 @@ import {
 export default function sendEmailToFmcsa() {
   const sendEmailToFmcsa: Array<CombineDecoratorType> = [
     Get('sendEmailToFmcsa/:driverId'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', ["f3ma5d8da"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see CSV for.',

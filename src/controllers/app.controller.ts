@@ -38,7 +38,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
-
+import { getDistance, getNext8Days, convertHM } from '../utils/getWeekData';
 import { AppService } from '../services/app.service';
 import AddInspectionDecorators from 'decorators/addInspection';
 import { InspectionRequest } from 'models/inspectionRequestModel';
@@ -58,6 +58,7 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
+import { previousWeekDate } from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -215,7 +216,7 @@ export class AppController extends BaseController {
       // requestInspection.vehicleManualId = unitData.manualVehicleId;
       // requestInspection.trailerNumber = unitData.trailerNumber;
       requestInspection.vehicleManualId = defectRequest.vehicleManualId;
-      requestInspection.trailerNumber = defectRequest.trailerNumber;
+      requestInspection.trailerNumber = defectRequest?.trailerNumber;
       if (!defectRequest.driverManualId) {
         throw new InternalServerErrorException(
           'Add defectRequest.driverManualId and vehicleManualId  ',
@@ -1864,7 +1865,8 @@ export class AppController extends BaseController {
     try {
       const options = {};
       const { search, orderBy, orderType, pageNo, limit } = queryParams;
-      const { tenantId: id } = request.user ?? ({ tenantId: undefined } as any);
+      const { tenantId: id, timeZone } =
+        request.user ?? ({ tenantId: undefined } as any);
       options['$and'] = [{ tenantId: id }];
       if (search) {
         options['$or'] = [];
@@ -2391,34 +2393,13 @@ export class AppController extends BaseController {
         driverId = id;
       }
       const unitData = await this.tripInspectionService.getUnitData(driverId);
-      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
-      function previousWeekDate(dateStr) {
-        // Create a new Date object from the input date string
-        const date = new Date(dateStr);
-
-        // Get the UTC values for year, month, and day
-        const year = date.getUTCFullYear();
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-        const day = date.getUTCDate().toString().padStart(2, '0');
-
-        // Create a new Date object with UTC values
-        const utcDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
-
-        // Subtract 7 days from the UTC date to get the previous week's date
-        utcDate.setUTCDate(utcDate.getUTCDate() - 7);
-
-        // Get the year, month, and day of the new date object and format it as a string
-        const newYear = utcDate.getUTCFullYear();
-        const newMonth = (utcDate.getUTCMonth() + 1)
-          .toString()
-          .padStart(2, '0');
-        const newDay = utcDate.getUTCDate().toString().padStart(2, '0');
-        const newDateStr = `${newYear}-${newMonth}-${newDay}`;
-
-        // Return the new date string
-        return newDateStr;
+      if (!unitData) {
+        return response.status(HttpStatus.OK).send({
+          message: 'Assosiated Unit not found.',
+          data: '',
+        });
       }
+      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
 
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
@@ -2429,6 +2410,13 @@ export class AppController extends BaseController {
           previousdate,
           date,
         );
+      // status
+      // if(logsOfSelectedDate){
+      //   return response.status(HttpStatus.OK).send({
+      //     message: 'Assosiated Unit not found.',
+      //     data: '',
+      //   });
+      // }
       const checkDate = date.split('-');
       const todayDate = date;
       let malfunctionIndicator = 'NO';
@@ -2494,7 +2482,7 @@ export class AppController extends BaseController {
             odoMeterSpeed: 0,
             engineHours: 0,
             address: '',
-            vehicleManualId: unitData.manualVehicleId,
+            vehicleManualId: unitData?.manualVehicleId,
             geoLocation: {
               longitude: 0,
               latitude: 0,
@@ -2615,77 +2603,7 @@ export class AppController extends BaseController {
       //     tenantId,
       //     companyTimeZone,
       //   );
-      function getDistance(dutyStatuses) {
-        let distance = 0;
-        dutyStatuses.map((element, index) => {
-          distance += Number(element.accumulatedVehicleMiles);
-        });
-        return distance;
-      }
-      function getNext8Days(dateString) {
-        Logger.log('Incoming date: -----------> ', dateString);
-        const result = [];
-        const currentDate = new Date(dateString);
-        currentDate.setUTCHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 in UTC
 
-        const formattedStartDate = `${currentDate.getFullYear().toString()}-${(
-          currentDate.getUTCMonth() + 1
-        )
-          .toString()
-          .padStart(2, '0')}-${currentDate
-          .getUTCDate()
-          .toString()
-          .padStart(2, '0')}`;
-
-        result.push(formattedStartDate);
-
-        Logger.log('Formatted Start Date: ' + formattedStartDate);
-
-        for (let i = 0; i < 6; i++) {
-          const nextDate = new Date(currentDate);
-          nextDate.setUTCDate(currentDate.getUTCDate() + (i + 1)); // Increment i by 1 to get the correct next date
-          Logger.log('Next Date: ------ > ', nextDate);
-
-          const formattedDate = `${nextDate.getFullYear().toString()}-${(
-            nextDate.getUTCMonth() + 1
-          )
-            .toString()
-            .padStart(2, '0')}-${nextDate
-            .getUTCDate()
-            .toString()
-            .padStart(2, '0')}`;
-          result.push(formattedDate);
-        }
-
-        return result;
-      }
-
-      function convertHM(value) {
-        // Hours, minutes and seconds
-        let ret = '';
-        if (value) {
-          const hrs = value / 3600;
-          const mins = (value % 3600) / 60;
-          // Output like "1:01" or "4:03:59" or "123:03:59"
-          if (hrs > 0) {
-            ret +=
-              '' +
-              (hrs < 10 ? '0' + Math.floor(hrs) : '' + Math.floor(hrs)) +
-              ':';
-          } else {
-            ret += '00:';
-          }
-          if (mins > 0) {
-            ret += mins < 10 ? '0' + Math.floor(mins) : '' + Math.floor(mins);
-          } else {
-            ret += '00';
-          }
-        } else {
-          ret = '00:00';
-        }
-
-        return ret;
-      }
       const allDaysworkHour = getNext8Days(previousdate);
       Logger.log(
         'Start Date ===================================> End date  ============= >' +
@@ -2942,6 +2860,7 @@ export class AppController extends BaseController {
   //     { name: 'signatureImages', maxCount: 2 },
   //   ]),
   // )
+
   async UpdateDefectsInspection(
     @Body() defectRequest: InspectionRequest,
     @Param('id', MongoIdValidationPipe) inspectionReportId: string,
@@ -3027,17 +2946,17 @@ export class AppController extends BaseController {
         companyTimeZone,
       );
       if (requestLog?.sign) {
-        const signature = JSON.parse(JSON.stringify(requestLog.sign));
-        const imageUrl = signature.imageUrl;
-        Logger.log(signature.imageUrl);
-        // let address = await getAddress(addDefect);
-        const messagePatternUnits =
-          await firstValueFrom<MessagePatternResponseType>(
-            this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
-          );
-        if (messagePatternUnits.isError) {
-          mapMessagePatternResponseToException(messagePatternUnits);
-        }
+        // const signature = JSON.parse(JSON.stringify(requestLog.sign));
+        // const imageUrl = signature.imageUrl;
+        // Logger.log(signature.imageUrl);
+        // // let address = await getAddress(addDefect);
+        // const messagePatternUnits =
+        //   await firstValueFrom<MessagePatternResponseType>(
+        //     this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
+        //   );
+        // if (messagePatternUnits.isError) {
+        //   mapMessagePatternResponseToException(messagePatternUnits);
+        // }
       }
       if (logResult && Object.keys(logResult).length > 0) {
         Logger.log(`Log Form has been updated successfully`);
@@ -3492,6 +3411,7 @@ export class AppController extends BaseController {
 
       const shippingIds = [];
       const trailerIds = [];
+      const vehicleIds = [];
       csvDataOfDutyStatus.forEach((record) => {
         if (!shippingIds.includes(record.shippingId)) {
           shippingIds.push(record.shippingId);
@@ -3499,11 +3419,15 @@ export class AppController extends BaseController {
         if (!trailerIds.includes(record.trailerId)) {
           trailerIds.push(record.trailerId);
         }
+        if (!vehicleIds.includes(record.vehicleId)) {
+          vehicleIds.push(record.vehicleId);
+        }
       });
-      Logger.log('before shipping doc');
+     
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
-      Logger.log('after shipping doc');
+      data['manualVehicleId'] = vehicleIds.toString() ?? null;
+     
 
       if (
         logsOfSelectedDate.data[0]?.csv
@@ -3534,7 +3458,7 @@ export class AppController extends BaseController {
     @Query('dateEnd') dateEnd: string = moment().format('YYYY-MM-DD'),
     @Query('origin') origin: string,
     @Query('investigationCode') investigationCode: string,
-
+    @Query('typeOfConnection') typeOfConnection: string,
     @Query('driverId') driverIdArr: [string],
     @Res() response: Response,
     @Req() request: Request,
