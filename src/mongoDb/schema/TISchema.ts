@@ -59,7 +59,7 @@ export const TISchema = new mongoose.Schema({
   vehicleManualId: { required: false, type: String },
   driverManualId: { required: false, type: String },
 
-  trailerNumber: { required: true, type: String },
+  trailerNumber: { required: false, type: String },
   carrier: { required: false, type: String },
   location: { type: String, required: true },
   odoMeterSpeed: { required: true, type: Number },

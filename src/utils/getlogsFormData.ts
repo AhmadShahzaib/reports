@@ -18,7 +18,7 @@ export const getLogsFormData = async (
   try {
     let formData = {};
     let logsForm = {};
-    const unitData = await tripInspectionService.getUnitData(id);
+    const unitData = await tripInspectionService.getdriverData(id);
 let terminal;
     const data = await serviceSign.findLogForm(id, date, companyTimeZone);
     if (data) {
@@ -60,6 +60,8 @@ let terminal;
       logsForm['totalVehicleMiles'] =  null;
     }
     formData = await getDriverSign(data, logsForm, awsService);
+    let stringLogform = JSON.stringify(formData);
+    formData = JSON.parse(stringLogform)
     const resGraph: any = await tripInspectionService.getLogsBetweenRange(
       logsForm['driverId'],
       date,
@@ -101,7 +103,32 @@ let terminal;
         resGraph?.data[0].csv?.timePlaceLine?.currentTotalEngineHours;
     }
     formData['distance'] = distance;
-   
+    
+      const csvOfDate = resGraph.data[0];
+      const csvDataOfDutyStatus =
+        csvOfDate.csv.eldEventListForDriversRecordOfDutyStatus; // get all the duty statuses
+      csvDataOfDutyStatus.sort((a, b) =>
+        a.eventTime.localeCompare(b.eventTime),
+      );
+
+      const shippingIds = [];
+      const trailerIds = [];
+      const vehicleIds = [];
+      csvDataOfDutyStatus.forEach((record) => {
+        if (!shippingIds.includes(record.shippingId)) {
+          shippingIds.push(record.shippingId);
+        }
+        if (!trailerIds.includes(record.trailerId)) {
+          trailerIds.push(record.trailerId);
+        }
+        if (!vehicleIds.includes(record.vehicleId)) {
+          vehicleIds.push(record.vehicleId);
+        }
+      });
+
+      formData['shippingDocument'] = shippingIds;
+      formData['trailerNumber'] = trailerIds;
+      formData['manualVehicleId'] = vehicleIds.toString() ?? null;
     console.log("\n\n\n\n ::" + data)
     let mostRecent;
     let notPresentLogform = false;
