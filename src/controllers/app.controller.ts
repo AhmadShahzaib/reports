@@ -2693,7 +2693,7 @@ export class AppController extends BaseController {
       // let graph = await resGraph;
       // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
 
-      const newGraph = convertICDtoV1(
+      const newGraph =                                                                                                                                              convertICDtoV1(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
         driverId,
         tenantId,
