@@ -419,6 +419,7 @@ export class AppService extends BaseService<TIDocument> {
       //   Logger.log('Error in getting  Graph data from UNIT srvice');
       //   mapMessagePatternResponseToException(res);
       // }
+      delete   resUNit.data._id
       const response = {...res.data , ...resUNit.data}
       return response;
     } catch (err) {

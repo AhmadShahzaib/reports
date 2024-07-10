@@ -265,7 +265,7 @@ export async function generatePdf(
   const logDate = moment(date, 'YYYY-MM-DD').unix();
   const graphEvent = graphData;
   driverData.carrier = formData['carrier']
-  driverData.usDot=formData['usDot']
+
   // .filter(function (element) {
   //   return (
   //     !element.eventType &&
