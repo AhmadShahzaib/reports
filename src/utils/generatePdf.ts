@@ -328,8 +328,8 @@ export async function generatePdf(
     odometerEnd: endOdometer,
     engineStart: startEngine,
     hoursWorkAvailable: convertHM(totalTime),
-    // shippingDocument: shippingID_String,
-    // trailerNumber: trailerNumber_String,
+    shippingDocument: shippingID_String,
+    trailerNumber: trailerNumber_String,
     distance: totalMielsTrevled,
     // graphEvent.length > 1
     //   ? graphEvent[graphEvent.length - 1]?.odoMeterMillage -

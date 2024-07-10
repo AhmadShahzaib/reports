@@ -420,6 +420,7 @@ export class AppService extends BaseService<TIDocument> {
       //   mapMessagePatternResponseToException(res);
       // }
       delete   resUNit.data._id
+      delete   resUNit.data.driverId
       const response = {...res.data , ...resUNit.data}
       return response;
     } catch (err) {
@@ -427,7 +428,30 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
-
+  getdriverData = async (driverId: string) => {
+    try {
+      const res = await firstValueFrom(
+        this.driverClient.send({ cmd: 'get_driver_by_id' }, driverId),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
+        
+      // if (res.isError) {
+      //   Logger.log('Error in getting  Graph data from UNIT srvice');
+      //   mapMessagePatternResponseToException(res);
+      // }
+     
+      return res.data;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   getTerminal = async (terminalId: string) => {
     try {
       const res = await firstValueFrom(

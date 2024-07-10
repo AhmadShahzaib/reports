@@ -18,7 +18,7 @@ export const getLogsFormData = async (
   try {
     let formData = {};
     let logsForm = {};
-    const unitData = await tripInspectionService.getUnitData(id);
+    const unitData = await tripInspectionService.getdriverData(id);
 let terminal;
     const data = await serviceSign.findLogForm(id, date, companyTimeZone);
     if (data) {
