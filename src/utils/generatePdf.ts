@@ -264,7 +264,7 @@ export async function generatePdf(
   }
   const logDate = moment(date, 'YYYY-MM-DD').unix();
   const graphEvent = graphData;
-  driverData.carrier = formData['carrier']
+  driverData.carrier = formData['carrier'];
 
   // .filter(function (element) {
   //   return (
@@ -328,8 +328,8 @@ export async function generatePdf(
     odometerEnd: endOdometer,
     engineStart: startEngine,
     hoursWorkAvailable: convertHM(totalTime),
-    shippingDocument: shippingID_String,
-    trailerNumber: trailerNumber_String,
+    shippingDocument: shippingID_String ?? ' ',
+    trailerNumber: trailerNumber_String ?? ' ',
     distance: totalMielsTrevled,
     // graphEvent.length > 1
     //   ? graphEvent[graphEvent.length - 1]?.odoMeterMillage -
@@ -493,7 +493,7 @@ export async function generatePdf(
       // console.log(context);
       let result;
       context.driver.eldNo = 'asd';
-    
+
       try {
         result = template(context);
       } catch (error) {
