@@ -41,7 +41,7 @@
       <tbody>
       <tr>
       <td colspan="1">Driver</td>accumulatedEngineHours
-      <td colspan="2">{{driver.driverFirstName}} {{driver.driverLastName}} {{driver.manualDriverId}}</td>
+      <td colspan="2">{{driver.firstName}} {{driver.lastName}} {{driver.driverId}}</td>
       <td colspan="1">Co-Drivers (ID)</td>
       <td colspan="2">{{driver.coDriverId}}</td>
       </tr>
@@ -164,7 +164,7 @@
       <div class="row">
         <div class="col-3">
           <h4>Driver</h4>
-           <p>: {{driver.driverFirstName}} {{driver.driverLastName}} ({{driver.manualDriverId}})</p>
+           <p>: {{driver.firstName}} {{driver.lastName}} ({{driver.driverId}})</p>
         </div>
         <div class="col-6">
           <h4>Co-Drivers (ID)</h4>
@@ -176,8 +176,8 @@
     <div class="row">
       <div class="col-3">
         <h4>DL Number</h4>
-        {{#if driver.driverLicense}}
-         <p>: {{driver.driverLicense}}</p>
+        {{#if driver.licenseNumber}}
+         <p>: {{driver.licenseNumber}}</p>
          {{/if}}
       </div>
       <div class="col-6">

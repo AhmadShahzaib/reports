@@ -58,7 +58,7 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
-import { previousWeekDate } from 'utils/helperFunctions';
+import { previousWeekDate,formatDate ,getOffdutyLog} from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -697,13 +697,7 @@ export class AppController extends BaseController {
         //       message: 'No Record Found',
         //       data: [],
         //     });
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          const year = date.getFullYear().toString().slice(-2);
-          return month + day + year;
-        }
+     
 
         const formattedDate = formatDate(date);
         if (currentDate != date) {
@@ -795,6 +789,7 @@ export class AppController extends BaseController {
           driverId,
           companyTimeZone,
           this.awsService,
+          this.tripInspectionService,
           // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
           ob,
           252000,
@@ -1150,6 +1145,7 @@ export class AppController extends BaseController {
         driverId,
         companyTimeZone,
         this.awsService,
+        this.tripInspectionService,
         // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
         object,
         totalDutyTime,
@@ -1553,6 +1549,7 @@ export class AppController extends BaseController {
           driverId,
           companyTimeZone,
           this.awsService,
+          
           // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
           object,
           totalDutyTime,
@@ -2411,12 +2408,12 @@ export class AppController extends BaseController {
           date,
         );
       // status
-      // if(logsOfSelectedDate){
-      //   return response.status(HttpStatus.OK).send({
-      //     message: 'Assosiated Unit not found.',
-      //     data: '',
-      //   });
-      // }
+      if(logsOfSelectedDate.status == 400){
+        return response.status(HttpStatus.OK).send({
+          message: 'Data Not found.',
+          data: '',
+        });
+      }
       const checkDate = date.split('-');
       const todayDate = date;
       let malfunctionIndicator = 'NO';
@@ -2447,13 +2444,7 @@ export class AppController extends BaseController {
         //       message: 'No Record Found',
         //       data: [],
         //     });
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          const year = date.getFullYear().toString().slice(-2);
-          return month + day + year;
-        }
+     
 
         const formattedDate = formatDate(date);
         if (currentDate != date) {
@@ -2471,41 +2462,7 @@ export class AppController extends BaseController {
           const hhmmss = hours + minutes + seconds;
           last = moment(formattedDate + hhmmss, 'MMDDYYHHmmss').unix();
         }
-        const offDutyLog = [
-          {
-            status: 'OFF DUTY',
-            startedAt: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
-            lastStartedAt: last,
-            totalSecondsSpentSoFar: 0,
-            actionDate: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
-            odoMeterMillage: 0,
-            odoMeterSpeed: 0,
-            engineHours: 0,
-            address: '',
-            vehicleManualId: unitData?.manualVehicleId,
-            geoLocation: {
-              longitude: 0,
-              latitude: 0,
-              address: '',
-            },
-            driver: {
-              id: driverId,
-              firstName: unitData?.driverFirstName || '',
-              lastName: unitData?.driverLastName || '',
-            },
-            id: '',
-            violations: [],
-            deviceType: 'android',
-            editRequest: [],
-            updated: [],
-            actionType: 'OFF_DUTY',
-            sequenceNumber: '0',
-            notes: '',
-            eventRecordStatus: '',
-            eventRecordOrigin: 'Auto',
-            eventType: '',
-          },
-        ];
+        const offDutyLog = getOffdutyLog(formattedDate,unitData,driverId,last )
         const rr = {
           date: date,
           recapData: {
@@ -2527,33 +2484,43 @@ export class AppController extends BaseController {
           '00:00',
           '00:00',
         ];
-        const offDutyBuffer = await generatePdf(
-          offDutyLog, //according to v2
-          // updatedDataGraph?.updatedGraph, // according to v1
-          // recap, // according to v1
-          rr, // according to v2
-          [],
-          unitData,
-          {
-            totalOffDutyTime: 0,
-            totalSleeperBerthTime: 0,
-            totalDrivingTime: 0,
-            totalDutyTime: 0,
-          }, // according to v2
-          date,
-          this.serviceSign,
-          driverId,
-          companyTimeZone,
-          this.awsService,
-          // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
-          ob,
-          252000,
-          unidentifiedIndicator,
-          dataDignosticIndicator,
-          malfunctionIndicator,
-          0,
-          // usdot,// according to v2
-        );
+        let offDutyBuffer
+        try {
+           offDutyBuffer = await generatePdf(
+            offDutyLog, //according to v2
+            // updatedDataGraph?.updatedGraph, // according to v1
+            // recap, // according to v1
+            rr, // according to v2
+            [],
+            unitData,
+            {
+              totalOffDutyTime: 0,
+              totalSleeperBerthTime: 0,
+              totalDrivingTime: 0,
+              totalDutyTime: 0,
+            }, // according to v2
+            date,
+            this.serviceSign,
+            driverId,
+            companyTimeZone,
+            this.awsService,
+            this.tripInspectionService,
+            // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
+            ob,
+            252000,
+            unidentifiedIndicator,
+            dataDignosticIndicator,
+            malfunctionIndicator,
+            0,
+            // usdot,// according to v2
+          );
+        } catch (error) {
+          return response.status(HttpStatus.OK).send({
+            message: 'Error while genrating pdf',
+            data: '',
+          });
+        }
+      
         const st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
         return response.status(HttpStatus.OK).send({
           message: 'Base64 string stream',
@@ -2830,6 +2797,7 @@ export class AppController extends BaseController {
         driverId,
         companyTimeZone,
         this.awsService,
+        this.tripInspectionService,
         // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
         object,
         totalDutyTime,

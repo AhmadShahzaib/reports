@@ -402,11 +402,25 @@ export class AppService extends BaseService<TIDocument> {
           Logger.log('Error in getting  Graph data from UNIT srvice');
           mapMessagePatternResponseToException(res);
         });
+        const resUNit = await firstValueFrom(
+          this.unitClient.send(
+            { cmd: 'get_assigned_driver_eld_SerialNo' },
+            driverId,
+          ),
+        )
+          .then((success) => {
+            return success;
+          })
+          .catch((error) => {
+            Logger.log('Error in getting  Graph data from UNIT srvice');
+            mapMessagePatternResponseToException(res);
+          });
       // if (res.isError) {
       //   Logger.log('Error in getting  Graph data from UNIT srvice');
       //   mapMessagePatternResponseToException(res);
       // }
-      return res.data;
+      const response = {...res.data , ...resUNit.data}
+      return response;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
       throw err;
