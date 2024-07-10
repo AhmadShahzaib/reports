@@ -2410,7 +2410,7 @@ export class AppController extends BaseController {
       // status
       if(logsOfSelectedDate.status == 400){
         return response.status(HttpStatus.OK).send({
-          message: 'Data Not found.',
+          message: 'Data Not found.',//if data not found
           data: '',
         });
       }
