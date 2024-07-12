@@ -58,7 +58,11 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
-import { previousWeekDate,formatDate ,getOffdutyLog} from 'utils/helperFunctions';
+import {
+  previousWeekDate,
+  formatDate,
+  getOffdutyLog,
+} from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -697,7 +701,6 @@ export class AppController extends BaseController {
         //       message: 'No Record Found',
         //       data: [],
         //     });
-     
 
         const formattedDate = formatDate(date);
         if (currentDate != date) {
@@ -1549,7 +1552,7 @@ export class AppController extends BaseController {
           driverId,
           companyTimeZone,
           this.awsService,
-          
+
           // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
           object,
           totalDutyTime,
@@ -2408,9 +2411,9 @@ export class AppController extends BaseController {
           date,
         );
       // status
-      if(logsOfSelectedDate.status == 400){
+      if (logsOfSelectedDate.status == 400) {
         return response.status(HttpStatus.OK).send({
-          message: 'Data Not found.',//if data not found
+          message: 'Data Not found.', //if data not found
           data: '',
         });
       }
@@ -2444,7 +2447,6 @@ export class AppController extends BaseController {
         //       message: 'No Record Found',
         //       data: [],
         //     });
-     
 
         const formattedDate = formatDate(date);
         if (currentDate != date) {
@@ -2462,7 +2464,12 @@ export class AppController extends BaseController {
           const hhmmss = hours + minutes + seconds;
           last = moment(formattedDate + hhmmss, 'MMDDYYHHmmss').unix();
         }
-        const offDutyLog = getOffdutyLog(formattedDate,unitData,driverId,last )
+        const offDutyLog = getOffdutyLog(
+          formattedDate,
+          unitData,
+          driverId,
+          last,
+        );
         const rr = {
           date: date,
           recapData: {
@@ -2484,9 +2491,9 @@ export class AppController extends BaseController {
           '00:00',
           '00:00',
         ];
-        let offDutyBuffer
+        let offDutyBuffer;
         try {
-           offDutyBuffer = await generatePdf(
+          offDutyBuffer = await generatePdf(
             offDutyLog, //according to v2
             // updatedDataGraph?.updatedGraph, // according to v1
             // recap, // according to v1
@@ -2520,7 +2527,7 @@ export class AppController extends BaseController {
             data: '',
           });
         }
-      
+
         const st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
         return response.status(HttpStatus.OK).send({
           message: 'Base64 string stream',
@@ -2693,7 +2700,7 @@ export class AppController extends BaseController {
       // let graph = await resGraph;
       // let sortedData = logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].csv
 
-      const newGraph =                                                                                                                                              convertICDtoV1(
+      const newGraph = convertICDtoV1(
         logsOfSelectedDate.data[logsOfSelectedDate.data.length - 1].csv,
         driverId,
         tenantId,
@@ -3029,8 +3036,9 @@ export class AppController extends BaseController {
     @Req() request: Request,
   ) {
     try {
-      const { tenantId, id, companyTimeZone } =
+      const { tenantId, id, homeTerminalTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
+      const userTimezone = homeTerminalTimeZone.tzCode;
       logFormRequest.tenantId = tenantId;
       const givenDates = date.split(',');
       const requestLog = await signUpload(
@@ -3040,15 +3048,18 @@ export class AppController extends BaseController {
         tenantId,
         id,
       );
+
       // requestLog.trailerNumber = JSON.parse(JSON.stringify(requestLog.trailerNumber));
       // requestLog.shippingDocument = JSON.parse(JSON.stringify(requestLog.shippingDocument));
+      Logger.log('Point1   ----------->');
 
+      Logger.log(userTimezone);
       const logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
         id,
         givenDates[0],
         true,
-        companyTimeZone,
+        userTimezone,
       );
       let signature;
       if (requestLog?.sign) {
@@ -3068,7 +3079,7 @@ export class AppController extends BaseController {
       const isCertified = await this.tripInspectionService.certification(
         id,
         givenDates,
-        companyTimeZone,
+        userTimezone,
         time,
         signature.imageUrl,
       );
