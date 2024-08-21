@@ -265,7 +265,7 @@ export async function generatePdf(
   const logDate = moment(date, 'YYYY-MM-DD').unix();
   const graphEvent = graphData;
   driverData.carrier = formData['carrier'];
-  driverData.homeTerminalAddress =formData["homeTerminalAddress"]
+  driverData.homeTerminalAddress = formData['homeTerminalAddress'];
   // .filter(function (element) {
   //   return (
   //     !element.eventType &&
@@ -483,9 +483,21 @@ export async function generatePdf(
         return rec.status;
       });
       hb.registerHelper('difference', function (last, start) {
-        return moment(moment.utc((last - start) * 1000)).format(
-          `HH [hrs] mm [min] `,
+        // return moment(moment.utc((last - start) * 1000)).format(
+        //   `HH [hrs] mm [min] `,
+        // );
+        const showData = moment(moment.utc((last - start) * 1000)).format(
+          'HH:mm:ss',
         );
+        const finalTime = showData.split(':');
+        let duration = `${finalTime[0] !== '00' ? `${finalTime[0]} hrs` : ''} ${
+          finalTime[1] !== '00' ? `${finalTime[1]} min` : ''
+        } ${finalTime[2] !== '00' ? `${finalTime[2]} sec` : ''}`;
+
+        if (duration === '23 hrs 59 min 59 sec') {
+          duration = '24h';
+        }
+        return duration;
       });
       const template = hb.compile(res.toString(), { strict: true });
 

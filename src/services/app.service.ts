@@ -611,14 +611,14 @@ export class AppService extends BaseService<TIDocument> {
   certification = async (
     driverId: string,
     givenDates,
-    companyTimeZone: string,
+    userTimeZone: string,
     time,
     signature,
   ) => {
     try {
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
-        const currentDate = moment().format('YYYY-MM-DD').toString();
+        const currentDate = moment().tz(userTimeZone).format('YYYY-MM-DD').toString();
         for (const date of givenDates) {
           logsOfSelectedDate = JSON.parse(
             JSON.stringify(
@@ -634,10 +634,10 @@ export class AppService extends BaseService<TIDocument> {
           certify['eventSequenceIdNumber'] = generateUniqueHexId();
           certify['eventCode'] = '1';
           if (currentDate == date) {
-            certify['eventDate'] = moment().format('MMDDYY').toString();
+            certify['eventDate'] = moment().tz(userTimeZone).format('MMDDYY').toString();
             const newtime = new Date();
             const options = {
-              timeZone: companyTimeZone, // specify the time zone you want to get the date and time for
+              timeZone: userTimeZone, // specify the time zone you want to get the date and time for
             };
             const nowinstring = newtime.toLocaleString('en-US', options);
             const now = new Date(Date.parse(nowinstring));
@@ -648,7 +648,7 @@ export class AppService extends BaseService<TIDocument> {
             certify['eventTime'] = hhmmss;
           } else {
             certify['eventDate'] = moment(date).format('MMDDYY').toString();
-            certify['eventTime'] = '235900';
+            certify['eventTime'] = '235958';
           }
           if (time) {
             certify['eventTime'] = time;
@@ -686,7 +686,7 @@ export class AppService extends BaseService<TIDocument> {
             driverId,
             date,
             true,
-            companyTimeZone,
+            userTimeZone,
           );
         }
 
