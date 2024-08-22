@@ -2400,7 +2400,6 @@ export class AppController extends BaseController {
         });
       }
       const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
@@ -2422,35 +2421,13 @@ export class AppController extends BaseController {
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
-      if (
-        logsOfSelectedDate.data.length == 0 ||
-        !unitData.hasOwnProperty('lastKnownLocation')
-      ) {
+      if (logsOfSelectedDate.data.length == 0) {
         let last = 0;
         const currentDate = moment().format('YYYY-MM-DD').toString();
 
-        //   try{
-        //   if ( !(logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].date == todayDate )) {
-        //     return response.status(HttpStatus.OK).send({
-        //       message: 'No Data for driver found for today ',
-        //       data: [],
-        //     });
-
-        //   }
-        // }catch(err){
-        //   return response.status(HttpStatus.OK).send({
-        //     message: 'No Data for driver found for today ',
-        //     data: [],
-        //   });
-        // }
-        //    return response.status(HttpStatus.OK).send({
-        //       message: 'No Record Found',
-        //       data: [],
-        //     });
-
         const formattedDate = formatDate(date);
         if (currentDate != date) {
-          last = moment(formattedDate + '235900', 'MMDDYYHHmmss').unix();
+          last = moment(formattedDate + '235959', 'MMDDYYHHmmss').unix();
         } else {
           const newtime = new Date();
           const options = {
@@ -2501,7 +2478,8 @@ export class AppController extends BaseController {
             [],
             unitData,
             {
-              totalOffDutyTime: 0,
+              totalOffDutyTime:
+                offDutyLog[0]?.lastStartedAt - offDutyLog[0]?.startedAt,
               totalSleeperBerthTime: 0,
               totalDrivingTime: 0,
               totalDutyTime: 0,
@@ -2708,41 +2686,69 @@ export class AppController extends BaseController {
       );
 
       // let clock= logsOfSelectedDateconsole.log()
-      const updatedDataGraph = await graphUpdatedData(newGraph);
-      if (newGraph[newGraph.length - 1].status == 'ON SB') {
+      let updatedDataGraph = await graphUpdatedData(newGraph);
+      let newGraphOffDutyStatuses = JSON.parse(JSON.stringify(newGraph));
+      newGraphOffDutyStatuses = newGraphOffDutyStatuses?.filter(
+        (x) =>
+          x.actionType === 'OFF_DUTY' ||
+          x.actionType === 'ON_DUTY_NOT_DRIVING' ||
+          x.actionType === 'DRIVING' ||
+          x.actionType === 'SLEEPER_BERTH',
+      );
+      if (
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+        'ON SB'
+      ) {
         updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       } else if (
-        newGraph[newGraph.length - 1].status == 'OFF DUTY' ||
-        newGraph[newGraph.length - 1].status == 'PC'
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'OFF DUTY' ||
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'PC'
       ) {
         updatedDataGraph.TotalTimeInHHMM.totalOffDutyTime =
           updatedDataGraph.TotalTimeInHHMM.totalOffDutyTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       } else if (
-        newGraph[newGraph.length - 1].status == 'ON DUTY' ||
-        newGraph[newGraph.length - 1].status == 'YM'
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'ON DUTY' ||
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'YM'
       ) {
         console.log(
           'before time ' + updatedDataGraph.TotalTimeInHHMM.totalDutyTime,
         );
         updatedDataGraph.TotalTimeInHHMM.totalDutyTime =
           updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
         console.log(
           'differance : ' +
-            (newGraph[newGraph.length - 1].lastStartedAt -
-              newGraph[newGraph.length - 1].startedAt),
+            (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .lastStartedAt -
+              newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+                .startedAt),
         );
-      } else if (newGraph[newGraph.length - 1].status == 'ON DRIVING') {
+      } else if (
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+        'ON DRIVING'
+      ) {
         updatedDataGraph.TotalTimeInHHMM.totalDrivingTime =
           updatedDataGraph.TotalTimeInHHMM.totalDrivingTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       }
 
       // let recap = await resRecap;
