@@ -18,6 +18,9 @@ export const getLogChecksum = (newLog: any) => {
       item != 'origin' &&
       item != 'destination' &&
       item != 'vehicleId' &&
+      item != 'trailerId' &&
+      item != 'shippingId' &&
+
       item != 'eventSynced' &&
       item != 'startEngineHour' &&
       item != 'endEngineHour' &&
@@ -30,7 +33,7 @@ export const getLogChecksum = (newLog: any) => {
       item != 'isEngineHours' &&
       item != 'intermediateType' &&
       item != 'speedMph' &&
-      
+      item != 'vinNumber' &&
       item != 'speedViolation' &&
       item != 'speedMph' &&
       item != 'violation'
