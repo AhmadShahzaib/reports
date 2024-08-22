@@ -151,7 +151,9 @@ const transformDataForGraphLines = (
 function convertHM(value) {
   // Hours, minutes and seconds
   let ret = '';
-  if (value) {
+  if (value === 86399) {
+    ret = '24:00';
+  } else if (value) {
     const hrs = value / 3600;
     const mins = (value % 3600) / 60;
     // Output like "1:01" or "4:03:59" or "123:03:59"
@@ -251,8 +253,12 @@ export async function generatePdf(
   let trailerNumber_String = '';
   if (data) {
     logsForm = data.logForm;
-    shippingID_String = logsForm['shippingDocument'].toString();
-    trailerNumber_String = logsForm['trailerNumber'].toString();
+    shippingID_String = logsForm['shippingDocument']
+      ?.filter((x) => x !== '')
+      .toString();
+    trailerNumber_String = logsForm['trailerNumber']
+      ?.filter((x) => x !== '')
+      .toString();
   }
   const formData = logsForm;
   let imagePath = '';
