@@ -2400,7 +2400,6 @@ export class AppController extends BaseController {
         });
       }
       const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
@@ -2422,35 +2421,13 @@ export class AppController extends BaseController {
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
-      if (
-        logsOfSelectedDate.data.length == 0 ||
-        !unitData.hasOwnProperty('lastKnownLocation')
-      ) {
+      if (logsOfSelectedDate.data.length == 0) {
         let last = 0;
         const currentDate = moment().format('YYYY-MM-DD').toString();
 
-        //   try{
-        //   if ( !(logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].date == todayDate )) {
-        //     return response.status(HttpStatus.OK).send({
-        //       message: 'No Data for driver found for today ',
-        //       data: [],
-        //     });
-
-        //   }
-        // }catch(err){
-        //   return response.status(HttpStatus.OK).send({
-        //     message: 'No Data for driver found for today ',
-        //     data: [],
-        //   });
-        // }
-        //    return response.status(HttpStatus.OK).send({
-        //       message: 'No Record Found',
-        //       data: [],
-        //     });
-
         const formattedDate = formatDate(date);
         if (currentDate != date) {
-          last = moment(formattedDate + '235900', 'MMDDYYHHmmss').unix();
+          last = moment(formattedDate + '235959', 'MMDDYYHHmmss').unix();
         } else {
           const newtime = new Date();
           const options = {
@@ -2501,7 +2478,8 @@ export class AppController extends BaseController {
             [],
             unitData,
             {
-              totalOffDutyTime: 0,
+              totalOffDutyTime:
+                offDutyLog[0]?.lastStartedAt - offDutyLog[0]?.startedAt,
               totalSleeperBerthTime: 0,
               totalDrivingTime: 0,
               totalDutyTime: 0,
