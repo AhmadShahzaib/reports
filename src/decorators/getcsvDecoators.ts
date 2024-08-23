@@ -36,6 +36,11 @@ export default function GetCsvDecorator() {
       name: 'investigationCode',
       example: 'VG565C45641R65416YGT',
       required: true,
+    }),  ApiQuery({
+      description: 'The Erods Code from inspector or back office.',
+      name: 'typeOfConnection',
+      example: 'VG565C45641R65416YGT',
+      required: true,
     }),
     ApiQuery({
       description: 'The driverId only for backoffice',
