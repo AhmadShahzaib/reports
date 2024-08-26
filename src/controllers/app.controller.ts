@@ -1640,7 +1640,7 @@ export class AppController extends BaseController {
       const { startDate, endDate, vehiclesArr, states, fileName, recipient } =
         queryObj;
       const allVehiclesObject = {};
-      for (let i = 0; i < vehiclesArr.length; i++) {
+      for (let i = 0; i < vehiclesArr?.length; i++) {
         const vehicleId = vehiclesArr[i];
         let vehicaleName = '';
         const unIdentified = [];
@@ -1684,7 +1684,7 @@ export class AppController extends BaseController {
               return !flag;
             });
 
-            filteredCSVs.map((eachCSV) => {
+            filteredCSVs?.map((eachCSV) => {
               let assignedUserCmvOrderNumber = '';
               eachCSV.csv.cmvList.map((eachCMV) => {
                 if (eachCMV.cmvVin === vinNumber) {
@@ -1933,6 +1933,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @GetPrevious7Days()
   async get7DaysReport(
     @Query('driverId') driverId: string,
@@ -2955,6 +2956,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @getLogFormNotesDecorators()
   async getDriverNotes(
     @Query('driverId') driverId: string,
@@ -2994,6 +2996,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @UpdateLogFormNotesDecorators()
   async UpdateDriverNotes(
     @Body() logFormRequest: LogFormNotes,
@@ -3031,6 +3034,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @certificationMobileDecorators()
   @UseInterceptors(FileInterceptor('driverSign'))
   async addCertificationMobile(
@@ -3149,6 +3153,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @UpdateLogFormDecorators()
   @UseInterceptors(FileInterceptor('driverSign'))
   async UpdateDriverLogFrom(
@@ -3725,6 +3730,7 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
   @GetCsvString()
   async GetCsvString(
     @Query('dateStart') dateStart: string,
@@ -3768,6 +3774,7 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
   @GetCertificationDays()
   async getunCertificationDays(
     @Query('dateStart') dateStart: string = moment().format('YYYY-MM-DD'),
@@ -3810,6 +3817,7 @@ export class AppController extends BaseController {
       });
     }
   }
+
   @updateCertification()
   async updateSpecficDaysCertification(
     @Query('dates') dates: [string],
@@ -3960,6 +3968,7 @@ export class AppController extends BaseController {
 
     // );
   }
+
   //  @UseInterceptors(new MessagePatternResponseInterceptor())
   @MessagePattern({ cmd: 'certification' })
   async update_certification(requestParam: any): Promise<any> {
@@ -4059,6 +4068,7 @@ export class AppController extends BaseController {
       return err;
     }
   }
+
   @UseInterceptors(new MessagePatternResponseInterceptor())
   @MessagePattern({ cmd: 'update_logform' })
   async updateLogForm(requestParam: any): Promise<any> {
