@@ -2393,7 +2393,9 @@ export class AppController extends BaseController {
       if (!driverId) {
         driverId = id;
       }
+      Logger.log('before unit :  ' + id);
       const unitData = await this.tripInspectionService.getUnitData(driverId);
+      Logger.log('unitData :  ' + unitData);
       if (!unitData) {
         return response.status(HttpStatus.OK).send({
           message: 'Assosiated Unit not found.',
