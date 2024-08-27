@@ -402,26 +402,26 @@ export class AppService extends BaseService<TIDocument> {
           Logger.log('Error in getting  Graph data from UNIT srvice');
           mapMessagePatternResponseToException(res);
         });
-        const resUNit = await firstValueFrom(
-          this.unitClient.send(
-            { cmd: 'get_assigned_driver_eld_SerialNo' },
-            driverId,
-          ),
-        )
-          .then((success) => {
-            return success;
-          })
-          .catch((error) => {
-            Logger.log('Error in getting  Graph data from UNIT srvice');
-            mapMessagePatternResponseToException(res);
-          });
+      const resUNit = await firstValueFrom(
+        this.unitClient.send(
+          { cmd: 'get_assigned_driver_eld_SerialNo' },
+          driverId,
+        ),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
       // if (res.isError) {
       //   Logger.log('Error in getting  Graph data from UNIT srvice');
       //   mapMessagePatternResponseToException(res);
       // }
-      delete   resUNit.data._id
-      delete   resUNit.data.driverId
-      const response = {...res.data , ...resUNit.data}
+      delete resUNit?.data?._id;
+      delete resUNit?.data?.driverId;
+      const response = { ...res.data, ...resUNit.data };
       return response;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
@@ -440,12 +440,12 @@ export class AppService extends BaseService<TIDocument> {
           Logger.log('Error in getting  Graph data from UNIT srvice');
           mapMessagePatternResponseToException(res);
         });
-        
+
       // if (res.isError) {
       //   Logger.log('Error in getting  Graph data from UNIT srvice');
       //   mapMessagePatternResponseToException(res);
       // }
-     
+
       return res.data;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
@@ -618,7 +618,10 @@ export class AppService extends BaseService<TIDocument> {
     try {
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
-        const currentDate = moment().tz(userTimeZone).format('YYYY-MM-DD').toString();
+        const currentDate = moment()
+          .tz(userTimeZone)
+          .format('YYYY-MM-DD')
+          .toString();
         for (const date of givenDates) {
           logsOfSelectedDate = JSON.parse(
             JSON.stringify(
@@ -634,7 +637,10 @@ export class AppService extends BaseService<TIDocument> {
           certify['eventSequenceIdNumber'] = generateUniqueHexId();
           certify['eventCode'] = '1';
           if (currentDate == date) {
-            certify['eventDate'] = moment().tz(userTimeZone).format('MMDDYY').toString();
+            certify['eventDate'] = moment()
+              .tz(userTimeZone)
+              .format('MMDDYY')
+              .toString();
             const newtime = new Date();
             const options = {
               timeZone: userTimeZone, // specify the time zone you want to get the date and time for
