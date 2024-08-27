@@ -474,7 +474,7 @@ export async function generateEditPdf(
       const html = result;
       // we are using headless mode
 
-      const browser = await puppeteer.launch({ headless: 'new' });
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
