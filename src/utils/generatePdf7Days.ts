@@ -33,9 +33,8 @@ export const convertUnixCompanyTimeZone = (
   unixValue: number,
   companyTimeZone,
 ) => {
-  const dateFromUnix = moment
-    .unix(unixValue)
-    
+  const dateFromUnix = moment.unix(unixValue);
+
   // dateFromUnix.minutes(new Date().getTimezoneOffset())
   return dateFromUnix;
 };
@@ -44,9 +43,9 @@ const convertUnixToMinutes = (unix: number, companyTimeZone) => {
   const dateFromUnix = convertUnixCompanyTimeZone(unix, companyTimeZone);
   const minutesFromHours = dateFromUnix.hours() * 60;
 
-    // console.log(`converted: ${minutesFromHours + dateFromUnix.minutes()}`);
-    // console.log(dateFromUnix.minutes());
-    
+  // console.log(`converted: ${minutesFromHours + dateFromUnix.minutes()}`);
+  // console.log(dateFromUnix.minutes());
+
   return minutesFromHours + dateFromUnix.minutes();
 };
 
@@ -64,32 +63,36 @@ const transformDataForGraphLines = (
   completeData: GraphType[],
   companyTimeZone,
 ): GraphLineType => {
-  const status = graphData.status
-  if (status == 'LOGIN' || status == 'LOGOUT' || status=='EV_ENGINE_OFF' || status == 'EV_ENGINE_ON') {
+  const status = graphData.status;
+  if (
+    status == 'LOGIN' ||
+    status == 'LOGOUT' ||
+    status == 'EV_ENGINE_OFF' ||
+    status == 'EV_ENGINE_ON'
+  ) {
     const result = {
       horizLn: {
-        x1:0,
-        x2:0,
-        y1:0,
-        y2:0,
+        x1: 0,
+        x2: 0,
+        y1: 0,
+        y2: 0,
       },
     };
 
     // no further status, so do not draw a vertical line afterwards
-    
-      Object.assign(result, {
-        vertLn: {
-          x1: 0,
-          x2:0,
-          y1:0,
-          y2:0,
-        },
-      });
-    
+
+    Object.assign(result, {
+      vertLn: {
+        x1: 0,
+        x2: 0,
+        y1: 0,
+        y2: 0,
+      },
+    });
 
     return result;
-    
-  }else{const horizontalLineBottomMargin = 7;
+  } else {
+    const horizontalLineBottomMargin = 7;
     if (index < completeData.length - 1) {
       if (!completeData[index + 1].startedAt) {
         index++;
@@ -98,25 +101,25 @@ const transformDataForGraphLines = (
     if (graphData.startedAt) {
       // horizontal line
       const x1 = convertUnixToMinutes(graphData.startedAt, companyTimeZone);
-  
+
       const x2 = convertUnixToMinutes(graphData.lastStartedAt, companyTimeZone);
-  
+
       const y1 =
         getLnStartingPoint(graphData.status) -
         slightlyBiggerLineHeight -
         horizontalLineBottomMargin;
-  
+
       const y2 =
         getLnStartingPoint(graphData.status) -
         slightlyBiggerLineHeight -
         horizontalLineBottomMargin;
-  
+
       let vy1 = 0;
       // check the order of next status and decide the starting point of vertical line that connects with another status
       if (completeData?.length > index + 1) {
         vy1 = getLnStartingPoint(completeData[index + 1].status) - 22;
       }
-  
+
       const result = {
         horizLn: {
           x1,
@@ -125,7 +128,7 @@ const transformDataForGraphLines = (
           y2,
         },
       };
-  
+
       // no further status, so do not draw a vertical line afterwards
       if (vy1 > 0) {
         Object.assign(result, {
@@ -137,11 +140,10 @@ const transformDataForGraphLines = (
           },
         });
       }
-  
+
       return result;
     }
   }
-  
 };
 function convertHM(value) {
   // Hours, minutes and seconds
@@ -164,7 +166,7 @@ function convertHM(value) {
   } else {
     ret = '00:00';
   }
-  
+
   return ret;
 }
 
@@ -192,7 +194,7 @@ export async function generatePdf7days(
   id: string,
   companyTimeZone: string,
   awaService,
-  
+
   objectData,
   totalTime,
   unidentifiedIndicator,
@@ -205,14 +207,14 @@ export async function generatePdf7days(
   const notDefect: boolean = true;
   const reverseable = 8;
   const object = {};
-  const recaps =  Object.keys(recap);
-  const currentDate =recap.date
+  const recaps = Object.keys(recap);
+  const currentDate = recap.date;
   for (let i = 0; i < objectData.length; i++) {
     object[i] = objectData[i];
   }
- 
+
   // object[`${reverseable}`] = convertHM(TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime);
-        
+
   if (inspection && inspection.length > 0) {
     for (const key of inspection) {
       key['driver'] = driverData ?? {};
@@ -239,7 +241,7 @@ export async function generatePdf7days(
   }
   const formData = await getDriverSign(data, logsForm, awaService);
   const logDate = moment(date, 'YYYY-MM-DD').unix();
-  const graphEvent = graphData
+  const graphEvent = graphData;
   // .filter(function (element) {
   //   return (
   //     !element.eventType &&
@@ -255,12 +257,11 @@ export async function generatePdf7days(
   // }
   // else{
 
-
   // }
-  let startEngine ;
+  let startEngine;
   let startOdometer;
-  let endOdometer
-  let endEngine
+  let endOdometer;
+  let endEngine;
 
   // const firstPowerEvent =await start_odometer_engin(graphEvent);
   // async function start_odometer_engin(graphEvent){
@@ -272,53 +273,54 @@ export async function generatePdf7days(
   //     }
   //   })
   // }
-  let totalHoursToday = TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime
-  totalHoursToday = convertHM(totalHoursToday)
+  let totalHoursToday =
+    TotalTimeInHHMM.totalDrivingTime + TotalTimeInHHMM.totalDutyTime;
+  totalHoursToday = convertHM(totalHoursToday);
 
-  console.log("\n\n\n\n Total Time Is : "+ totalTime);
-  if (totalTime<=0) {
-    totalTime = (252000 -(TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime))
-  }
-  else{
-    totalTime =252000 -  totalTime 
+  console.log('\n\n\n\n Total Time Is : ' + totalTime);
+  if (totalTime <= 0) {
+    totalTime =
+      252000 -
+      (TotalTimeInHHMM.totalDrivingTime + TotalTimeInHHMM.totalDutyTime);
+  } else {
+    totalTime = 252000 - totalTime;
   }
 
-  const milageGraph = JSON.parse(JSON.stringify(graphEvent))
+  const milageGraph = JSON.parse(JSON.stringify(graphEvent));
   milageGraph.sort((a, b) => a.startedAt - b.startedAt);
-  if(milageGraph[0].eventType == 'LOGIN'){
-    startEngine = milageGraph[1]?.engineHours
-        startOdometer = graphData[1]?.odoMeterMillage
-  }else{
-        startEngine = milageGraph[0]?.engineHours
-        startOdometer = graphData[0]?.odoMeterMillage
+  if (milageGraph[0].eventType == 'LOGIN') {
+    startEngine = milageGraph[1]?.engineHours;
+    startOdometer = graphData[1]?.odoMeterMillage;
+  } else {
+    startEngine = milageGraph[0]?.engineHours;
+    startOdometer = graphData[0]?.odoMeterMillage;
   }
-  endEngine = milageGraph[milageGraph.length -1]?.engineHours
-        endOdometer = graphData[milageGraph.length -1]?.odoMeterMillage
+  endEngine = milageGraph[milageGraph.length - 1]?.engineHours;
+  endOdometer = graphData[milageGraph.length - 1]?.odoMeterMillage;
 
-  const context =       {
-   
+  const context = {
     driver: driverData,
     currentDate: currentDate,
-    odometerStart: startOdometer ,
+    odometerStart: startOdometer,
     odometerEnd: endOdometer,
     engineStart: startEngine,
     hoursWorkAvailable: convertHM(totalTime),
     shippingDocument: formData.shippingDocument
       ? formData?.shippingDocument
       : '',
-    distance:totalMielsTrevled,
-      // graphEvent.length > 1
-      //   ? graphEvent[graphEvent.length - 1]?.odoMeterMillage -
-      //     graphEvent[0]?.odoMeterMillage
-      //   : graphEvent[0]?.odoMeterMillage,
+    distance: totalMielsTrevled,
+    // graphEvent.length > 1
+    //   ? graphEvent[graphEvent.length - 1]?.odoMeterMillage -
+    //     graphEvent[0]?.odoMeterMillage
+    //   : graphEvent[0]?.odoMeterMillage,
     from: formData.from ?? '',
     to: formData.to ?? '',
     logSign: formData?.sign?.imagePath ?? '',
     companyTimeZone: companyTimeZone,
-    totalHoursToday:totalHoursToday,
+    totalHoursToday: totalHoursToday,
     engineEnd: endEngine,
     inspectionDate: moment(moment.unix(logDate)).format(`MMMM D YYYY`),
-   
+
     currentInspectiondate: moment.unix(logDate),
     totalOffDutyTime: convertHM(TotalTimeInHHMM.totalOffDutyTime),
     drivingTime: convertHM(TotalTimeInHHMM.totalDrivingTime),
@@ -334,9 +336,9 @@ export async function generatePdf7days(
     inspection: inspection,
     data: graphData,
     // isDummy:isDummy,
-    unidentifiedIndicator:unidentifiedIndicator,
-    malfunctionIndicator:malfunctionIndicator,
-    dataDignosticIndicator:dataDignosticIndicator,
+    unidentifiedIndicator: unidentifiedIndicator,
+    malfunctionIndicator: malfunctionIndicator,
+    dataDignosticIndicator: dataDignosticIndicator,
     topLabels: [
       '1',
       '2',
@@ -398,9 +400,9 @@ export async function generatePdf7days(
         smallVerticalsLines: smallVerticalsLines,
       });
       let count = 0;
-  const sortedGraph = graphEvent.sort((a, b) => a.startedAt - b.startedAt);
-  
-        // if(sta)
+      const sortedGraph = graphEvent.sort((a, b) => a.startedAt - b.startedAt);
+
+      // if(sta)
       hb.registerHelper('increment', function () {
         return ++count * 59.9;
       });
@@ -420,7 +422,6 @@ export async function generatePdf7days(
         if (index === 'LOGOUT') {
           return 'Logout';
         }
-        
       });
 
       MomentHandler.registerHelpers(hb);
@@ -432,7 +433,6 @@ export async function generatePdf7days(
         }
       });
       hb.registerHelper('actionTime', function (index, options) {
-        
         return moment.unix(index).format('HH:mm:ss A');
       });
       hb.registerHelper('workHours', function (value, options) {
@@ -454,11 +454,10 @@ export async function generatePdf7days(
       });
 
       hb.registerHelper('actionType', function (rec) {
-        if (!(rec.status == 'LOGIN' || rec.status == 'LOGOUT')){
+        if (!(rec.status == 'LOGIN' || rec.status == 'LOGOUT')) {
           return rec.status;
-        } 
-          return rec.status;
-        
+        }
+        return rec.status;
       });
       hb.registerHelper('difference', function (last, start) {
         return moment(moment.utc((last - start) * 1000)).format(
@@ -474,15 +473,15 @@ export async function generatePdf7days(
       const html = result;
       // we are using headless mode
 
-      const browser = await puppeteer.launch({ headless: 'new' });
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
 
       // We use pdf function to generate the pdf in the same folder as this file.
-      const pdfName = 'reports'+date
+      const pdfName = 'reports' + date;
       const pdfConfig = {
-        path: pdfName+'.pdf', // Saves pdf to disk.
+        path: pdfName + '.pdf', // Saves pdf to disk.
         // format: 'A4',
         printBackground: true,
         margin: {
