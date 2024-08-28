@@ -9,6 +9,7 @@ import { InspectionResponse } from '../models/inspectionresponseModel';
 import { min } from 'lodash';
 import { getDriverSign } from './getSignPath';
 import { from } from 'rxjs';
+import { Logger } from '@nestjs/common';
 
 async function getTemplateHtml() {
   console.log('Loading template file in memory');
@@ -111,7 +112,12 @@ export async function generateIFTA(
       const html = result;
       // we are using headless mode
 
-      const browser = await puppeteer.launch();
+      let browser ;
+      try {
+        browser = await puppeteer.launch();
+      } catch (error) {
+        Logger.log(error)
+      }
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
