@@ -10,6 +10,7 @@ import { min } from 'lodash';
 import { getDriverSign } from './getSignPath';
 import { from } from 'rxjs';
 import { getLogsFormData } from './getlogsFormData';
+import { Logger } from '@nestjs/common';
 
 const getRectOrderNumberWRTStatus = (status: string) => {
   let row = 0;
@@ -520,8 +521,13 @@ export async function generatePdf(
       // We can use this to add dyamic data to our handlebas template at run time from database or API as per need. you can read the official doc to learn more https://handlebarsjs.com/
       const html = result;
       // we are using headless mode
-
-      const browser = await puppeteer.launch();
+let browser
+try {
+  browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+} catch (error) {
+  Logger.log(error)
+}
+      
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
