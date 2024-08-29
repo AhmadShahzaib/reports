@@ -2402,7 +2402,13 @@ export class AppController extends BaseController {
           data: '',
         });
       }
-      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
+      if (unitData?.meta) {
+        await this.tripInspectionService.runHOS(
+          driverId,
+          unitData?.homeTerminalTimeZone?.tzCode,
+        );
+      }
+      const companyTimeZone = unitData?.homeTerminalTimeZone?.tzCode;
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
