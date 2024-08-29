@@ -473,7 +473,7 @@ export async function generatePdf7days(
       const html = result;
       // we are using headless mode
 
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
