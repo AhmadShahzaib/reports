@@ -114,7 +114,7 @@ export async function generateIFTA(
 
       let browser ;
       try {
-        browser = await puppeteer.launch();
+        browser = await puppeteer.launch({ args: ['--no-sandbox'] });
       } catch (error) {
         Logger.log(error)
       }
