@@ -3485,7 +3485,7 @@ export class AppController extends BaseController {
             dateEnd,
           );
         if (logsOfSelectedDate.data.length == 0) {
-          return response.status(404).send({
+          return response.status(200).send({
             message: 'No, record found there.',
           });
         }
