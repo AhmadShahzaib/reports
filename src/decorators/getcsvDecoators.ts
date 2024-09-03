@@ -17,7 +17,7 @@ import {
 export default function GetCsvDecorator() {
   const GetCsvDecorator: Array<CombineDecoratorType> = [
     Get('csv/submitCsvToFmcsa'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', ["fmed5idea"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see CSV for.',
