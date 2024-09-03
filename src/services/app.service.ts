@@ -428,6 +428,19 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
+  runHOS = async (driverId: string, timezone: string) => {
+    try {
+      const date = moment.tz(timezone).format('YYYY-MM-DD');
+      const res = await firstValueFrom(
+        this.client.send({ cmd: 'run_hos' }, { driverId, date }),
+      );
+      if (res) {
+        Logger.log('Run HOS working');
+      }
+    } catch (error) {
+      Logger.error({ message: 'Run HOS not working' });
+    }
+  };
   getdriverData = async (driverId: string) => {
     try {
       const res = await firstValueFrom(
