@@ -221,16 +221,16 @@ export async function generatePdf(
 
   // object[`${reverseable}`] = convertHM(TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime);
 
-  if (inspection && inspection.length > 0) {
+  if (inspection && inspection?.length > 0) {
     for (const key of inspection) {
       key['driver'] = driverData ?? {};
-      const vehicleDefect = key?.defectsCategory?.vehicle.filter(
-        (item) => item.resolved === false,
+      const vehicleDefect = key?.defectsCategory?.vehicle?.filter(
+        (item) => item?.resolved === false,
       );
-      const trailerDefect = key?.defectsCategory?.trailer.filter(
-        (item) => item.resolved === false,
+      const trailerDefect = key?.defectsCategory?.trailer?.filter(
+        (item) => item?.resolved === false,
       );
-      if (vehicleDefect || trailerDefect) {
+      if (vehicleDefect.length > 0 || trailerDefect.length > 0) {
         key['defect'] = true;
         key['notDefect'] = false;
       } else {
@@ -521,13 +521,13 @@ export async function generatePdf(
       // We can use this to add dyamic data to our handlebas template at run time from database or API as per need. you can read the official doc to learn more https://handlebarsjs.com/
       const html = result;
       // we are using headless mode
-let browser
-try {
-  browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-} catch (error) {
-  Logger.log(error)
-}
-      
+      let browser;
+      try {
+        browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+      } catch (error) {
+        Logger.log(error);
+      }
+
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);
