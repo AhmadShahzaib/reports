@@ -83,6 +83,7 @@ export const imagesUpload = async (
           //   imageUrl.key,
           //   driverSignatureFiles.originalname,
           // );
+          //if you want image in unit on inspection.
           defectRequest.signatures.driverSignature.imageUrl = imageUrl.Location;
           defectRequest.signatures.driverSignature.key = imageUrl.key;
         } catch (error) {
