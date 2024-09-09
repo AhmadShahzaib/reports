@@ -2936,17 +2936,17 @@ export class AppController extends BaseController {
         companyTimeZone,
       );
       if (requestLog?.sign) {
-        // const signature = JSON.parse(JSON.stringify(requestLog.sign));
-        // const imageUrl = signature.imageUrl;
-        // Logger.log(signature.imageUrl);
-        // // let address = await getAddress(addDefect);
-        // const messagePatternUnits =
-        //   await firstValueFrom<MessagePatternResponseType>(
-        //     this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
-        //   );
-        // if (messagePatternUnits.isError) {
-        //   mapMessagePatternResponseToException(messagePatternUnits);
-        // }
+        const signature = JSON.parse(JSON.stringify(requestLog.sign));
+        const imageUrl = signature.imageUrl;
+        Logger.log(signature.imageUrl);
+        // let address = await getAddress(addDefect);
+        const messagePatternUnits =
+          await firstValueFrom<MessagePatternResponseType>(
+            this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
+          );
+        if (messagePatternUnits.isError) {
+          mapMessagePatternResponseToException(messagePatternUnits);
+        }
       }
       if (logResult && Object.keys(logResult).length > 0) {
         Logger.log(`Log Form has been updated successfully`);
@@ -3081,17 +3081,17 @@ export class AppController extends BaseController {
       );
       let signature;
       if (requestLog?.sign) {
-        signature = JSON.parse(JSON.stringify(requestLog.sign));
-        const imageUrl = signature.imageUrl;
-        Logger.log(signature.imageUrl);
-        // let address = await getAddress(addDefect);
-        const messagePatternUnits =
-          await firstValueFrom<MessagePatternResponseType>(
-            this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
-          );
-        if (messagePatternUnits.isError) {
-          mapMessagePatternResponseToException(messagePatternUnits);
-        }
+        // signature = JSON.parse(JSON.stringify(requestLog.sign));
+        // const imageUrl = signature.imageUrl;
+        // Logger.log(signature.imageUrl);
+        // // let address = await getAddress(addDefect);
+        // const messagePatternUnits =
+        //   await firstValueFrom<MessagePatternResponseType>(
+        //     this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
+        //   );
+        // if (messagePatternUnits.isError) {
+        //   mapMessagePatternResponseToException(messagePatternUnits);
+        // }
       }
 
       const isCertified = await this.tripInspectionService.certification(
