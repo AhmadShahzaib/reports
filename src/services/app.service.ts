@@ -565,27 +565,27 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
-  // updateUnitDriverSign = async (
-  //   driverId: string,
-  //   imageKey: string,
-  //   imageName: string,
-  // ) => {
-  //   try {
-  //     const res = await firstValueFrom(
-  //       this.unitClient.send(
-  //         { cmd: 'update_signature_image' },
-  //         { driverId: driverId, imageKey: imageKey, imageName: imageName },
-  //       ),
-  //     );
-  //     if (res.isError) {
-  //       mapMessagePatternResponseToException(res);
-  //     }
-  //     return res.data;
-  //   } catch (err) {
-  //     Logger.error({ message: err.message, stack: err.stack });
-  //     throw err;
-  //   }
-  // };
+  updateUnitDriverSign = async (
+    driverId: string,
+    imageKey: string,
+    imageName: string,
+  ) => {
+    try {
+      const res = await firstValueFrom(
+        this.unitClient.send(
+          { cmd: 'update_signature_image' },
+          { driverId: driverId, imageKey: imageKey, imageName: imageName },
+        ),
+      );
+      if (res.isError) {
+        mapMessagePatternResponseToException(res);
+      }
+      return res.data;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   findInspection = async (id: string, date: string): Promise<TIDocument[]> => {
     try {
       const requestedDateStart = moment(date, 'YYYY-MM-DD')

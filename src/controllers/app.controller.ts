@@ -3314,12 +3314,10 @@ export class AppController extends BaseController {
           });
         }
       }
-      if(options.hasOwnProperty('$and')){
-        options['$and'].push({tenantId:id})
-
-      }else{
-        options['$and'] = [{tenantId:id}];
-
+      if (options.hasOwnProperty('$and')) {
+        options['$and'].push({ tenantId: id });
+      } else {
+        options['$and'] = [{ tenantId: id }];
       }
       const query = this.tripInspectionService.getAll(options);
 
