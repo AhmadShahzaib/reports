@@ -3081,9 +3081,9 @@ export class AppController extends BaseController {
       );
       let signature;
       if (requestLog?.sign) {
-        // signature = JSON.parse(JSON.stringify(requestLog.sign));
-        // const imageUrl = signature.imageUrl;
-        // Logger.log(signature.imageUrl);
+        signature = JSON.parse(JSON.stringify(requestLog.sign));
+        const imageUrl = signature.imageUrl;
+        Logger.log(signature.imageUrl);
         // // let address = await getAddress(addDefect);
         // const messagePatternUnits =
         //   await firstValueFrom<MessagePatternResponseType>(
@@ -3099,7 +3099,7 @@ export class AppController extends BaseController {
         givenDates,
         userTimezone,
         time,
-        signature.imageUrl,
+        signature?.imageUrl,
       );
       if (isCertified) {
         let messagePatternDriver;
