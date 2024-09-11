@@ -621,6 +621,16 @@ export class AppService extends BaseService<TIDocument> {
       throw err;
     }
   };
+
+  updateSignatureViolation = async (dates, driverId) => {
+    const res =  firstValueFrom(
+      this.client.send(
+        { cmd: 'update_record_table' },
+        { driverId, dates },
+      ),
+    );
+   
+  };
   certification = async (
     driverId: string,
     givenDates,
