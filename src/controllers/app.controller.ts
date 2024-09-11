@@ -3134,6 +3134,7 @@ export class AppController extends BaseController {
         );
 
         // END notification handler
+        Logger.log("using this api")
         setTimeout(() => {
           this.tripInspectionService.updateSignatureViolation(givenDates, id);
         }, 0); 
