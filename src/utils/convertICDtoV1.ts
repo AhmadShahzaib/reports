@@ -192,7 +192,10 @@ export const convertICDtoV1 = (
     if (item.notes) {
       rawLog.notes = item.notes;
     }
-    const currentDate = moment().format('MMDDYY').toString();
+    const currentDate = moment()
+      .tz(companyTimeZone)
+      .format('MMDDYY')
+      .toString();
 
     if (index == allLogs.length - 1) {
       if (currentDate != item.eventDate) {
