@@ -58,7 +58,11 @@ import GetReportsDecorators, {
   GetEmail7DaysDecorator,
   GetIFTAReport,
 } from 'decorators/getReports';
-import { previousWeekDate } from 'utils/helperFunctions';
+import {
+  previousWeekDate,
+  formatDate,
+  getOffdutyLog,
+} from 'utils/helperFunctions';
 import { generatePdf7days } from 'utils/generatePdf7Days';
 import { generateIFTA } from 'utils/generateIFTA';
 import GetInspectionDecoratorsMobile from 'decorators/inspectionForDriver';
@@ -697,13 +701,6 @@ export class AppController extends BaseController {
         //       message: 'No Record Found',
         //       data: [],
         //     });
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          const year = date.getFullYear().toString().slice(-2);
-          return month + day + year;
-        }
 
         const formattedDate = formatDate(date);
         if (currentDate != date) {
@@ -795,6 +792,7 @@ export class AppController extends BaseController {
           driverId,
           companyTimeZone,
           this.awsService,
+          this.tripInspectionService,
           // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
           ob,
           252000,
@@ -1150,6 +1148,7 @@ export class AppController extends BaseController {
         driverId,
         companyTimeZone,
         this.awsService,
+        this.tripInspectionService,
         // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
         object,
         totalDutyTime,
@@ -1553,6 +1552,7 @@ export class AppController extends BaseController {
           driverId,
           companyTimeZone,
           this.awsService,
+
           // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
           object,
           totalDutyTime,
@@ -1640,7 +1640,7 @@ export class AppController extends BaseController {
       const { startDate, endDate, vehiclesArr, states, fileName, recipient } =
         queryObj;
       const allVehiclesObject = {};
-      for (let i = 0; i < vehiclesArr.length; i++) {
+      for (let i = 0; i < vehiclesArr?.length; i++) {
         const vehicleId = vehiclesArr[i];
         let vehicaleName = '';
         const unIdentified = [];
@@ -1684,7 +1684,7 @@ export class AppController extends BaseController {
               return !flag;
             });
 
-            filteredCSVs.map((eachCSV) => {
+            filteredCSVs?.map((eachCSV) => {
               let assignedUserCmvOrderNumber = '';
               eachCSV.csv.cmvList.map((eachCMV) => {
                 if (eachCMV.cmvVin === vinNumber) {
@@ -1933,6 +1933,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @GetPrevious7Days()
   async get7DaysReport(
     @Query('driverId') driverId: string,
@@ -2392,15 +2393,22 @@ export class AppController extends BaseController {
       if (!driverId) {
         driverId = id;
       }
+      Logger.log('before unit :  ' + id);
       const unitData = await this.tripInspectionService.getUnitData(driverId);
+      Logger.log('unitData :  ' + unitData);
       if (!unitData) {
         return response.status(HttpStatus.OK).send({
           message: 'Assosiated Unit not found.',
           data: '',
         });
       }
-      const companyTimeZone = unitData.homeTerminalTimeZone.tzCode;
-
+      if (unitData?.meta) {
+        await this.tripInspectionService.runHOS(
+          driverId,
+          unitData?.homeTerminalTimeZone?.tzCode,
+        );
+      }
+      const companyTimeZone = unitData?.homeTerminalTimeZone?.tzCode;
       const previousdate = previousWeekDate(date);
       Logger.log('previous date :  ' + previousdate);
 
@@ -2411,53 +2419,24 @@ export class AppController extends BaseController {
           date,
         );
       // status
-      // if(logsOfSelectedDate){
-      //   return response.status(HttpStatus.OK).send({
-      //     message: 'Assosiated Unit not found.',
-      //     data: '',
-      //   });
-      // }
+      if (logsOfSelectedDate.status == 400) {
+        return response.status(HttpStatus.OK).send({
+          message: 'Data Not found.', //if data not found
+          data: '',
+        });
+      }
       const checkDate = date.split('-');
       const todayDate = date;
       let malfunctionIndicator = 'NO';
       let unidentifiedIndicator = 'NO';
       let dataDignosticIndicator = 'NO';
-      if (
-        logsOfSelectedDate.data.length == 0 ||
-        !unitData.hasOwnProperty('lastKnownLocation')
-      ) {
+      if (logsOfSelectedDate.data.length == 0) {
         let last = 0;
         const currentDate = moment().format('YYYY-MM-DD').toString();
 
-        //   try{
-        //   if ( !(logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].date == todayDate )) {
-        //     return response.status(HttpStatus.OK).send({
-        //       message: 'No Data for driver found for today ',
-        //       data: [],
-        //     });
-
-        //   }
-        // }catch(err){
-        //   return response.status(HttpStatus.OK).send({
-        //     message: 'No Data for driver found for today ',
-        //     data: [],
-        //   });
-        // }
-        //    return response.status(HttpStatus.OK).send({
-        //       message: 'No Record Found',
-        //       data: [],
-        //     });
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          const year = date.getFullYear().toString().slice(-2);
-          return month + day + year;
-        }
-
         const formattedDate = formatDate(date);
         if (currentDate != date) {
-          last = moment(formattedDate + '235900', 'MMDDYYHHmmss').unix();
+          last = moment(formattedDate + '235959', 'MMDDYYHHmmss').unix();
         } else {
           const newtime = new Date();
           const options = {
@@ -2471,41 +2450,12 @@ export class AppController extends BaseController {
           const hhmmss = hours + minutes + seconds;
           last = moment(formattedDate + hhmmss, 'MMDDYYHHmmss').unix();
         }
-        const offDutyLog = [
-          {
-            status: 'OFF DUTY',
-            startedAt: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
-            lastStartedAt: last,
-            totalSecondsSpentSoFar: 0,
-            actionDate: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
-            odoMeterMillage: 0,
-            odoMeterSpeed: 0,
-            engineHours: 0,
-            address: '',
-            vehicleManualId: unitData?.manualVehicleId,
-            geoLocation: {
-              longitude: 0,
-              latitude: 0,
-              address: '',
-            },
-            driver: {
-              id: driverId,
-              firstName: unitData?.driverFirstName || '',
-              lastName: unitData?.driverLastName || '',
-            },
-            id: '',
-            violations: [],
-            deviceType: 'android',
-            editRequest: [],
-            updated: [],
-            actionType: 'OFF_DUTY',
-            sequenceNumber: '0',
-            notes: '',
-            eventRecordStatus: '',
-            eventRecordOrigin: 'Auto',
-            eventType: '',
-          },
-        ];
+        const offDutyLog = getOffdutyLog(
+          formattedDate,
+          unitData,
+          driverId,
+          last,
+        );
         const rr = {
           date: date,
           recapData: {
@@ -2527,33 +2477,44 @@ export class AppController extends BaseController {
           '00:00',
           '00:00',
         ];
-        const offDutyBuffer = await generatePdf(
-          offDutyLog, //according to v2
-          // updatedDataGraph?.updatedGraph, // according to v1
-          // recap, // according to v1
-          rr, // according to v2
-          [],
-          unitData,
-          {
-            totalOffDutyTime: 0,
-            totalSleeperBerthTime: 0,
-            totalDrivingTime: 0,
-            totalDutyTime: 0,
-          }, // according to v2
-          date,
-          this.serviceSign,
-          driverId,
-          companyTimeZone,
-          this.awsService,
-          // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
-          ob,
-          252000,
-          unidentifiedIndicator,
-          dataDignosticIndicator,
-          malfunctionIndicator,
-          0,
-          // usdot,// according to v2
-        );
+        let offDutyBuffer;
+        try {
+          offDutyBuffer = await generatePdf(
+            offDutyLog, //according to v2
+            // updatedDataGraph?.updatedGraph, // according to v1
+            // recap, // according to v1
+            rr, // according to v2
+            [],
+            unitData,
+            {
+              totalOffDutyTime:
+                offDutyLog[0]?.lastStartedAt - offDutyLog[0]?.startedAt,
+              totalSleeperBerthTime: 0,
+              totalDrivingTime: 0,
+              totalDutyTime: 0,
+            }, // according to v2
+            date,
+            this.serviceSign,
+            driverId,
+            companyTimeZone,
+            this.awsService,
+            this.tripInspectionService,
+            // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
+            ob,
+            252000,
+            unidentifiedIndicator,
+            dataDignosticIndicator,
+            malfunctionIndicator,
+            0,
+            // usdot,// according to v2
+          );
+        } catch (error) {
+          return response.status(HttpStatus.OK).send({
+            message: 'Error while genrating pdf',
+            data: '',
+          });
+        }
+
         const st = Buffer.from(offDutyBuffer).toString('base64'); //buffer.toString('base64');
         return response.status(HttpStatus.OK).send({
           message: 'Base64 string stream',
@@ -2734,41 +2695,69 @@ export class AppController extends BaseController {
       );
 
       // let clock= logsOfSelectedDateconsole.log()
-      const updatedDataGraph = await graphUpdatedData(newGraph);
-      if (newGraph[newGraph.length - 1].status == 'ON SB') {
+      let updatedDataGraph = await graphUpdatedData(newGraph);
+      let newGraphOffDutyStatuses = JSON.parse(JSON.stringify(newGraph));
+      newGraphOffDutyStatuses = newGraphOffDutyStatuses?.filter(
+        (x) =>
+          x.actionType === 'OFF_DUTY' ||
+          x.actionType === 'ON_DUTY_NOT_DRIVING' ||
+          x.actionType === 'DRIVING' ||
+          x.actionType === 'SLEEPER_BERTH',
+      );
+      if (
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+        'ON SB'
+      ) {
         updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime =
           updatedDataGraph.TotalTimeInHHMM.totalSleeperBerthTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       } else if (
-        newGraph[newGraph.length - 1].status == 'OFF DUTY' ||
-        newGraph[newGraph.length - 1].status == 'PC'
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'OFF DUTY' ||
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'PC'
       ) {
         updatedDataGraph.TotalTimeInHHMM.totalOffDutyTime =
           updatedDataGraph.TotalTimeInHHMM.totalOffDutyTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       } else if (
-        newGraph[newGraph.length - 1].status == 'ON DUTY' ||
-        newGraph[newGraph.length - 1].status == 'YM'
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'ON DUTY' ||
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+          'YM'
       ) {
         console.log(
           'before time ' + updatedDataGraph.TotalTimeInHHMM.totalDutyTime,
         );
         updatedDataGraph.TotalTimeInHHMM.totalDutyTime =
           updatedDataGraph.TotalTimeInHHMM.totalDutyTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
         console.log(
           'differance : ' +
-            (newGraph[newGraph.length - 1].lastStartedAt -
-              newGraph[newGraph.length - 1].startedAt),
+            (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .lastStartedAt -
+              newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+                .startedAt),
         );
-      } else if (newGraph[newGraph.length - 1].status == 'ON DRIVING') {
+      } else if (
+        newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1].status ==
+        'ON DRIVING'
+      ) {
         updatedDataGraph.TotalTimeInHHMM.totalDrivingTime =
           updatedDataGraph.TotalTimeInHHMM.totalDrivingTime +
-          (newGraph[newGraph.length - 1].lastStartedAt -
-            newGraph[newGraph.length - 1].startedAt);
+          (newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+            .lastStartedAt -
+            newGraphOffDutyStatuses[newGraphOffDutyStatuses.length - 1]
+              .startedAt);
       }
 
       // let recap = await resRecap;
@@ -2830,6 +2819,7 @@ export class AppController extends BaseController {
         driverId,
         companyTimeZone,
         this.awsService,
+        this.tripInspectionService,
         // logsOfSelectedDate.data[logsOfSelectedDate.data.length-1].meta.clockData,
         object,
         totalDutyTime,
@@ -2946,17 +2936,17 @@ export class AppController extends BaseController {
         companyTimeZone,
       );
       if (requestLog?.sign) {
-        // const signature = JSON.parse(JSON.stringify(requestLog.sign));
-        // const imageUrl = signature.imageUrl;
-        // Logger.log(signature.imageUrl);
-        // // let address = await getAddress(addDefect);
-        // const messagePatternUnits =
-        //   await firstValueFrom<MessagePatternResponseType>(
-        //     this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
-        //   );
-        // if (messagePatternUnits.isError) {
-        //   mapMessagePatternResponseToException(messagePatternUnits);
-        // }
+        const signature = JSON.parse(JSON.stringify(requestLog.sign));
+        const imageUrl = signature.imageUrl;
+        Logger.log(signature.imageUrl);
+        // let address = await getAddress(addDefect);
+        const messagePatternUnits =
+          await firstValueFrom<MessagePatternResponseType>(
+            this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
+          );
+        if (messagePatternUnits.isError) {
+          mapMessagePatternResponseToException(messagePatternUnits);
+        }
       }
       if (logResult && Object.keys(logResult).length > 0) {
         Logger.log(`Log Form has been updated successfully`);
@@ -2974,6 +2964,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @getLogFormNotesDecorators()
   async getDriverNotes(
     @Query('driverId') driverId: string,
@@ -3013,6 +3004,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @UpdateLogFormNotesDecorators()
   async UpdateDriverNotes(
     @Body() logFormRequest: LogFormNotes,
@@ -3050,6 +3042,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @certificationMobileDecorators()
   @UseInterceptors(FileInterceptor('driverSign'))
   async addCertificationMobile(
@@ -3061,8 +3054,9 @@ export class AppController extends BaseController {
     @Req() request: Request,
   ) {
     try {
-      const { tenantId, id, companyTimeZone } =
+      const { tenantId, id, homeTerminalTimeZone } =
         request.user ?? ({ tenantId: undefined } as any);
+      const userTimezone = homeTerminalTimeZone.tzCode;
       logFormRequest.tenantId = tenantId;
       const givenDates = date.split(',');
       const requestLog = await signUpload(
@@ -3072,37 +3066,40 @@ export class AppController extends BaseController {
         tenantId,
         id,
       );
+
       // requestLog.trailerNumber = JSON.parse(JSON.stringify(requestLog.trailerNumber));
       // requestLog.shippingDocument = JSON.parse(JSON.stringify(requestLog.shippingDocument));
+      Logger.log('Point1   ----------->');
 
+      Logger.log(userTimezone);
       const logResult = await this.serviceSign.UpdateLogForm(
         requestLog,
         id,
         givenDates[0],
         true,
-        companyTimeZone,
+        userTimezone,
       );
       let signature;
       if (requestLog?.sign) {
         signature = JSON.parse(JSON.stringify(requestLog.sign));
         const imageUrl = signature.imageUrl;
         Logger.log(signature.imageUrl);
-        // let address = await getAddress(addDefect);
-        const messagePatternUnits =
-          await firstValueFrom<MessagePatternResponseType>(
-            this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
-          );
-        if (messagePatternUnits.isError) {
-          mapMessagePatternResponseToException(messagePatternUnits);
-        }
+        // // let address = await getAddress(addDefect);
+        // const messagePatternUnits =
+        //   await firstValueFrom<MessagePatternResponseType>(
+        //     this.unitClient.send({ cmd: 'update_image_URL' }, { id, imageUrl }),
+        //   );
+        // if (messagePatternUnits.isError) {
+        //   mapMessagePatternResponseToException(messagePatternUnits);
+        // }
       }
 
       const isCertified = await this.tripInspectionService.certification(
         id,
         givenDates,
-        companyTimeZone,
+        userTimezone,
         time,
-        signature.imageUrl,
+        signature?.imageUrl,
       );
       if (isCertified) {
         let messagePatternDriver;
@@ -3137,11 +3134,16 @@ export class AppController extends BaseController {
         );
 
         // END notification handler
+        Logger.log("using this api")
+        setTimeout(() => {
+          this.tripInspectionService.updateSignatureViolation(givenDates, id);
+        }, 0); 
 
         return response.status(HttpStatus.OK).send({
           message: 'Certification is added successfully  ',
           data: givenDates,
         });
+     
       } else {
         return response.status(HttpStatus.OK).send({
           message: 'Certification is not added Succefully  ',
@@ -3164,6 +3166,7 @@ export class AppController extends BaseController {
       throw error;
     }
   }
+
   @UpdateLogFormDecorators()
   @UseInterceptors(FileInterceptor('driverSign'))
   async UpdateDriverLogFrom(
@@ -3316,13 +3319,11 @@ export class AppController extends BaseController {
           });
         }
       }
-      // if(options.hasOwnProperty('$and')){
-      //   options['$and'].push({tenantId:id})
-
-      // }else{
-      //   options['$and'] = [{tenantId:id}];
-
-      // }
+      if (options.hasOwnProperty('$and')) {
+        options['$and'].push({ tenantId: id });
+      } else {
+        options['$and'] = [{ tenantId: id }];
+      }
       const query = this.tripInspectionService.getAll(options);
 
       if (orderBy && sortableAttributes.includes(orderBy)) {
@@ -3423,11 +3424,10 @@ export class AppController extends BaseController {
           vehicleIds.push(record.vehicleId);
         }
       });
-     
+
       data['shippingDocument'] = shippingIds;
       data['trailerNumber'] = trailerIds;
       data['manualVehicleId'] = vehicleIds.toString() ?? null;
-     
 
       if (
         logsOfSelectedDate.data[0]?.csv
@@ -3488,7 +3488,7 @@ export class AppController extends BaseController {
             dateEnd,
           );
         if (logsOfSelectedDate.data.length == 0) {
-          return response.status(404).send({
+          return response.status(200).send({
             message: 'No, record found there.',
           });
         }
@@ -3741,6 +3741,7 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
   @GetCsvString()
   async GetCsvString(
     @Query('dateStart') dateStart: string,
@@ -3784,6 +3785,7 @@ export class AppController extends BaseController {
       throw err;
     }
   }
+
   @GetCertificationDays()
   async getunCertificationDays(
     @Query('dateStart') dateStart: string = moment().format('YYYY-MM-DD'),
@@ -3826,6 +3828,7 @@ export class AppController extends BaseController {
       });
     }
   }
+
   @updateCertification()
   async updateSpecficDaysCertification(
     @Query('dates') dates: [string],
@@ -3976,6 +3979,7 @@ export class AppController extends BaseController {
 
     // );
   }
+
   //  @UseInterceptors(new MessagePatternResponseInterceptor())
   @MessagePattern({ cmd: 'certification' })
   async update_certification(requestParam: any): Promise<any> {
@@ -4075,6 +4079,7 @@ export class AppController extends BaseController {
       return err;
     }
   }
+
   @UseInterceptors(new MessagePatternResponseInterceptor())
   @MessagePattern({ cmd: 'update_logform' })
   async updateLogForm(requestParam: any): Promise<any> {

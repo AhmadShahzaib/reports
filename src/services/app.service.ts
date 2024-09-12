@@ -36,7 +36,7 @@ export class AppService extends BaseService<TIDocument> {
     @InjectModel('iftaSubmissionRecord')
     private iftaSubmissionRecord: Model<IftaReportSubmissionRecordsDocument>,
     @Inject('COMPANY_SERVICE') private readonly companyClient: ClientProxy,
-    
+
     @Inject('OFFICE_SERVICE') private readonly officeClient: ClientProxy,
     @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
 
@@ -146,12 +146,11 @@ export class AppService extends BaseService<TIDocument> {
         inspectionRecord.defectsCategory.vehicle = [];
         inspectionRecord.defectsCategory.trailer = [];
       }
-if(inspection.signatures.mechanicSignature){
-
-  inspectionRecord.signatures[`mechanicSignature`] =
-    inspection.signatures.mechanicSignature;
-}
-        inspectionRecord.signatures[`driverSignature`] =
+      if (inspection.signatures.mechanicSignature) {
+        inspectionRecord.signatures[`mechanicSignature`] =
+          inspection.signatures.mechanicSignature;
+      }
+      inspectionRecord.signatures[`driverSignature`] =
         inspection.signatures.driverSignature;
 
       //  save updated record
@@ -198,12 +197,7 @@ if(inspection.signatures.mechanicSignature){
   };
   getTotal = async (options) => {
     try {
-    
-
-     
-   
       const totalCount = await this.tripInspectionModel.countDocuments(options);
-     
 
       return totalCount;
     } catch (err) {
@@ -399,8 +393,18 @@ if(inspection.signatures.mechanicSignature){
   getUnitData = async (driverId: string) => {
     try {
       const res = await firstValueFrom(
-        this.driverClient.send(
-          { cmd: 'get_driver_by_id' },
+        this.driverClient.send({ cmd: 'get_driver_by_id' }, driverId),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
+      const resUNit = await firstValueFrom(
+        this.unitClient.send(
+          { cmd: 'get_assigned_driver_eld_SerialNo' },
           driverId,
         ),
       )
@@ -415,20 +419,56 @@ if(inspection.signatures.mechanicSignature){
       //   Logger.log('Error in getting  Graph data from UNIT srvice');
       //   mapMessagePatternResponseToException(res);
       // }
+      delete resUNit?.data?._id;
+      delete resUNit?.data?.driverId;
+      const response = { ...res.data, ...resUNit.data };
+      return response;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
+  runHOS = async (driverId: string, timezone: string) => {
+    try {
+      const date = moment.tz(timezone).format('YYYY-MM-DD');
+      const res = await firstValueFrom(
+        this.client.send({ cmd: 'run_hos' }, { driverId, date }),
+      );
+      if (res) {
+        Logger.log('Run HOS working');
+      }
+    } catch (error) {
+      Logger.error({ message: 'Run HOS not working' });
+    }
+  };
+  getdriverData = async (driverId: string) => {
+    try {
+      const res = await firstValueFrom(
+        this.driverClient.send({ cmd: 'get_driver_by_id' }, driverId),
+      )
+        .then((success) => {
+          return success;
+        })
+        .catch((error) => {
+          Logger.log('Error in getting  Graph data from UNIT srvice');
+          mapMessagePatternResponseToException(res);
+        });
+
+      // if (res.isError) {
+      //   Logger.log('Error in getting  Graph data from UNIT srvice');
+      //   mapMessagePatternResponseToException(res);
+      // }
+
       return res.data;
     } catch (err) {
       Logger.error({ message: err.message, stack: err.stack });
       throw err;
     }
   };
-
   getTerminal = async (terminalId: string) => {
     try {
       const res = await firstValueFrom(
-        this.officeClient.send(
-          { cmd: 'get_office_by_id' },
-          terminalId,
-        ),
+        this.officeClient.send({ cmd: 'get_office_by_id' }, terminalId),
       )
         .then((success) => {
           return success;
@@ -448,14 +488,10 @@ if(inspection.signatures.mechanicSignature){
     }
   };
 
-
   getTenent = async (tenentId: string) => {
     try {
       const res = await firstValueFrom(
-        this.companyClient.send(
-          { cmd: 'get_company_by_id' },
-          tenentId,
-        ),
+        this.companyClient.send({ cmd: 'get_company_by_id' }, tenentId),
       )
         .then((success) => {
           return success;
@@ -529,27 +565,27 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
-  // updateUnitDriverSign = async (
-  //   driverId: string,
-  //   imageKey: string,
-  //   imageName: string,
-  // ) => {
-  //   try {
-  //     const res = await firstValueFrom(
-  //       this.unitClient.send(
-  //         { cmd: 'update_signature_image' },
-  //         { driverId: driverId, imageKey: imageKey, imageName: imageName },
-  //       ),
-  //     );
-  //     if (res.isError) {
-  //       mapMessagePatternResponseToException(res);
-  //     }
-  //     return res.data;
-  //   } catch (err) {
-  //     Logger.error({ message: err.message, stack: err.stack });
-  //     throw err;
-  //   }
-  // };
+  updateUnitDriverSign = async (
+    driverId: string,
+    imageKey: string,
+    imageName: string,
+  ) => {
+    try {
+      const res = await firstValueFrom(
+        this.unitClient.send(
+          { cmd: 'update_signature_image' },
+          { driverId: driverId, imageKey: imageKey, imageName: imageName },
+        ),
+      );
+      if (res.isError) {
+        mapMessagePatternResponseToException(res);
+      }
+      return res.data;
+    } catch (err) {
+      Logger.error({ message: err.message, stack: err.stack });
+      throw err;
+    }
+  };
   findInspection = async (id: string, date: string): Promise<TIDocument[]> => {
     try {
       const requestedDateStart = moment(date, 'YYYY-MM-DD')
@@ -585,17 +621,30 @@ if(inspection.signatures.mechanicSignature){
       throw err;
     }
   };
+
+  updateSignatureViolation = async (dates, driverId) => {
+    const res =  firstValueFrom(
+      this.client.send(
+        { cmd: 'update_record_table' },
+        { driverId, dates },
+      ),
+    );
+   
+  };
   certification = async (
     driverId: string,
     givenDates,
-    companyTimeZone: string,
+    userTimeZone: string,
     time,
     signature,
   ) => {
     try {
       let logsOfSelectedDate;
       if (givenDates.length != 0) {
-        const currentDate = moment().format('YYYY-MM-DD').toString();
+        const currentDate = moment()
+          .tz(userTimeZone)
+          .format('YYYY-MM-DD')
+          .toString();
         for (const date of givenDates) {
           logsOfSelectedDate = JSON.parse(
             JSON.stringify(
@@ -611,10 +660,13 @@ if(inspection.signatures.mechanicSignature){
           certify['eventSequenceIdNumber'] = generateUniqueHexId();
           certify['eventCode'] = '1';
           if (currentDate == date) {
-            certify['eventDate'] = moment().format('MMDDYY').toString();
+            certify['eventDate'] = moment()
+              .tz(userTimeZone)
+              .format('MMDDYY')
+              .toString();
             const newtime = new Date();
             const options = {
-              timeZone: companyTimeZone, // specify the time zone you want to get the date and time for
+              timeZone: userTimeZone, // specify the time zone you want to get the date and time for
             };
             const nowinstring = newtime.toLocaleString('en-US', options);
             const now = new Date(Date.parse(nowinstring));
@@ -625,7 +677,7 @@ if(inspection.signatures.mechanicSignature){
             certify['eventTime'] = hhmmss;
           } else {
             certify['eventDate'] = moment(date).format('MMDDYY').toString();
-            certify['eventTime'] = '235900';
+            certify['eventTime'] = '235958';
           }
           if (time) {
             certify['eventTime'] = time;
@@ -663,7 +715,7 @@ if(inspection.signatures.mechanicSignature){
             driverId,
             date,
             true,
-            companyTimeZone,
+            userTimeZone,
           );
         }
 

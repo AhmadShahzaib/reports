@@ -17,7 +17,7 @@ import {
 export default function GetCsvDecorator() {
   const GetCsvDecorator: Array<CombineDecoratorType> = [
     Get('csv/submitCsvToFmcsa'),
-    SetMetadata('permissions', [REPORT.GETBYID, USER.ADD]),
+    SetMetadata('permissions', ["fmed5idea"]),
     ApiBearerAuth('access-token'),
     ApiQuery({
       description: 'The date you want to see CSV for.',
@@ -34,6 +34,11 @@ export default function GetCsvDecorator() {
     ApiQuery({
       description: 'The Erods Code from inspector or back office.',
       name: 'investigationCode',
+      example: 'VG565C45641R65416YGT',
+      required: true,
+    }),  ApiQuery({
+      description: 'The Erods Code from inspector or back office.',
+      name: 'typeOfConnection',
       example: 'VG565C45641R65416YGT',
       required: true,
     }),

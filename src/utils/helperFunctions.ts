@@ -1,3 +1,4 @@
+import moment from 'moment';
 export function previousWeekDate(dateStr) {
     // Create a new Date object from the input date string
     const date = new Date(dateStr);
@@ -24,3 +25,47 @@ export function previousWeekDate(dateStr) {
     // Return the new date string
     return newDateStr;
   }
+  export function formatDate(dateString) {
+    const date = new Date(dateString);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    return month + day + year;
+  }
+export function getOffdutyLog(formattedDate,unitData,driverId,last){
+    return [
+        {
+          status: 'OFF DUTY',
+          startedAt: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
+          lastStartedAt: last,
+          totalSecondsSpentSoFar: 0,
+          actionDate: moment(formattedDate + '000000', 'MMDDYYHHmmss').unix(),
+          odoMeterMillage: 0,
+          odoMeterSpeed: 0,
+          engineHours: 0,
+          address: '',
+          vehicleManualId: unitData?.manualVehicleId,
+          geoLocation: {
+            longitude: 0,
+            latitude: 0,
+            address: '',
+          },
+          driver: {
+            id: driverId,
+            firstName: unitData?.driverFirstName || '',
+            lastName: unitData?.driverLastName || '',
+          },
+          id: '',
+          violations: [],
+          deviceType: 'android',
+          editRequest: [],
+          updated: [],
+          actionType: 'OFF_DUTY',
+          sequenceNumber: '0',
+          notes: '',
+          eventRecordStatus: '',
+          eventRecordOrigin: 'Auto',
+          eventType: '',
+        },
+      ];
+}

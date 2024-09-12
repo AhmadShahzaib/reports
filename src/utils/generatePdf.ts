@@ -9,6 +9,8 @@ import { InspectionResponse } from '../models/inspectionresponseModel';
 import { min } from 'lodash';
 import { getDriverSign } from './getSignPath';
 import { from } from 'rxjs';
+import { getLogsFormData } from './getlogsFormData';
+import { Logger } from '@nestjs/common';
 
 const getRectOrderNumberWRTStatus = (status: string) => {
   let row = 0;
@@ -150,7 +152,9 @@ const transformDataForGraphLines = (
 function convertHM(value) {
   // Hours, minutes and seconds
   let ret = '';
-  if (value) {
+  if (value === 86399) {
+    ret = '24:00';
+  } else if (value) {
     const hrs = value / 3600;
     const mins = (value % 3600) / 60;
     // Output like "1:01" or "4:03:59" or "123:03:59"
@@ -195,8 +199,8 @@ export async function generatePdf(
   serviceSign,
   id: string,
   companyTimeZone: string,
-  awaService,
-
+  awsService,
+  tripInspectionService,
   objectData,
   totalTime,
   unidentifiedIndicator,
@@ -217,16 +221,16 @@ export async function generatePdf(
 
   // object[`${reverseable}`] = convertHM(TotalTimeInHHMM.totalDrivingTime+TotalTimeInHHMM.totalDutyTime);
 
-  if (inspection && inspection.length > 0) {
+  if (inspection && inspection?.length > 0) {
     for (const key of inspection) {
       key['driver'] = driverData ?? {};
-      const vehicleDefect = key?.defectsCategory?.vehicle.filter(
-        (item) => item.resolved === false,
+      const vehicleDefect = key?.defectsCategory?.vehicle?.filter(
+        (item) => item?.resolved === false,
       );
-      const trailerDefect = key?.defectsCategory?.trailer.filter(
-        (item) => item.resolved === false,
+      const trailerDefect = key?.defectsCategory?.trailer?.filter(
+        (item) => item?.resolved === false,
       );
-      if (vehicleDefect || trailerDefect) {
+      if (vehicleDefect.length > 0 || trailerDefect.length > 0) {
         key['defect'] = true;
         key['notDefect'] = false;
       } else {
@@ -237,20 +241,38 @@ export async function generatePdf(
   }
 
   let logsForm = {};
-  const data = await serviceSign.findLogForm(id, date, companyTimeZone);
+  const data = await getLogsFormData(
+    date,
+    id,
+    tripInspectionService,
+    serviceSign,
+    awsService,
+    driverData.tenantId,
+    companyTimeZone,
+  );
+  let shippingID_String = '';
+  let trailerNumber_String = '';
   if (data) {
-    logsForm = Object.keys(data['_doc']).length > 0 ? data['_doc'] : {};
+    logsForm = data.logForm;
+    shippingID_String = logsForm['shippingDocument']
+      ?.filter((x) => x !== '')
+      .toString();
+    trailerNumber_String = logsForm['trailerNumber']
+      ?.filter((x) => x !== '')
+      .toString();
   }
-  const formData = await getDriverSign(data, logsForm, awaService);
-  let shippingID_String=''
-  let trailerNumber_String=''
-  if (formData && formData.shippingDocument && formData.trailerNumber){
-    shippingID_String = `${formData.shippingDocument.join(', ')}`
-    trailerNumber_String = `${formData.trailerNumber.join(', ')}`
-
+  const formData = logsForm;
+  let imagePath = '';
+  if (formData && formData['sign']) {
+    let sign = formData['sign'];
+    if (sign.imagePath) {
+      imagePath = sign.imagePath;
+    }
   }
   const logDate = moment(date, 'YYYY-MM-DD').unix();
   const graphEvent = graphData;
+  driverData.carrier = formData['carrier'];
+  driverData.homeTerminalAddress = formData['homeTerminalAddress'];
   // .filter(function (element) {
   //   return (
   //     !element.eventType &&
@@ -313,16 +335,16 @@ export async function generatePdf(
     odometerEnd: endOdometer,
     engineStart: startEngine,
     hoursWorkAvailable: convertHM(totalTime),
-    shippingDocument:shippingID_String,
-    trailerNumber:trailerNumber_String,
+    shippingDocument: shippingID_String ?? ' ',
+    trailerNumber: trailerNumber_String ?? ' ',
     distance: totalMielsTrevled,
     // graphEvent.length > 1
     //   ? graphEvent[graphEvent.length - 1]?.odoMeterMillage -
     //     graphEvent[0]?.odoMeterMillage
     //   : graphEvent[0]?.odoMeterMillage,
-    from: formData.from ?? '',
-    to: formData.to ?? '',
-    logSign: formData?.sign?.imagePath ?? '',
+    from: '',
+    to: '',
+    logSign: imagePath ?? '',
     companyTimeZone: companyTimeZone,
     totalHoursToday: totalHoursToday,
     engineEnd: endEngine,
@@ -441,7 +463,7 @@ export async function generatePdf(
       });
       hb.registerHelper('actionTime', function (index, options) {
         const ans = moment.unix(index).format('hh:mm:ss A');
-        return ans
+        return ans;
       });
       hb.registerHelper('workHours', function (value, options) {
         const time = value.split(':');
@@ -468,20 +490,44 @@ export async function generatePdf(
         return rec.status;
       });
       hb.registerHelper('difference', function (last, start) {
-        return moment(moment.utc((last - start) * 1000)).format(
-          `HH [hrs] mm [min] `,
+        // return moment(moment.utc((last - start) * 1000)).format(
+        //   `HH [hrs] mm [min] `,
+        // );
+        const showData = moment(moment.utc((last - start) * 1000)).format(
+          'HH:mm:ss',
         );
+        const finalTime = showData.split(':');
+        let duration = `${finalTime[0] !== '00' ? `${finalTime[0]} hrs` : ''} ${
+          finalTime[1] !== '00' ? `${finalTime[1]} min` : ''
+        } ${finalTime[2] !== '00' ? `${finalTime[2]} sec` : ''}`;
+
+        if (duration === '23 hrs 59 min 59 sec') {
+          duration = '24h';
+        }
+        return duration;
       });
       const template = hb.compile(res.toString(), { strict: true });
 
       // we have compile our code with handlebars
       // console.log(context);
-      const result = template(context);
+      let result;
+      context.driver.eldNo = 'asd';
+
+      try {
+        result = template(context);
+      } catch (error) {
+        console.error(error);
+      }
       // We can use this to add dyamic data to our handlebas template at run time from database or API as per need. you can read the official doc to learn more https://handlebarsjs.com/
       const html = result;
       // we are using headless mode
+      let browser;
+      try {
+        browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+      } catch (error) {
+        Logger.log(error);
+      }
 
-      const browser = await puppeteer.launch({ headless: 'new' });
       const page = await browser.newPage();
       // We set the page content as the generated html by handlebars
       await page.setContent(html);

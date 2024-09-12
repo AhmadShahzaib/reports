@@ -12,13 +12,11 @@ export const convertICDtoV1 = (
 ) => {
   const allLoginLogoutLogs = csvData.eldLoginLogoutReport;
   let allLogs = JSON.parse(
-            JSON.stringify(
-              csvData.eldEventListForDriversRecordOfDutyStatus,
-            ),
+    JSON.stringify(csvData.eldEventListForDriversRecordOfDutyStatus),
   );
-    allLogs = allLogs.filter((element) => {
-        return element.eventRecordStatus != '2';
-      });
+  allLogs = allLogs.filter((element) => {
+    return element.eventRecordStatus != '2';
+  });
 
   // allLogs = allLogs.filter((item,index)=>{
   //     return item.eventRecordStatus=="1"
@@ -26,7 +24,7 @@ export const convertICDtoV1 = (
   // })
   allLogs = allLogs.sort((a, b) => a.eventTime - b.eventTime);
   const allPowerupPowerdown = csvData.cmvEnginePowerUpShutDownActivity;
-  const certification = csvData.eldEventListForDriverCertificationOfOwnRecords
+  const certification = csvData.eldEventListForDriverCertificationOfOwnRecords;
   const nawLog = {
     status: '',
     startedAt: 0,
@@ -65,11 +63,21 @@ export const convertICDtoV1 = (
 
   const allRawLog = [];
   const graph = JSON.parse(JSON.stringify(allLogs));
-      
-  const filteredGraph = graph.filter((item) => { return (item.eventType != '2' && item.eventCode != '1') || (item.eventType != '2' && item.eventCode != '2') });
-  const inter = graph.filter((item) => { return !((item.eventType != '2' && item.eventCode != '1') || (item.eventType != '2' && item.eventCode != '2') )});
 
-allLogs = filteredGraph
+  const filteredGraph = graph.filter((item) => {
+    return (
+      (item.eventType != '2' && item.eventCode != '1') ||
+      (item.eventType != '2' && item.eventCode != '2')
+    );
+  });
+  const inter = graph.filter((item) => {
+    return !(
+      (item.eventType != '2' && item.eventCode != '1') ||
+      (item.eventType != '2' && item.eventCode != '2')
+    );
+  });
+
+  allLogs = filteredGraph;
   allLogs.forEach((item, index) => {
     // if(index + 1 < allLogs.length){
     const rawLog = JSON.parse(JSON.stringify(nawLog));
@@ -93,7 +101,10 @@ allLogs = filteredGraph
         : item.eventCode == '2'
         ? 'SLEEPER_BERTH'
         : 'OFF_DUTY';
-    if (item.eventType == '2' && (item.eventCode == '1' || item.eventCode == '2') ){
+    if (
+      item.eventType == '2' &&
+      (item.eventCode == '1' || item.eventCode == '2')
+    ) {
       rawLog.status = 'INT';
       rawLog.actionType = 'INT';
       rawLog.eventType = 'Int. Location';
@@ -108,9 +119,9 @@ allLogs = filteredGraph
     if (item.eventCode == '1' && item.eventType == '3') {
       rawLog.status = 'OFF DUTY';
       rawLog.actionType = 'OFF_DUTY';
-      rawLog.eventType = 'OFF DUTY (PC)' ;
+      rawLog.eventType = 'OFF DUTY (PC)';
       rawLog.eventCode = 'PC';
-     }
+    }
     if (item.eventRecordOrigin == '1') {
       rawLog.eventRecordOrigin = 'AUTO';
     }
@@ -181,12 +192,15 @@ allLogs = filteredGraph
     if (item.notes) {
       rawLog.notes = item.notes;
     }
-    const currentDate = moment().format('MMDDYY').toString();
+    const currentDate = moment()
+      .tz(companyTimeZone)
+      .format('MMDDYY')
+      .toString();
 
     if (index == allLogs.length - 1) {
       if (currentDate != item.eventDate) {
         const last = moment(
-          allLogs[index].eventDate + '235900',
+          allLogs[index].eventDate + '235959',
           'MMDDYYHHmmss',
         ).unix();
         rawLog.lastStartedAt = last;
@@ -365,8 +379,8 @@ allLogs = filteredGraph
     delete power.lastStartedAt;
     allpower.push(power);
   });
-  const int = []
- inter.map((item, index) => {
+  const int = [];
+  inter.map((item, index) => {
     const intermediate = JSON.parse(JSON.stringify(nawLog));
 
     if (item.eventCode == '1') {
@@ -379,7 +393,10 @@ allLogs = filteredGraph
       intermediate.eventType = 'LOGOUT';
       intermediate.actionType = 'LOGOUT';
     }
-    if (item.eventType == '2' && (item.eventCode == '1' || item.eventCode == '2') ){
+    if (
+      item.eventType == '2' &&
+      (item.eventCode == '1' || item.eventCode == '2')
+    ) {
       intermediate.status = 'INT';
       intermediate.actionType = 'INT';
       intermediate.eventType = 'Int. Location';
@@ -434,7 +451,9 @@ allLogs = filteredGraph
       intermediate.vehicleManualId = csvData.powerUnitLine.powerUnitNumber;
     }
 
-    intermediate.odoMeterMillage = Number(item.totalVehicleMilesDutyStatus + '');
+    intermediate.odoMeterMillage = Number(
+      item.totalVehicleMilesDutyStatus + '',
+    );
     intermediate.engineHours = Number(item.totalEngineHoursDutyStatus + '');
     if (Number.isNaN(intermediate.odoMeterMillage)) {
       intermediate.odoMeterMillage = 0;
@@ -443,12 +462,12 @@ allLogs = filteredGraph
     if (Number.isNaN(intermediate.engineHours)) {
       intermediate.engineHours = 0;
     }
-   intermediate.sequenceNumber = item.eventSequenceIdNumber;
-   delete intermediate.lastStartedAt;
+    intermediate.sequenceNumber = item.eventSequenceIdNumber;
+    delete intermediate.lastStartedAt;
     int.push(intermediate);
- });
-    const certi = []
- certification.map((item, index) => {
+  });
+  const certi = [];
+  certification.map((item, index) => {
     const certify = JSON.parse(JSON.stringify(nawLog));
 
     // if (item.eventCode == '1') {
@@ -466,14 +485,14 @@ allLogs = filteredGraph
     //   certify.actionType = 'INT';
     //   certify.eventType = 'Int. Location';
     //   certify.eventCode = 'INT';
-   // }
-   
-   if (item.certificateType == '4') { 
+    // }
+
+    if (item.certificateType == '4') {
       certify.status = 'Certification';
       certify.actionType = 'Certification';
       certify.eventType = 'Certification';
       certify.eventCode = 'Certification';
-   }
+    }
     certify.eventRecordOrigin = 'AUTO';
     if (item.eventRecordOrigin == '1') {
       certify.eventRecordOrigin = 'AUTO';
@@ -532,9 +551,9 @@ allLogs = filteredGraph
     if (Number.isNaN(certify.engineHours)) {
       certify.engineHours = 0;
     }
-   certify.sequenceNumber = item.eventSequenceIdNumber;
-   delete certify.lastStartedAt;
+    certify.sequenceNumber = item.eventSequenceIdNumber;
+    delete certify.lastStartedAt;
     certi.push(certify);
   });
-  return [...allLogin, ...allpower, ...allRawLog,...certi,...int];
+  return [...allLogin, ...allpower, ...allRawLog, ...certi, ...int];
 };
