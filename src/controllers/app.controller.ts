@@ -45,7 +45,7 @@ import { InspectionRequest } from 'models/inspectionRequestModel';
 import { InspectionResponse } from 'models/inspectionresponseModel';
 import GetInspectionDecorators from 'decorators/getInspection';
 import GetAllInspectionDecorators from 'decorators/getAllInspection';
-
+import {generateELDAuthenticationValue} from '../utils/generateELDAuthenticationValue'
 import {
   FileFieldsInterceptor,
   FileInterceptor,
@@ -109,7 +109,7 @@ import { generatePdf } from 'utils/generatePdf';
 import { each, forEach } from 'lodash';
 import GetCertificationDays from 'decorators/getUncertifyDays';
 import { Length } from 'class-validator';
-
+import * as path from 'path';
 import GetAllIFTARecords from 'decorators/getAllIFTAReports';
 import DeleteIFTA from 'decorators/deleteIFTA';
 import { getEventsCheckSum } from 'utils/eventFuntion';
@@ -135,8 +135,9 @@ import GetDefectsDecorators from 'decorators/getDefects';
 @ApiTags('inspection')
 export class AppController extends BaseController {
   private readonly logger = new Logger('TI App Controller');
-
+  private privateKey: string;
   constructor(
+    
     private readonly socketManager: SocketManagerService,
     private readonly awsService: AwsService,
     @Inject('AppService') private readonly tripInspectionService: AppService,
@@ -147,6 +148,8 @@ export class AppController extends BaseController {
     @Inject('DRIVER_SERVICE') private readonly driverClient: ClientProxy,
   ) {
     super();
+    const privateKeyPath = path.resolve(__dirname, '../privateKey.pem');
+    this.privateKey = fs.readFileSync(privateKeyPath, 'utf8');
   }
 
   // ######## DVIR ######### - START
@@ -3495,6 +3498,14 @@ export class AppController extends BaseController {
         const finalCsv = logsOfSelectedDate.data[0].csv;
         finalCsv.eldFileHeaderSegment.outputFileComment =
           investigationCode.trim();
+          // function here
+          finalCsv.eldFileHeaderSegment.eldIdentifier ="DBELD1"
+          
+          finalCsv.eldFileHeaderSegment.eldRegistrationId ="ZXDM"
+          finalCsv.eldFileHeaderSegment.eldAuthenticationValue = await generateELDAuthenticationValue( finalCsv.eldFileHeaderSegment.eldRegistrationId,
+            finalCsv.eldFileHeaderSegment.eldIdentifier,
+            finalCsv.cmvList[0].cmvVin,
+            finalCsv.driver.driverLicenseNumber,this.privateKey)
         let stringOfEldLine = '';
         Object.keys(finalCsv.eldFileHeaderSegment).map((item) => {
           if (item != 'lineDataCheckValue') {

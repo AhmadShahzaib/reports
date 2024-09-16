@@ -3,12 +3,12 @@ import { error } from 'console';
 export const fmcsaCall = async (outFileBody: string, investigationCode : string, fileName: string) => {
   try {
     const data = JSON.stringify({
-      eldIdentifier: 'TESTXX',
-      eldRegistrationId: 'TEST',
+      eldIdentifier: 'DBELD1',
+      eldRegistrationId: 'ZXDM',
       outputFileBody: outFileBody,
       outputFileComment: investigationCode,
       outputFilename: fileName,
-      test: true,
+      test: false,
       version: 1,
     });
 
