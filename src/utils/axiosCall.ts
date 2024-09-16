@@ -9,7 +9,7 @@ export const fmcsaCall = async (outFileBody: string, investigationCode : string,
       outputFileComment: investigationCode,
       outputFilename: fileName,
       test: false,
-      version: 1,
+      version: 0.1,
     });
 
     const config = {
